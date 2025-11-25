@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subtitle Player for Browsers</title>
+	<meta name="author" content="Normand Petit">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+
+	<link rel="apple-touch-icon" sizes="57x57" href="favicon/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="favicon/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="favicon/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="favicon/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="favicon/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="favicon/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="favicon/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="favicon/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="favicon/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+	<link rel="manifest" href="manifest.json">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+	<link rel="shortcut icon" href="favicon/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+
+	<link rel="stylesheet" href="css/style.css">
+	<script type="text/javascript" src="js/config.js"></script>
+	<script type="text/javascript" src="js/srt-parser.js"></script>
+	<script type="text/javascript" src="js/ssa.js"></script>
+	<script type="text/javascript" src="js/default.js"></script>
+</head>
+
+<body>
+<!-- Hamburger -->
+<div class="hamburger-dropdown-wrapper">
+    <span class="line"></span>
+    <span class="line"></span>
+    <span class="line"></span>
+<span class="hamburger-dropdown-block">
+<!-- Dropdown Unit Start -->
+<span class="hamburger-dropdown-unit">
+<span class="loadFile-dropdown-wrapper">
+		<span class="button color4">Load Subtitles<span class="dropdown-arrow">▾</span></span>
+		<span class="loadFile-dropdown-block">
+		<!-- Dropdown Unit Start -->
+		<span class="loadFile-dropdown-unit">
+		<input id="subtitleFileInput0" type="file" accept=".ass,.srt" style="display:none"
+			onchange="loadSubtitleFile0(this.files[0])" >
+		<input id="subtitleFileInput1" type="file" accept=".ass,.srt" style="display:none"
+			onchange="loadSubtitleFile1(this.files[0])" >
+		<input id="subtitleFileInput2" type="file" accept=".ass,.srt" style="display:none"
+			onchange="loadSubtitleFile2(this.files[0])" >
+		<span class="hovertext1" data-hover="Load subtitles from 1 file">
+		<span class="loadFile-dropdown-option" onclick="clickSubtitleFileInput(1)">Load 1 file</span><br>
+		</span>
+		<span class="hovertext1" data-hover="Load subtitles from 2 files and interleave them">
+		<span class="loadFile-dropdown-option"  onclick="clickSubtitleFileInput(2)">Load 2 files</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		</span>
+</span>  <!-- class="loadFile-dropdown-wrapper"-->
+<span class="settings-dropdown-wrapper">
+		<span class="button color5">Settings<span class="dropdown-arrow">▾</span></span>
+		<span class="settings-dropdown-block">
+		<span class="settings-dropdown-innerblock">
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Video width scale">
+			<span class="settings-dropdown-option">Video Width</span>
+		<span class="dropright">
+			<select id="videoSizeMenu" class="selectClass" style="position: relative; ">
+			<option class="selectOption" value="0.10">10%</option>
+			<option class="selectOption" value="0.15">15%</option>
+			<option class="selectOption" value="0.20">20%</option>
+			<option class="selectOption" value="0.25">25%</option>
+			<option class="selectOption" value="0.30">30%</option>
+			<option class="selectOption" value="0.35">35%</option>
+			<option class="selectOption" value="0.40">40%</option>
+			<option class="selectOption" value="0.45">45%</option>
+			<option class="selectOption" value="0.50">50%</option>
+			<option class="selectOption" value="0.55">55%</option>
+			<option class="selectOption" value="0.60">60%</option>
+			<option class="selectOption" value="0.65">65%</option>
+			<option class="selectOption" value="0.70">70%</option>
+			<option class="selectOption" value="0.75">75%</option>
+			<option class="selectOption" value="0.80">80%</option>
+			<option class="selectOption" value="0.85">85%</option>
+			<option class="selectOption" value="0.90">90%</option>
+			<option class="selectOption" value="0.95">95%</option>
+			<option class="selectOption" value="1">100%</option>
+			</select>
+		</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Select the font of the featured subtitle">
+			<span class="settings-dropdown-option">Font</span>
+		<input id="fontListFileInput" type="file" accept=".txt" style="display:none"
+			onchange="loadFontListFile(this.files[0])" >
+			<span class="dropright">
+			<select id="subtitleFontMenu" class="selectClass" style="position: relative;">
+			</select>
+			</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Change the font size of the featured subtitle">
+			<span class="settings-dropdown-option">Font Size</span>
+		<span class="dropright">
+			<select id="subtitleFontSizeMenu" class="selectClass" style="position: relative;">
+			<option class="selectOption" value="100%">100%</option>
+			<option class="selectOption" value="110%">110%</option>
+			<option class="selectOption" value="120%">120%</option>
+			<option class="selectOption" value="130%">130%</option>
+			<option class="selectOption" value="140%">140%</option>
+			<option class="selectOption" value="150%">150%</option>
+			<option class="selectOption" value="160%">160%</option>
+			<option class="selectOption" value="170%">170%</option>
+			<option class="selectOption" value="180%">180%</option>
+			<option class="selectOption" value="190%">190%</option>
+			<option class="selectOption" value="200%">200%</option>
+			<option class="selectOption" value="210%">210%</option>
+			<option class="selectOption" value="220%">220%</option>
+			<option class="selectOption" value="230%">230%</option>
+			<option class="selectOption" value="240%">240%</option>
+			<option class="selectOption" value="250%">250%</option>
+			<option class="selectOption" value="260%">260%</option>
+			<option class="selectOption" value="270%">270%</option>
+			<option class="selectOption" value="280%">280%</option>
+			<option class="selectOption" value="290%">290%</option>
+			<option class="selectOption" value="300%">300%</option>
+			</select>
+		</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Set the action performed when the space bar is pressed">
+			<span class="settings-dropdown-option">Space Bar</span>
+		<span class="dropright">
+			<select id="spacebarMenu" class="selectClass" style="position: relative;">
+			<option class="selectOption" value="currentLine" selected>Current Line</option>
+			<option class="selectOption" value="playPause">Play/Pause</option>
+			<option class="selectOption" value="loop">Loop</option>
+			</select>
+		</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Number of subtitles to display and scroll by">
+			<span class="settings-dropdown-option">Scroll Step</span>
+		<span class="dropright">
+			<select id="scrollStepMenu" class="selectClass" style="position: relative;">
+			<option class="selectOption" value="1" selected>1</option>
+			<option class="selectOption" value="2">2</option>
+			</select>
+		</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		</span>  <!-- class="settings-dropdown-innerblock" -->
+
+		<!-- 2nd Block of Controls -->
+		<span class="settings-dropdown-innerblock">
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Add a time margin before and after a subtitle">
+			<span class="settings-dropdown-option">Margin</span>
+		<span class="dropright">
+			<select id="marginMenu" class="selectClass" style="position: relative;">
+			<option class="selectOption" value="0" selected>0</option>
+			<option class="selectOption" value="0.1">0.1</option>
+			<option class="selectOption" value="0.2">0.2</option>
+			<option class="selectOption" value="0.3">0.3</option>
+			<option class="selectOption" value="0.4">0.4</option>
+			<option class="selectOption" value="0.5">0.5</option>
+			<option class="selectOption" value="0.6">0.6</option>
+			<option class="selectOption" value="0.7">0.7</option>
+			<option class="selectOption" value="0.8">0.8</option>
+			<option class="selectOption" value="0.9">0.9</option>
+			<option class="selectOption" value="1.0">1.0</option>
+			<option class="selectOption" value="1.1">1.1</option>
+			<option class="selectOption" value="1.2">1.2</option>
+			<option class="selectOption" value="1.3">1.3</option>
+			<option class="selectOption" value="1.4">1.4</option>
+			<option class="selectOption" value="1.5">1.5</option>
+			<option class="selectOption" value="1.6">1.6</option>
+			<option class="selectOption" value="1.7">1.7</option>
+			<option class="selectOption" value="1.8">1.8</option>
+			<option class="selectOption" value="1.9">1.9</option>
+			<option class="selectOption" value="2.0">2.0</option>
+			</select>
+		</span>			<!-- class="dropright" -->
+		</span>			<!-- class="hovertext" -->
+		</span><br>		<!-- class="settings-dropdown-unit" -->
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Change the alignment of the featured subtitle">
+			<span class="settings-dropdown-option">Alignment</span>
+		<span class="dropright">
+			<select id="subtitleAlignmentMenu" class="selectClass" style="position: relative;">
+			<option class="selectOption" value="center" selected>center</option>
+			<option class="selectOption" value="left">left</option>
+			</select>
+		</span>			<!-- class="dropright" -->
+		</span>			<!-- class="hovertext" -->
+		</span><br>		<!-- class="settings-dropdown-unit" -->
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext"
+			data-hover="If enabled, the selected subtitle row is kept visible when the subtitle table scrolls">
+			<span class="settings-dropdown-option">Table Scrollbar</span>
+		<span class="dropright">
+			<select id="scrollMenu"class="selectClass" style="position: relative;">
+			<option class="selectOption" value="alwaysVisible" selected>Always Visible</option>
+			<option class="selectOption" value="notAlwaysVisible">Visibility Not Imposed</option>
+			</select>
+		</span>			<!-- class="dropright" -->
+		</span>			<!-- class="hovertext" -->
+		</span><br>		<!-- class="settings-dropdown-unit" -->
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Select a color theme for the display">
+			<span class="settings-dropdown-option">Theme</span>
+		<span class="dropright">
+			<select id="themeMenu"class="selectClass" style="position: relative;">
+			<option class="selectOption" value="light" selected>light</option>
+			<option class="selectOption" value="dark">dark</option>
+			<option class="selectOption" value="OSDefault">OS Default</option>
+			</select>
+		</span>			<!-- class="dropright" -->
+		</span>			<!-- class="hovertext" -->
+		</span><br>		<!-- class="settings-dropdown-unit" -->
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Select fields to enable, if they fit">
+			<span class="settings-dropdown-option">Enable</span><br>
+		<span class="dropright">
+			<input type="checkbox" id="myCheck01" onclick="enableFields('myCheck01')" checked>
+			<label for="myCheck01" class="selectOption">Subtitle Track 1</label><br>
+			<input type="checkbox" id="myCheck02" onclick="enableFields('myCheck02')">
+			<label for="myCheck02" class="selectOption">Subtitle Track 2</label><br>
+			<input type="checkbox" id="myCheck03" onclick="enableFields('myCheck03')" checked>
+			<label for="myCheck03" class="selectOption">Counter</label><br>
+			<input type="checkbox" id="myCheck04" onclick="enableFields('myCheck04')" checked>
+			<label for="myCheck04" class="selectOption">Selection Information</label><br>
+			<input type="checkbox" id="myCheck05" onclick="enableFields('myCheck05')" checked>
+			<label for="myCheck05" class="selectOption">Control Buttons</label><br>
+			<input type="checkbox" id="myCheck06" onclick="enableFields('myCheck06')" checked>
+			<label for="myCheck06" class="selectOption">Subtitle Table</label><br>
+			<input type="checkbox" id="myCheck07" onclick="enableFields('myCheck07')">
+			<label for="myCheck07" class="selectOption">Editing</label><br>
+			<input type="checkbox" id="myCheck08" onclick="enableFields('myCheck08')">
+			<label for="myCheck08" class="selectOption">Show time popup when new subtitle added</label><br>
+			<input type="checkbox" id="myCheck09" onclick="enableFields('myCheck09')">
+			<label for="myCheck09" class="selectOption">Movable Dashboard</label>
+		</span>			<!-- class="dropright" -->
+		</span>			<!-- class="hovertext" -->
+		</span><br>		<!-- class="settings-dropdown-unit" -->
+		<!-- Dropdown Unit End -->
+		</span>  <!-- class="settings-dropdown-innerblock" -->
+		</span>  <!-- class="settings-dropdown-block" -->
+</span>  <!-- class="settings-dropdown-wrapper" -->
+<span class="saveFile-wrapper">
+	<span class="button color4" onclick="saveFile()">Save File</span>
+</span>  <!-- class="savefile-wrapper"-->
+<span class="newFile-wrapper">
+	<span class="button color4" onclick="newFile()">New File</span>
+</span>  <!-- class="newfile-wrapper"-->
+
+</span>  <!-- class="hamburger-dropdown-unit" -->
+<!-- Dropdown Unit End -->
+</span>
+
+</div
+
+<!-- Media File section -->
+<div id="wrapper">
+<div id="pageTitle">
+	<b>Subtitle Player for Browsers</b>
+</div>
+<div id="player"></div>
+<div style="z-index: 1; position: absolute; left: 20%; top: 40%; margin: auto;">
+<p>	<input id="videoFileInput" type="file" accept=".mp4,.mp3" style="display: none;"
+		onchange="loadVideoFile(this.files[0])" >
+</p>
+<p id="videoFileContainer">
+	<span class="hovertext" data-hover="Click to select a video file or an audio file">
+		<button id="videoFileButton" class="vidButton color1">Select a Video or Audio File</button><br><br>
+	</span>
+</p>
+<p id="videoURLContainer" class="URL-Label">
+	<label for="videoURLInput">Or paste a YouTube link:<br></label>
+	<input type="url" id="videoURLInput" name="videoURLInput" placeholder="Insert YouTube url" size="45">
+	<button id="videoURLButton" class="vidButton color1">Enter</button>
+</p>
+</div>
+<video id="videoArea" style="display: none; width: 100%; height: auto; preload: auto;"
+	controls disablePictureInPicture>
+</video>
+<!-- seekBar -->
+<div id="seekBarContainer" class="seek-container">
+<input type="range" id="seekBar" min="0" max="100" value="0" class="slider">
+</div>
+</div>
+
+
+<!-- BlankLine -->
+<div id="blankLine" style="display: none;">
+<p style="height: 1rem"> </p>
+</div>
+
+<!-- Featured subtitle -->
+<div id="divSubtitle1Wrapper" style="overflow-y: auto;">
+<div id="divSubtitle1" style="font-size: 2rem; min-height: 2rem; padding-top: 0px;
+	padding-left: 2%; padding-right: 2%; text-align: center; overflow-y: auto;">
+<span contenteditable="false" style="height: auto; text-wrap: balance; padding-left: 5px;
+	padding-right: 5px;" id="spanSubtitle1"></span><br>
+</div>
+</div>
+<div id="divSubtitle2Wrapper" style="overflow-y: auto;">
+<div id="divSubtitle2" style="font-size: 2rem; min-height: 2rem; padding-top: 0px;
+	padding-left: 2%; padding-right: 2%; text-align: center; overflow-y: auto;">
+<span contenteditable="false" style="height: auto; text-wrap: balance;" id="spanSubtitle2"></span>
+</div>
+</div>
+
+<!-- Video counter -->
+<div id="videoCounterDiv" style="margin: 0; padding-left: 10px; font-size: 1.5rem; height: 1.5rem; overflow: hidden; ">
+		<b><span id="currentTime" class="time">0:00:00</span>
+		<span><b>/</b></span>
+		<span id="duration" class="time" style="margin-right: 10px;">0:00:00</span>
+		</b>
+</div>
+<!-- Selection info -->
+<div id="selectionInfoDiv" style="margin: 0; padding-left: 10px; font-size: 1.25rem; height: 1.5rem; overflow: hidden;">
+		<span id="selectionLabel" style="display: none;">Selection: </span>
+		<span id="spanStartTime" style="margin-right: auto;"></span>
+		<span><b id="selectionHyphen" style="display: none;">-</b></span>
+		<span id="spanEndTime" style="margin-right: auto;"></span>
+		<span id="spanTrack"></span>
+</div>
+<!-- Controls -->
+<div id="buttonSection" style="margin: 0; padding-left: 10px; height: 2rem; ">
+	<p>
+		<span class="hovertext1" data-hover="Play the selection and pause">
+		<button id="currentLine" class="button color1">Play single</button>
+		</span>
+
+		<span class="hovertext1" data-hover="Play the video continuously or pause">
+		<button id="playVideo" class="button color2">Play/Pause</button>
+		</span>
+
+		<span class="hovertext1" data-hover="Repeat the selection in a loop">
+		<button id="loop" class="button color3">Loop</button>
+		</span>
+
+	</p>
+
+
+</div>
+<!-- Subtitle Table div -->
+<div id="subtitleTableDiv" style="margin: 0; padding-left: 10px; overflow-y: auto; height: 1rem; display: none;">
+<table class="table" id="subtitleTable">
+            <thead>
+                <tr style="font-weight: bold; font-size: 1.5rem; padding: 2px;">
+                    <th scope="col" style="width:3%" id="subtitleNumber">#</th>
+                    <th scope="col" style="width:6%" id="subtitleStart">Start</th>
+                    <th scope="col" style="width:6%" id="subtitleEnd">End</th>
+                    <th scope="col" style="width:6%" id="subtitleTrack">Track</th>
+                    <th scope="col" id="subtitleText">Subtitle</th>
+                </tr>
+            </thead>
+            <tbody id="task-row">
+            </tbody>
+        </table>
+</div>
+
+<!-- End-of-table delimiter -->
+<div id="EOT" style="height: 5px; background: #87CEEB;"> </div>
+
+<!-- timeEditPopup -->
+<div id="timeEditPopup">
+<!-- <span id="timeEditPopupHeader">Editing</span> -->
+<div class="dashboardHeaderBlock">
+	<span class="dashboardHeader">Editing</span>
+	<span class="dashboardX" onclick="changeTime('close')">X</span>
+</div>
+<div class="timeEditPopupWrapper">
+	<span class="hovertext1" data-hover="Click on Subtitle Start Time to select the current video time">
+	<div class="timeEditPopupTitle color1" onclick="changeTime('current', 't1')">Subtitle Start Time</div>
+	</span>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1hourField1')">⇧</div>
+			<div id="t1hourField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1hourField1')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">:</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="minuteContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1minuteField1')">⇧</div>
+			<div id="t1minuteField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1minuteField1')">⇩</div>
+		</div>
+		<div class="minuteContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1minuteField2')">⇧</div>
+            <div id="t1minuteField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1minuteField2')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">:</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="secondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1secondField1')">⇧</div>
+			<div id="t1secondField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1secondField1')">⇩</div>
+		</div>
+		<div class="secondContainer">
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1secondField2')">⇧</div>
+            <div id="t1secondField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1secondField2')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">.</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="millisecondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1millisecondField1')">⇧</div>
+			<div id="t1millisecondField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1millisecondField1')">⇩</div>
+		</div>
+		<div class="millisecondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1millisecondField2')">⇧</div>
+            <div id="t1millisecondField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1millisecondField2')">⇩</div>
+		</div>
+		<div class="millisecondContainer">
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1millisecondField3')">⇧</div>
+            <div id="t1millisecondField3" class="timeDigit3"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1millisecondField3')">⇩</div>
+		</div>
+	<div style="padding-top: 1rem; padding-left: 0;">
+	<p>
+		<span class="hovertext1" data-hover="Select the current video time">
+		<button class="button color3"
+			onclick="changeTime('current', 't1')">Current</button>
+		</span>
+
+		<span style="position: absolute; right: 15px;">
+		<span class="hovertext1" data-hover="Restore the selected time.">
+		<button class="button color3"
+			onclick="changeTime('restore', 't1')">Restore</button>
+		</span>
+		</span>
+	</p>
+	</div>
+</div>  <!-- timeEditPopupWrapper -->
+<div class="timeEditPopupWrapper">
+	<span class="hovertext1" data-hover="Click on Subtitle End Time to select the current video time">
+	<div class="timeEditPopupTitle color1" onclick="changeTime('current', 't2')">Subtitle End Time</div>
+	</span>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2hourField1')">⇧</div>
+			<div id="t2hourField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2hourField1')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">:</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="minuteContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2minuteField1')">⇧</div>
+			<div id="t2minuteField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2minuteField1')">⇩</div>
+		</div>
+		<div class="minuteContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2minuteField2')">⇧</div>
+            <div id="t2minuteField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2minuteField2')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">:</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="secondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2secondField1')">⇧</div>
+			<div id="t2secondField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2secondField1')">⇩</div>
+		</div>
+		<div class="secondContainer">
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2secondField2')">⇧</div>
+            <div id="t2secondField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2secondField2')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">.</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="millisecondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2millisecondField1')">⇧</div>
+			<div id="t2millisecondField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2millisecondField1')">⇩</div>
+		</div>
+		<div class="millisecondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2millisecondField2')">⇧</div>
+            <div id="t2millisecondField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2millisecondField2')">⇩</div>
+		</div>
+		<div class="millisecondContainer">
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2millisecondField3')">⇧</div>
+            <div id="t2millisecondField3" class="timeDigit3"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2millisecondField3')">⇩</div>
+		</div>
+	<div style="padding-top: 1rem; padding-left: 0;">
+	<p>
+		<span class="hovertext1" data-hover="Select the current video time">
+		<button class="button color3"
+			onclick="changeTime('current', 't2')">Current</button>
+		</span>
+
+		<span style="position: absolute; right: 15px;">
+		<span class="hovertext1" data-hover="Restore the selected time.">
+		<button class="button color3"
+			onclick="changeTime('restore', 't2')">Restore</button>
+		</span>
+		</span>
+	</p>
+	</div>
+</div>  <!-- timeEditPopupWrapper -->
+<div class="textEditPopupWrapper">
+	<span class="hovertext1" data-hover="Play the selection and pause">
+	<div class="textEditPopupTitle color1" onclick="textEditPopupAction('playSingle')"">Play Single</div>
+	</span>
+	<div class="textEditButtonColumn">
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Split at the cursor">
+		<button class="button color3"
+			onclick="textEditPopupAction('simpleSplit')">Split at cursor</button>
+		</span>
+		</div>
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Insert before the selected subtitle">
+		<button class="button color3"
+			onclick="textEditPopupAction('insertAbove')">Insert Above</button>
+		</span>
+		</div>
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Insert after the selected subtitle">
+		<button class="button color3"
+			onclick="textEditPopupAction('insertBelow')">Insert Below</button>
+		</span>
+		</div>
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Delete the selected subtitle">
+		<button class="button color3"
+			onclick="textEditPopupAction('delete')">Delete</button>
+		</span>
+		</div>
+	</div>  <!-- textEditButtonColumn -->
+	<div class="textEditButtonColumn">
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Select the previous subtitle">
+		<button class="button color3"
+			onclick="textEditPopupAction('selectPrev')">Previous</button>
+		</span>
+		</div>
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Select the next subtitle">
+		<button class="button color3"
+			onclick="textEditPopupAction('selectNext')">Next</button>
+		</span>
+		</div>
+		<div class="textEditPopupButton1">
+		</div>
+	</div>  <!-- textEditButtonColumn -->
+</div>  <!-- timeEditPopupWrapper -->
+</div>  <!-- timeEditPopup -->
+<!-- Dashboard -->
+<div id="dashboard">
+<div class="dashboardHeaderBlock">
+	<span class="dashboardHeader">Dashboard</span>
+	<span class="dashboardX" onclick="enableFields('myCheck09')">X</span>
+</div>
+<div class="dashboardWrapper">
+<!-- Video counter -->
+<div style="margin: 0; padding-left: 10px; font-size: 1.5rem; height: 1.5rem; overflow: hidden; ">
+		<b><span id="currentTimeOnDashboard" class="time">0:00:00</span>
+		<span><b>/</b></span>
+		<span id="durationOnDashboard" class="time" style="margin-right: 10px;">0:00:00</span>
+		</b>
+</div>
+<!-- Selection info -->
+<div style="margin: 0; padding-left: 10px; font-size: 1.25rem; height: 1.5rem; overflow: hidden;">
+		<span id="selectionLabelOnDashboard" style="display: none;">Selection: </span>
+		<span id="spanStartTimeOnDashboard" style="margin-right: auto;"></span>
+		<span><b id="selectionHyphenOnDashboard" style="display: none;">-</b></span>
+		<span id="spanEndTimeOnDashboard" style="margin-right: auto;"></span>
+		<span id="spanTrackOnDashboard"></span>
+</div>
+<!-- Controls -->
+<div style="margin: 0; padding-left: 10px; height: 2rem; ">
+	<p>
+		<span class="hovertext1" data-hover="Play the selection and pause">
+		<button id="currentLineOnDashboard" class="button color1">Play single</button>
+		</span>
+
+		<span class="hovertext1" data-hover="Play the video continuously or pause">
+		<button id="playVideoOnDashboard" class="button color2">Play/Pause</button>
+		</span>
+
+		<span class="hovertext1" data-hover="Repeat the selection in a loop">
+		<button id="loopOnDashboard" class="button color3">Loop</button>
+		</span>
+
+	</p>
+</div>
+</div>  <!-- dashboardWrapper -->
+</div>  <!-- dashboard -->
+</body>
+</html>
+
+
