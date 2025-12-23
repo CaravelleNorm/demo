@@ -247,45 +247,72 @@ function computeSubtitleTableHeight() {
 }	// computeSubtitleTableHeight
 
 function getViewportWidth(){
+
+	console.log("getViewportWidth window.innerWidth = ", window.innerWidth);
+	console.log("getViewportWidth document.documentElement.clientWidth = ", document.documentElement.clientWidth);
+	console.log("getViewportWidth document.body.clientWidth = ", document.body.clientWidth);
+
+	let returnWidth = 0;
+	let returnWidthSet = false;
+
 	if (window.innerWidth){
-		console.log("getViewportWidth window.innerWidth = ", window.innerWidth);
-		return window.innerWidth;
+		console.log("getViewportWidth selecting window.innerWidth = ", window.innerWidth);
+		returnWidth = window.innerWidth;
+		returnWidthSet = true;
 	}
 	
-	if (document.documentElement && (document.documentElement.clientWidth != 0)){
-		console.log("getViewportWidth document.documentElement.clientWidth = ", document.documentElement.clientWidth);
-		return document.documentElement.clientWidth;
+	if (!returnWidthSet && document.documentElement && (document.documentElement.clientWidth != 0)){
+		console.log("getViewportWidth selecting document.documentElement.clientWidth = ", document.documentElement.clientWidth);
+		returnWidth = document.documentElement.clientWidth;
+		returnWidthSet = true;
 	}
 
-	if (document.body){
-		console.log("getViewportWidth document.body.clientWidth = ", document.body.clientWidth);
-		return document.body.clientWidth;
+	if (!returnWidthSet && document.body){
+		console.log("getViewportWidth selecting document.body.clientWidth = ", document.body.clientWidth);
+		returnWidth = document.body.clientWidth;
+		returnWidthSet = true;
 	}
 
-	console.log("getViewportWidth returning 0");
-	alert("getViewportWidth returning 0");
-	return 0;
+	if (returnWidth <= 0) {
+		console.log("getViewportWidth returning ", returnWidth);
+		alert("getViewportWidth returning ", returnWidth);
+	}
+
+	return returnWidth;
 }
 
-function getViewportHeight(){
+function getViewportHeight () {
+	console.log("getViewportHeight window.innerHeight = ", window.innerHeight);
+	console.log("getViewportHeight document.documentElement.clientHeight = ", document.documentElement.clientHeight);
+	console.log("getViewportHeight document.body.clientHeight = ", document.body.clientHeight);
+
+	let returnHeight = 0;
+	let returnHeightSet = false;
+
 	if (window.innerHeight){
-		console.log("getViewportHeight window.innerHeight = ", window.innerHeight);
-		return window.innerHeight;
+		console.log("getViewportHeight selecting window.innerHeight = ", window.innerHeight);
+		returnHeight = window.innerHeight;
+		returnHeightSet = true;
+	}
+	
+	if (!returnHeightSet && document.documentElement && (document.documentElement.clientHeight != 0)){
+		console.log("getViewportHeight selecting document.documentElement.clientHeight = ", document.documentElement.clientHeight);
+		returnHeight = document.documentElement.clientHeight;
+		returnHeightSet = true;
 	}
 
-	if (document.documentElement && (document.documentElement.clientHeight != 0)){
-		console.log("getViewportHeight document.documentElement.clientHeight = ", document.documentElement.clientHeight);
-		return document.documentElement.clientHeight;
+	if (!returnHeightSet && document.body){
+		console.log("getViewportHeight selecting document.body.clientHeight = ", document.body.clientHeight);
+		returnHeight = document.body.clientHeight;
+		returnHeightSet = true;
 	}
-    
-	if (document.body){
-		console.log("getViewportHeight document.body.clientHeight = ", document.body.clientHeight);
-		return document.body.clientHeight;
+
+	if (returnHeight <= 0) {
+		console.log("getViewportHeight returning ", returnHeight);
+		alert("getViewportHeight returning ", returnHeight);
 	}
-    
-	console.log("getViewportHeight returning 0");
-	alert("getViewportHeight returning 0");
-	return 0;
+
+	return returnHeight;
 }
 
 function convertToSeconds(time){
