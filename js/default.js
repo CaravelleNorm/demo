@@ -247,21 +247,45 @@ function computeSubtitleTableHeight() {
 }	// computeSubtitleTableHeight
 
 function getViewportWidth(){
-    if (window.innerWidth){
-        return window.innerWidth;}
-    else if (document.documentElement && document.documentElement.clientWidth != 0){
-        return document.documentElement.clientWidth;    }
-    else if (document.body){return document.body.clientWidth;}
-        return 0;
+	if (window.innerWidth){
+		console.log("getViewportWidth window.innerWidth = ", window.innerWidth);
+		return window.innerWidth;
+	}
+	
+	if (document.documentElement && (document.documentElement.clientWidth != 0)){
+		console.log("getViewportWidth document.documentElement.clientWidth = ", document.documentElement.clientWidth);
+		return document.documentElement.clientWidth;
+	}
+
+	if (document.body){
+		console.log("getViewportWidth document.body.clientWidth = ", document.body.clientWidth);
+		return document.body.clientWidth;
+	}
+
+	console.log("getViewportWidth returning 0");
+	alert("getViewportWidth returning 0");
+	return 0;
 }
 
 function getViewportHeight(){
-    if (window.innerHeight){
-        return window.innerHeight;}
-    else if (document.documentElement && document.documentElement.clientHeight != 0){
-        return document.documentElement.clientHeight;    }
-    else if (document.body){return document.body.clientHeight;}
-        return 0;
+	if (window.innerHeight){
+		console.log("getViewportHeight window.innerHeight = ", window.innerHeight);
+		return window.innerHeight;
+	}
+
+	if (document.documentElement && (document.documentElement.clientHeight != 0)){
+		console.log("getViewportHeight document.documentElement.clientHeight = ", document.documentElement.clientHeight);
+		return document.documentElement.clientHeight;
+	}
+    
+	if (document.body){
+		console.log("getViewportHeight document.body.clientHeight = ", document.body.clientHeight);
+		return document.body.clientHeight;
+	}
+    
+	console.log("getViewportHeight returning 0");
+	alert("getViewportHeight returning 0");
+	return 0;
 }
 
 function convertToSeconds(time){
