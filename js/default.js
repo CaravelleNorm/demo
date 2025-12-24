@@ -487,6 +487,32 @@ function selectRow(rowNumber,directive) {
 
 } // selectRow
 
+function setColor (type) {
+
+	switch (type) {
+		case 'foreground':
+		case 'background':
+			document.body.style.backgroundColor = document.getElementById("color2Input").value;
+			document.body.style.color = document.getElementById("color1Input").value;
+			break;
+		default:
+			console.log("setColor Invalid option: ", type);
+			alert("setColor Invalid option: ", type);
+
+	}
+/*		case 'foreground':
+			document.body.setAttribute('style', `background: ${document.getElementById("color2Input").value}`);
+			document.body.setAttribute('style', `color: ${document.getElementById("color1Input").value}`);
+			break;
+		case 'background':
+			document.body.setAttribute('style', `background: ${document.getElementById("color2Input").value}`);
+			document.body.setAttribute('style', `color: ${document.getElementById("color1Input").value}`);
+			break;
+		default:
+			console.log("setColor Invalid option: ", type);
+*/
+}
+
 function changeVideoSize(){
 
 	if (!videoFileLoaded) {
