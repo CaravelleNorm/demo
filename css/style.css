@@ -34,7 +34,7 @@ body {
 }
 
 .lightTheme {
-	color : #000; 
+	color : #000;   /* hsl(235, 100%, 40%)  #01c*/
 	background : #fdfff5; /* milk white */
 }
 
@@ -57,6 +57,16 @@ body {
 .selectedOSDefault {
 	background: #cce5ff; /* Light blue; OS Default background for selected row */ 
 }
+
+#color1Input, #color2Input {
+	background-color: transparent;
+	width: 30px;
+	height: 30px;
+	border: none;
+	cursor: pointer;
+    vertical-align: middle;
+}
+
 
 th {
 	position: sticky; /* sticky; */
