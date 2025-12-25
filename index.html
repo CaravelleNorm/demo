@@ -171,10 +171,16 @@
 		<!-- Dropdown Unit End -->
 		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
+		<input type="checkbox" id="myCheck10" onclick="setColor('toggle')">
+		<label for="myCheck10" class="settings-dropdown-option">Custom Colors</label>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
 		<span class="hovertext" data-hover="Foreground Color">
-			<span class="settings-dropdown-option">Foreground Color</span>
+			<span class="settings-dropdown-option">Foreground</span>
 		<span class="dropright">
-			<input type="color" value="#000000" id="color1Input" oninput="setColor('foreground')"/>
+			<input type="color" id="color1Input" oninput="setColor('foreground')"/>
 		</span>
 		</span>
 		</span><br>
@@ -182,9 +188,19 @@
 		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
 		<span class="hovertext" data-hover="Background Color">
-			<span class="settings-dropdown-option">Background Color</span>
+			<span class="settings-dropdown-option">Background</span>
 		<span class="dropright">
-			<input type="color" value="#fdfff5" id="color2Input" oninput="setColor('background')"/>
+			<input type="color" id="color2Input" oninput="setColor('background')"/>
+		</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Highlighted Row">
+			<span class="settings-dropdown-option">Highlighted Row</span>
+		<span class="dropright">
+			<input type="color" id="color3Input" oninput="setColor('highlightedRow')"/>
 		</span>
 		</span>
 		</span><br>
@@ -257,7 +273,7 @@
 		<span class="hovertext" data-hover="Select a color theme for the display">
 			<span class="settings-dropdown-option">Theme</span>
 		<span class="dropright">
-			<select id="themeMenu"class="selectClass" style="position: relative;">
+			<select id="themeMenu" class="selectClass" style="position: relative;">
 			<option class="selectOption" value="light" selected>light</option>
 			<option class="selectOption" value="dark">dark</option>
 			<option class="selectOption" value="OSDefault">OS Default</option>
@@ -412,7 +428,7 @@
 </div>
 
 <!-- End-of-table delimiter -->
-<div id="EOT" style="height: 5px; background: #87CEEB;"> </div>
+<div id="EOT" style="height: 5px; background-color: #87CEEB;"> </div>
 
 <!-- timeEditPopup -->
 <div id="timeEditPopup">
