@@ -34,31 +34,32 @@ body {
 }
 
 .lightTheme {
-	color : #000;   /* hsl(235, 100%, 40%)  #01c*/
-	background : #fdfff5; /* milk white */
+	color: hsl(0, 0%, 0%);   /* hsl(235, 100%, 40%)  #01c*/
+	background-color: hsl(72, 100%, 98%); /* milk white */
 }
 
 .darkTheme {
-	color :  #ffffff; 
-	background : #000;
+	color:  hsl(0, 0%, 100%); 
+	background-color: hsl(0, 0%, 0%);
 }
 
 .OSDefaultTheme {
 }
 
 .selectedLight {
-	background: #cce5ff; /* Light blue; light theme background for selected row */ 
+	background-color: hsl(211, 100%, 90%); /* Light blue; light theme background for selected row */ 
 }
 
 .selectedDark {
-	background-color: lightslategray; /* Dark theme background for selected row */ 
+	background-color: hsl(210, 14%, 53%); /* Dark theme background for selected row */ 
 }
 
 .selectedOSDefault {
-	background: #cce5ff; /* Light blue; OS Default background for selected row */ 
+	background-color: hsl(211, 100%, 90%); /* Light blue; OS Default background for selected row */ 
 }
 
-#color1Input, #color2Input {
+
+#color1Input, #color2Input, #color3Input {
 	background-color: transparent;
 	width: 30px;
 	height: 30px;
@@ -72,9 +73,9 @@ th {
 	position: sticky; /* sticky; */
 	top: 0;
 	z-index: 1; /* Keep it on top of other rows */
-	color :  #ffffff; 
-	background: #001858;
-	/* background: #87CEEB;  */
+	color:   #ffffff; 
+	background-color: #001858;
+	/* background-color: #87CEEB;  */
 }
 
 table {
@@ -508,7 +509,7 @@ select {
 	width: 100%;
 	height: 5px;
 	border-radius: 2px;
-	background: #001858;
+	background-color: #001858;
 	outline: none;
 	transition: all 0.2s ease;
 }
@@ -519,7 +520,7 @@ select {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	background: #04AA6D;	 /* Green background */ /* #fff; */
+	background-color: #04AA6D;	 /* Green background */ /* #fff; */
 	cursor: pointer; /* Cursor on hover */
 	
 }
@@ -527,7 +528,7 @@ select {
 .slider::-moz-range-thumb {
   width: 10px; /* Set a specific slider handle width */
   height: 10px; /* Slider handle height */
-  background:  #04AA6D;  /* Green background */
+  background-color:  #04AA6D;  /* Green background */
   cursor: pointer; /* Cursor on hover */
 }
 
@@ -580,12 +581,12 @@ select {
 .timeDigit3 {
 	margin: .6rem 0px .6rem 0px;
 	font-size: 1.75rem;
-	color : #000; 
+	color: #000; 
 }
 
 
 #timeEditPopup{
-    /* background:rgba(0,0,0,.4); */
+    /* background-color:rgba(0,0,0,.4); */
     display:none;
     height:auto;
 	padding: none;
@@ -699,7 +700,7 @@ select {
 /* dashboard BEGIN */
 
 #dashboard{
-    /* background:rgba(0,0,0,.4); */
+    /* background-color:rgba(0,0,0,.4); */
     display: none;
     height:auto;
 	padding: none;
