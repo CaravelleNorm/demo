@@ -3,7 +3,6 @@ localStorage.clear(); //Clear old values left behind;
 document.addEventListener('keydown', PSDPD_KeyCheck);
 
 selectedElementTheme = 'dummy';
-themeClass = 'dummy';
 let videoFileLoaded = false;
 let videoElem;
 let videoDuration;
@@ -56,6 +55,8 @@ let t2timeEditPopupOldTime;
 let t2timeEditPopupOldSeconds;
 let CaretUtil = { };
 let showTimePopup = false;
+let customColorsEnabled = false;
+let selectedCustomStyle;
 
 var helper = {
 	toTimeString: function(ms) {
@@ -275,7 +276,7 @@ function getViewportWidth(){
 
 	if (returnWidth <= 0) {
 		console.log("getViewportWidth returning ", returnWidth);
-		alert("getViewportWidth returning ", returnWidth);
+		alert("getViewportWidth returning " + returnWidth);
 	}
 
 	return returnWidth;
@@ -309,7 +310,7 @@ function getViewportHeight () {
 
 	if (returnHeight <= 0) {
 		console.log("getViewportHeight returning ", returnHeight);
-		alert("getViewportHeight returning ", returnHeight);
+		alert("getViewportHeight returning " + returnHeight);
 	}
 
 	return returnHeight;
@@ -345,6 +346,10 @@ function highlightSelectedRow(rowNumber) {
 		break;
 	default:
 		break;
+	}
+
+	if (customColorsEnabled) {
+		selectedElementTheme = 'selectedCustom';
 	}
 
 	document.getElementById("row" + rowNumber).classList.add(selectedElementTheme);
@@ -489,23 +494,50 @@ function selectRow(rowNumber,directive) {
 
 function setColor (type) {
 
+	console.log("setColor type = ", type);
+	let enforceCustomColors = false;
+
 	switch (type) {
 		case 'foreground':
 		case 'background':
-			document.body.style.backgroundColor = document.getElementById("color2Input").value;
-			document.body.style.color = document.getElementById("color1Input").value;
+		case 'highlightedRow':
+			if (customColorsEnabled) {
+				enforceCustomColors = true;
+			}
+			break;
+		case 'toggle':
+			if (!customColorsEnabled) {
+				enforceCustomColors = true;
+				customColorsEnabled = true;
+			}
+			else {
+				customColorsEnabled = false;
+				console.log("setColor calling changeTheme customColorsEnabled = ", customColorsEnabled);
+				changeTheme();
+			}
 			break;
 		default:
 			console.log("setColor Invalid option: ", type);
-			alert("setColor Invalid option: ", type);
-
+			alert("setColor Invalid option: " + type);
 	}
-/*		case 'foreground':
-			document.body.setAttribute('style', `background: ${document.getElementById("color2Input").value}`);
+
+	if (enforceCustomColors) {
+		document.body.style.backgroundColor = document.getElementById("color2Input").value;
+		document.body.style.color = document.getElementById("color1Input").value;
+		selectedCustomStyle.textContent = 
+			".selectedCustom {background-color: " + `${document.getElementById("color3Input").value}` + " }";
+		if (selectedSubtitleNumber > 0){
+			highlightSelectedRow(selectedSubtitleNumber);
+		}
+	}
+
+
+		/*		case 'foreground':
+			document.body.setAttribute('style', `background-color: ${document.getElementById("color2Input").value}`);
 			document.body.setAttribute('style', `color: ${document.getElementById("color1Input").value}`);
 			break;
 		case 'background':
-			document.body.setAttribute('style', `background: ${document.getElementById("color2Input").value}`);
+			document.body.setAttribute('style', `background-color: ${document.getElementById("color2Input").value}`);
 			document.body.setAttribute('style', `color: ${document.getElementById("color1Input").value}`);
 			break;
 		default:
@@ -1010,29 +1042,30 @@ function changeTheme() {
     
 	const selectTheme = document.getElementById("themeMenu");
 	const selectedValue = selectTheme.value;
-	
+
 	console.log("Theme changed from " + theme + " to " + selectedValue);
-	
 	theme = selectedValue;
 
-	document.body.classList.remove(themeClass);
-				
+	customColorsEnabled = false;
+
 	switch(theme) {
 	case 'light':
-		themeClass = 'lightTheme';
+		document.body.style.backgroundColor = "hsl(72, 100%, 98%)"; /* milk white */
+		document.body.style.color = "hsl(0, 0%, 0%)"; /* black */
 		break;
 	case 'dark':
-		themeClass = 'darkTheme';
+		document.body.style.backgroundColor = "hsl(0, 0%, 0%)"; /* black */
+		document.body.style.color = "hsl(0, 0%, 100%)"; /* white */
 		break;
 	case 'OSDefault':
-		themeClass = 'OSDefaultTheme';
+		document.body.style.backgroundColor = "";
+		document.body.style.color = "";
 		break;
 	default:
 		break;
 	}
 
-	document.body.classList.add(themeClass);
-	// document.getElementById("timeEditPopup").classList.add(themeClass);
+	document.getElementById("myCheck10").checked = false;
 
 	if (selectedSubtitleNumber > 0){
 		highlightSelectedRow(selectedSubtitleNumber);
@@ -1694,7 +1727,7 @@ function updateTime() {
 
 function updateSliderFill(slider) {
 	const percentage = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
-	slider.style.background = 
+	slider.style.backgroundColor = 
 		`linear-gradient(to right, #ffffff 0%,(255, 255, 255, 0.1) ${percentage}%)`;
 }
 
@@ -3122,6 +3155,9 @@ function clickSubtitleFileInput(numberOfFiles) {
 
 function DOMInitializations() {
 
+selectedCustomStyle = document.createElement('style');
+document.head.appendChild(selectedCustomStyle);
+
 let viewportWidth = getViewportWidth();
 let viewportHeight = getViewportHeight();
 console.log("Viewport Width " + viewportWidth + " Height " + viewportHeight);
@@ -3285,7 +3321,11 @@ function configInitializations() {
 			errorReason = 'theme = ' + theme + ' invalid';
 			initError(errorReason);
 			break;
-		}
+	}
+
+	document.getElementById("color1Input").value = "#000000";
+	document.getElementById("color2Input").value = "#fdfff5";
+	document.getElementById("color3Input").value = "#cce5ff";
 
 
 	if (typeof spacebarOption == 'undefined') {
