@@ -43,7 +43,7 @@ videoWidthScale = '0.55'; // videoWidthScale rescales the video size by a fracti
 
 fontSize = '200%';
 
-theme = 'light'; // light | dark
+theme = 'light'; // light | dark | OSDefault | blue
 
 editEnabled = true;
 

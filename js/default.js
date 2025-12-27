@@ -2,7 +2,6 @@
 localStorage.clear(); //Clear old values left behind;
 document.addEventListener('keydown', PSDPD_KeyCheck);
 
-selectedElementTheme = 'dummy';
 let videoFileLoaded = false;
 let videoElem;
 let videoDuration;
@@ -57,6 +56,34 @@ let CaretUtil = { };
 let showTimePopup = false;
 let customColorsEnabled = false;
 let selectedCustomStyle;
+
+let themeAttributes;
+
+let lightThemeAttributes = {
+	foregroundColor: "#000000", /* black */
+	backgroundColor: "#fdfff5", /* milk white */
+	highlightBackgroundColor: "#cce5ff"
+}
+let darkThemeAttributes = {
+	foregroundColor: "#ffffff", /* white */
+	backgroundColor: "#000000", /* black */
+	highlightBackgroundColor: "#768798"
+}
+let OSDefaultThemeAttributes = {
+	foregroundColor: "#000000",
+	backgroundColor: "#ffffff",
+	highlightBackgroundColor: "#338ef0"
+	}
+let blueThemeAttributes = {
+	foregroundColor: "#f5f5f5", /* white */
+	backgroundColor: "#2e9dc2", /* blue */
+	highlightBackgroundColor: "#0c6183"
+}
+let orangeThemeAttributes = {
+	foregroundColor: "#f5f5f5", /* white */
+	backgroundColor: "#c25a2e", /* blue */
+	highlightBackgroundColor: "#a0390d"
+}
 
 var helper = {
 	toTimeString: function(ms) {
@@ -332,27 +359,9 @@ function convertToSeconds(time){
 function highlightSelectedRow(rowNumber) {
 
 	// Remove 'selected' class from previously selected row
-	document.getElementById("row" + selectedSubtitleNumber).classList.remove(selectedElementTheme);
+	document.getElementById("row" + selectedSubtitleNumber).classList.remove("selectedCustom");
 				
-	switch(theme) {
-	case 'light':
-		selectedElementTheme = 'selectedLight';
-		break;
-	case 'dark':
-		selectedElementTheme = 'selectedDark';
-		break;
-	case 'OSDefault':
-		selectedElementTheme = 'selectedOSDefault';
-		break;
-	default:
-		break;
-	}
-
-	if (customColorsEnabled) {
-		selectedElementTheme = 'selectedCustom';
-	}
-
-	document.getElementById("row" + rowNumber).classList.add(selectedElementTheme);
+	document.getElementById("row" + rowNumber).classList.add("selectedCustom");
 
 	return;
 }
@@ -515,6 +524,11 @@ function setColor (type) {
 				console.log("setColor calling changeTheme customColorsEnabled = ", customColorsEnabled);
 				changeTheme();
 			}
+			break;
+		case 'copyThemeColors':
+			document.getElementById("color1Input").value = themeAttributes.foregroundColor;
+			document.getElementById("color2Input").value = themeAttributes.backgroundColor;
+			document.getElementById("color3Input").value = themeAttributes.highlightBackgroundColor;
 			break;
 		default:
 			console.log("setColor Invalid option: ", type);
@@ -1050,20 +1064,30 @@ function changeTheme() {
 
 	switch(theme) {
 	case 'light':
-		document.body.style.backgroundColor = "hsl(72, 100%, 98%)"; /* milk white */
-		document.body.style.color = "hsl(0, 0%, 0%)"; /* black */
+		themeAttributes = lightThemeAttributes;
 		break;
 	case 'dark':
-		document.body.style.backgroundColor = "hsl(0, 0%, 0%)"; /* black */
-		document.body.style.color = "hsl(0, 0%, 100%)"; /* white */
+		themeAttributes = darkThemeAttributes;
 		break;
 	case 'OSDefault':
-		document.body.style.backgroundColor = "";
-		document.body.style.color = "";
+		themeAttributes = OSDefaultThemeAttributes;
+		break;
+	case 'blue':
+		themeAttributes = blueThemeAttributes;
+		break;
+	case 'orange':
+		themeAttributes = orangeThemeAttributes;
 		break;
 	default:
-		break;
+		console.log("setColor Invalid option: ", type);
+		alert("setColor Invalid option: " + type);
+		return;
 	}
+
+	document.body.style.backgroundColor = themeAttributes.backgroundColor;
+	document.body.style.color = themeAttributes.foregroundColor;
+	selectedCustomStyle.textContent = 
+		".selectedCustom {background-color: " + themeAttributes.highlightBackgroundColor + "}";
 
 	document.getElementById("myCheck10").checked = false;
 
@@ -1859,7 +1883,7 @@ async function loadSubtitleFile1(file) {
 
 	subtitleFileDataArray[1].loaded = false;
 	if (selectedSubtitleNumber != 0) {
-		document.getElementById("row" + selectedSubtitleNumber).classList.remove(selectedElementTheme);
+		document.getElementById("row" + selectedSubtitleNumber).classList.remove("selectedCustom");
 		selectedSubtitleNumber = 0;
 	}
 	totalNumberOfSubtitlesRead = 0;
@@ -3313,6 +3337,8 @@ function configInitializations() {
 		case 'light':
 		case 'dark':
 		case 'OSDefault':
+		case 'blue':
+		case 'orange':
 			const selectTheme = document.getElementById("themeMenu");
 			selectTheme.value = theme;
 			console.log("Configuration: theme = " + selectTheme.value);
