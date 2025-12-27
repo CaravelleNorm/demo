@@ -46,19 +46,6 @@ body {
 .OSDefaultTheme {
 }
 
-.selectedLight {
-	background-color: hsl(211, 100%, 90%); /* Light blue; light theme background for selected row */ 
-}
-
-.selectedDark {
-	background-color: hsl(210, 14%, 53%); /* Dark theme background for selected row */ 
-}
-
-.selectedOSDefault {
-	background-color: hsl(211, 100%, 90%); /* Light blue; OS Default background for selected row */ 
-}
-
-
 #color1Input, #color2Input, #color3Input {
 	background-color: transparent;
 	width: 30px;
@@ -372,6 +359,11 @@ select {
 
 .selectOption {
 	font-size: 20px;
+}
+
+.selectOptionSmall {
+	font-size: 1rem;
+	background-color: color
 }
 
 .loadFile-dropdown-wrapper,
