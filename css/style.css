@@ -118,8 +118,8 @@ hamburger-dropdown-wrapper::after {
 	display: none;
 	border: 1px solid blue;
 	position: absolute;
-	left: 25%;
-	top: 25%;
+	left: 40%;
+	top: 30%;
 	padding: 3px;
 	background-color: #f1f1f1;
 	min-width: 400px;
@@ -137,7 +137,7 @@ hamburger-dropdown-wrapper::after {
 .hamburger-dropdown-block a:hover {background-color: #ddd;}
 
 .hamburger-dropdown-unit {
-	font-size: 1.75rem;
+	font-size: 1.5rem;
 	color: black;
 }
 
@@ -163,6 +163,7 @@ hamburger-dropdown-wrapper::after {
 	padding: 5px;
 	border-radius: 12px;
 	background-color: #3498DB;
+	border: 3px solid hsla(350, 27%, 96%, 0.75);
 }	  
 
 .resizable{
@@ -369,8 +370,8 @@ select {
 .loadFile-dropdown-wrapper,
 .newFile-wrapper,
 .saveFile-wrapper {
-  position: relative;
-  display: inline-block;
+	position: relative;
+	display: inline-block;
 }
 
 .loadFile-dropdown-wrapper:hover .loadFile-dropdown-block {display: block;}
@@ -389,7 +390,8 @@ select {
 	position: absolute;
 	padding: 3px;
 	background-color: #f1f1f1;
-	min-width: 150px;
+	min-width: max-content; /* 150px; */
+	height: max-content;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 	z-index: 1000;
 }
@@ -411,6 +413,11 @@ select {
 .loadFile-dropdown-option {
 	font-size: 1.25rem;
 	transition: background-color 0.25s;
+	border: 2px, solid black;
+	border-radius: 4px;
+	display: block;
+	margin-bottom: 2px;
+	padding: 2px;
 }
 
 .loadFile-dropdown-option:hover {background-color: hsl(182, 87%, 67%);} 
