@@ -728,7 +728,88 @@ function changeMargin(){
 	unFocus();
 }
 
-function changeTime(operation, elemId ) {
+function copyTime(elemIdTo, rowOffset, elemIdFrom) {
+
+	let fromRow;
+
+	switch (rowOffset) {
+	case "-1":
+		fromRow = timeEditPopupRow - 1;
+		break;
+	case "+1":
+		fromRow = timeEditPopupRow + 1;
+		break;
+	default:
+	}
+	console.log("copyTime source row: ", fromRow);
+
+	if ((fromRow <= 0) || (fromRow > lastSubtitleNumber)){
+		console.log("copyTime source row out of bounds: ", fromRow);
+		alert("copyTime source row out of bounds: " + fromRow);
+		return;
+	}
+
+	let toType;
+	switch (elemIdTo) {
+	case "t1":
+		toType = "start";
+		break;
+	case "t2":
+		toType = "end";
+		break;
+	default:
+		console.log('copyTime Invalid target prefix ', elemIdTo);
+		alert('copyTime Invalid target prefix ' + elemIdTo);
+		return;
+	}
+
+	switch (elemIdFrom) {
+	case "t1":
+	case "t2":
+		break;
+	default:
+		console.log('copyTime Invalid source prefix ', elemIdFrom);
+		alert('copyTime Invalid source prefix ' + elemIdFrom);
+		return;
+	}
+
+	let oldText;
+	let oldSeconds;
+	let newText;
+	let newSeconds;
+
+	if (elemIdTo === 't1') {
+		oldText = document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText;
+		oldSeconds = subtitleStartSeconds[timeEditPopupRow];
+	} else {
+		oldText = document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText;
+		oldSeconds = subtitleEndSeconds[timeEditPopupRow];
+	}
+	if (elemIdFrom === 't1') {
+		newText = document.getElementById(`row${fromRow}SubtitleStart`).innerText;
+		newSeconds = subtitleStartSeconds[fromRow];
+	} else {
+		newText = document.getElementById(`row${fromRow}SubtitleEnd`).innerText;
+		newSeconds = subtitleEndSeconds[fromRow];
+	}
+
+	console.log("copyTime Row ", elemIdTo, " ", toType, " changed from ",
+			oldText, " to ", newText, 
+			" seconds changed from ", oldSeconds, " to ", newSeconds);
+
+	if (elemIdTo === 't1') {
+		document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText = newText;
+		subtitleStartSeconds[timeEditPopupRow] = newSeconds;
+	} else {
+		document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText = newText;
+		subtitleEndSeconds[timeEditPopupRow] = newSeconds;
+	}
+
+	showTimeEditPopup(timeEditPopupRow);
+
+}
+
+function changeTime(operation, elemId) {
 
 	switch(operation) {
 	case "close":
@@ -747,7 +828,8 @@ function changeTime(operation, elemId ) {
 		break;
 	default:
 		console.log('changeTime Invalid operation ', operation);
-		break;
+		alert("changeTime Invalid operation " + operation);
+		return;
 	}
 
 	let min = 0;
@@ -882,16 +964,16 @@ function timeEditCurrent(prefix) {
 		console.log("timeEditCurrent Row ", timeEditPopupRow, " start changed from ",
 			document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText, 
 			" to ", timeText, 
-			" seconds restored from ", subtitleStartSeconds[timeEditPopupRow], 
+			" seconds changed from ", subtitleStartSeconds[timeEditPopupRow], 
 			" to ", current);
 		document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText = timeText;
 		subtitleStartSeconds[timeEditPopupRow] = current;
 		break;
 	case "t2":
-		console.log("timeEditCurrent Row ", timeEditPopupRow, " end restored from ",
+		console.log("timeEditCurrent Row ", timeEditPopupRow, " end changed from ",
 			document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText, 
 			" to ", t2timeEditPopupOldTime, 
-			" seconds restored from ", subtitleEndSeconds[timeEditPopupRow], 
+			" seconds changed from ", subtitleEndSeconds[timeEditPopupRow], 
 			" to ", current);
 		document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText = timeText;
 		subtitleEndSeconds[timeEditPopupRow] = current;
@@ -1500,6 +1582,7 @@ async function loadVideoFile(file) {
 		console.log('loadVideoFile intrinsic width = ',videoElem.videoWidth);
 
 		document.getElementById('wrapper').style.backgroundColor = "transparent";
+		document.getElementById('wrapper').style.border = "none";
 		document.getElementById('pageTitle').style.display = "none";
 
 		//let newWidth = Math.round((videoElem.videoWidth)*0.50);
@@ -1668,7 +1751,9 @@ function onYouTubeIframeAPIReady() {
 	// document.getElementById('pageTitle').style.display = "none";
 
 	document.getElementById('wrapper').style.backgroundColor = "transparent";
+	document.getElementById('wrapper').style.border = "none";
 	document.getElementById('pageTitle').style.display = "none";
+
 
 	// This function creates an <iframe> (and YouTube player)
 	// after the API code downloads.
