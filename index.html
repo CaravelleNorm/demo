@@ -54,12 +54,12 @@
 		<input id="subtitleFileInput2" type="file" accept=".ass,.srt" style="display:none"
 			onchange="loadSubtitleFile2(this.files[0])" >
 		<span class="hovertext1" data-hover="Load subtitles from 1 file">
-		<span class="loadFile-dropdown-option" onclick="clickSubtitleFileInput(1)">Load 1 file</span><br>
+		<span class="loadFile-dropdown-option" onclick="clickSubtitleFileInput(1)">Load 1 file</span>
 		</span>
 		<span class="hovertext1" data-hover="Load subtitles from 2 files and interleave them">
-		<span class="loadFile-dropdown-option"  onclick="clickSubtitleFileInput(2)">Load 2 files</span>
+		<span class="loadFile-dropdown-option" onclick="clickSubtitleFileInput(2)">Load 2 files</span>
 		</span>
-		</span><br>
+		</span>
 		<!-- Dropdown Unit End -->
 		</span>
 </span>  <!-- class="loadFile-dropdown-wrapper"-->
@@ -525,6 +525,28 @@
 			onclick="changeTime('current', 't1')">Current</button>
 		</span>
 
+		<span class="loadFile-dropdown-wrapper">
+		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
+		<span class="loadFile-dropdown-block">
+		<!-- Dropdown Unit Start -->
+		<span class="loadFile-dropdown-unit">
+		<span class="hovertext1" data-hover="Copy from row n-1 Start Time">
+		<span class="loadFile-dropdown-option" onclick="copyTime('t1', '-1', 't1')">Row n-1 Start Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
+		<span class="loadFile-dropdown-option" onclick="copyTime('t1', '-1', 't2')">Row n-1 End Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-2 Start Time">
+		<span class="loadFile-dropdown-option" onclick="copyTime('t1', '+1', 't1')">Row n+1 Start Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-2 End Time">
+		<span class="loadFile-dropdown-option" onclick="copyTime('t1', '+1', 't2')">Row n+1 End Time</span>
+		</span>
+		</span>
+		<!-- Dropdown Unit End -->
+		</span>
+		</span>  <!-- class="loadFile-dropdown-wrapper"-->
+
 		<span style="position: absolute; right: 15px;">
 		<span class="hovertext1" data-hover="Restore the selected time.">
 		<button class="button color3"
@@ -615,6 +637,28 @@
 		<button class="button color3"
 			onclick="changeTime('current', 't2')">Current</button>
 		</span>
+
+		<span class="loadFile-dropdown-wrapper">
+		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
+		<span class="loadFile-dropdown-block">
+		<!-- Dropdown Unit Start -->
+		<span class="loadFile-dropdown-unit">
+		<span class="hovertext1" data-hover="Copy from row n-1 Start Time">
+		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '-1', 't1')">Row n-1 Start Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
+		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '-1', 't2')">Row n-1 End Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-2 Start Time">
+		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '+1', 't1')">Row n+1 Start Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-2 End Time">
+		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '+1', 't2')">Row n+1 End Time</span>
+		</span>
+		</span>
+		<!-- Dropdown Unit End -->
+		</span>
+		</span>  <!-- class="loadFile-dropdown-wrapper"-->
 
 		<span style="position: absolute; right: 15px;">
 		<span class="hovertext1" data-hover="Restore the selected time.">
