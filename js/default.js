@@ -368,6 +368,66 @@ function convertToSeconds(time){
 	return (hours+minutes+seconds+hundredths);
 }
 
+
+function findThemeAttributeObject(name) {
+
+	let themeAttributeObject;
+
+	switch(name) {
+	case 'light':
+		themeAttributeObject = lightThemeAttributes;
+		break;
+	case 'dark':
+		themeAttributeObject = darkThemeAttributes;
+		break;
+	case 'OSDefault':
+		themeAttributeObject = OSDefaultThemeAttributes;
+		break;
+	case 'preset01':
+		themeAttributeObject = preset01ThemeAttributes;
+		break;
+	case 'preset02':
+		themeAttributeObject = preset02ThemeAttributes;
+		break;
+	case 'preset03':
+		themeAttributeObject = preset03ThemeAttributes;
+		break;
+	default:
+		themeAttributeObject = 0;
+		break;
+	}
+
+	return themeAttributeObject;
+
+}
+
+
+function highlightThemeOption(optionName, action) {
+
+	let themeAttributeObject = findThemeAttributeObject(optionName);
+
+	if (!themeAttributeObject) { 
+		console.log("highlightThemeOption Invalid optionName: ", optionName);
+		alert("highlightThemeOption Invalid optionName: " + optionName);
+		return;
+	}
+
+	switch (action) {
+	case 'off':
+		document.getElementById(optionName + 'ThemeOption').style.backgroundColor = themeAttributeObject.backgroundColor;
+		break;
+	case 'on':
+		document.getElementById(optionName + 'ThemeOption').style.backgroundColor = 
+			themeAttributeObject.highlightBackgroundColor;
+		break;
+	default:
+		console.log("highlightThemeOption Invalid action: ", action);
+		alert("highlightThemeOption Invalid action: " + action);
+		return;
+	}
+
+}
+
 function highlightSelectedRow(rowNumber) {
 
 	// Remove 'selected' class from previously selected row
@@ -1153,28 +1213,11 @@ function changeTheme(newTheme) {
     
 	customColorsEnabled = false;
 
-	switch(newTheme) {
-	case 'light':
-		themeAttributes = lightThemeAttributes;
-		break;
-	case 'dark':
-		themeAttributes = darkThemeAttributes;
-		break;
-	case 'OSDefault':
-		themeAttributes = OSDefaultThemeAttributes;
-		break;
-	case 'preset01':
-		themeAttributes = preset01ThemeAttributes;
-		break;
-	case 'preset02':
-		themeAttributes = preset02ThemeAttributes;
-		break;
-	case 'preset03':
-		themeAttributes = preset03ThemeAttributes;
-		break;
-	default:
-		console.log("changeTheme Invalid option: ", newTheme);
-		alert("changeTheme Invalid option: " + newTheme);
+	themeAttributes = findThemeAttributeObject(newTheme);
+
+	if (!themeAttributes) { 
+		console.log("changeTheme Invalid newTheme: ", newTheme);
+		alert("changeTheme Invalid newTheme: " + newTheme);
 		return;
 	}
 
@@ -3436,24 +3479,17 @@ function configInitializations() {
 		initError(errorReason);
 	}
 	
-	switch(theme) {
-		case 'light':
-		case 'dark':
-		case 'OSDefault':
-		case 'preset01':
-		case 'preset02':
-		case 'preset03':
-			console.log("Configuration: theme = " + theme);
-			break;
-		default:
-			errorReason = 'theme = ' + theme + ' invalid';
-			initError(errorReason);
-			break;
+	let themeAttributeObject = findThemeAttributeObject(theme);
+
+	if (!themeAttributeObject) { 
+		errorReason = 'theme = ' + theme + ' invalid';
+		initError(errorReason);
+		return;
 	}
 
-	document.getElementById("color1Input").value = "#000000";
-	document.getElementById("color2Input").value = "#fdfff5";
-	document.getElementById("color3Input").value = "#cce5ff";
+	document.getElementById("color1Input").value = themeAttributeObject.foregroundColor;
+	document.getElementById("color2Input").value = themeAttributeObject.backgroundColor;
+	document.getElementById("color3Input").value = themeAttributeObject.highlightBackgroundColor;
 
 	document.getElementById("lightThemeOption").style.color = lightThemeAttributes.foregroundColor;
 	document.getElementById("lightThemeOption").style.backgroundColor = lightThemeAttributes.backgroundColor;
