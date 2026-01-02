@@ -182,22 +182,40 @@
 		<!-- Dropdown Unit Start -->
 		<span class="themeList-dropdown-unit">
 		<span class="hovertext1" data-hover="Change screen colors">
-		<span class="themeList-dropdown-option" id="lightThemeOption" onclick="changeTheme('light')">light</span>
+		<span class="themeList-dropdown-option" id="lightThemeOption" 
+			onclick="changeTheme('light')"
+			onmouseover="highlightThemeOption('light', 'on')"
+			onmouseleave="highlightThemeOption('light', 'off')">light</span>
 		</span>
 		<span class="hovertext1" data-hover="Change screen colors">
-		<span class="themeList-dropdown-option" id="darkThemeOption" onclick="changeTheme('dark')">dark</span>
+		<span class="themeList-dropdown-option" id="darkThemeOption" 
+			onclick="changeTheme('dark')"
+			onmouseover="highlightThemeOption('dark', 'on')"
+			onmouseleave="highlightThemeOption('dark', 'off')">dark</span>
 		</span>
 		<span class="hovertext1" data-hover="Change screen colors">
-		<span class="themeList-dropdown-option" id="OSDefaultThemeOption" onclick="changeTheme('OSDefault')">OS Default</span>
+		<span class="themeList-dropdown-option" id="OSDefaultThemeOption" 
+			onclick="changeTheme('OSDefault')"
+			onmouseover="highlightThemeOption('OSDefault', 'on')"
+			onmouseleave="highlightThemeOption('OSDefault', 'off')">OS Default</span>
 		</span>
 		<span class="hovertext1" data-hover="Change screen colors">
-		<span class="themeList-dropdown-option" id="preset01ThemeOption" onclick="changeTheme('preset01')">x1</span>
+		<span class="themeList-dropdown-option" id="preset01ThemeOption"  
+			onclick="changeTheme('preset01')"
+			onmouseover="highlightThemeOption('preset01', 'on')"
+			onmouseleave="highlightThemeOption('preset01', 'off')">preset01'x1</span>
 		</span>
 		<span class="hovertext1" data-hover="Change screen colors">
-		<span class="themeList-dropdown-option" id="preset02ThemeOption" onclick="changeTheme('preset02')">x2</span>
+		<span class="themeList-dropdown-option" id="preset02ThemeOption" 
+			onclick="changeTheme('preset02')"
+			onmouseover="highlightThemeOption('preset02', 'on')"
+			onmouseleave="highlightThemeOption('preset02', 'off')">x2</span>
 		</span>
 		<span class="hovertext1" data-hover="Change screen colors">
-		<span class="themeList-dropdown-option" id="preset03ThemeOption" onclick="changeTheme('preset03')">x3</span>
+		<span class="themeList-dropdown-option" id="preset03ThemeOption" 
+			onclick="changeTheme('preset03')"
+			onmouseover="highlightThemeOption('preset03', 'on')"
+			onmouseleave="highlightThemeOption('preset03', 'off')">x3</span>
 		</span>
 		</span>
 		<!-- Dropdown Unit End -->
@@ -215,7 +233,7 @@
 		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
 		<span class="hovertext" data-hover="Foreground Color">
-			<span class="settings-dropdown-option">Foreground</span>
+			<span class="selectOption">Foreground</span>
 		<span class="dropright">
 			<input type="color" id="color1Input" oninput="setColor('foreground')"/>
 		</span>
@@ -225,7 +243,7 @@
 		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
 		<span class="hovertext" data-hover="Background Color">
-			<span class="settings-dropdown-option">Background</span>
+			<span class="selectOption">Background</span>
 		<span class="dropright">
 			<input type="color" id="color2Input" oninput="setColor('background')"/>
 		</span>
@@ -235,7 +253,7 @@
 		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
 		<span class="hovertext" data-hover="Highlighted Row">
-			<span class="settings-dropdown-option">Highlighted Row</span>
+			<span class="selectOption">Highlighted Row</span>
 		<span class="dropright">
 			<input type="color" id="color3Input" oninput="setColor('highlightedRow')"/>
 		</span>
