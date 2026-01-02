@@ -169,7 +169,41 @@
 		</span>
 		</span><br>
 		<!-- Dropdown Unit End -->
+				<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Change screen colors">
+			<span class="settings-dropdown-option">Theme</span>
+		</span>			<!-- class="hovertext" -->
+		</span>			<!-- class="settings-dropdown-unit" -->
+		<!-- Dropdown Unit End -->
+		<span class="themeList-dropdown-wrapper">
+		<span id="selectedTheme" class="themeList-dropdown-option">Theme<span class="dropdown-arrow">▾</span></span>
+		<span class="themeList-dropdown-block">
 		<!-- Dropdown Unit Start -->
+		<span class="themeList-dropdown-unit">
+		<span class="hovertext1" data-hover="Change screen colors">
+		<span class="themeList-dropdown-option" id="lightThemeOption" onclick="changeTheme('light')">light</span>
+		</span>
+		<span class="hovertext1" data-hover="Change screen colors">
+		<span class="themeList-dropdown-option" id="darkThemeOption" onclick="changeTheme('dark')">dark</span>
+		</span>
+		<span class="hovertext1" data-hover="Change screen colors">
+		<span class="themeList-dropdown-option" id="OSDefaultThemeOption" onclick="changeTheme('OSDefault')">OS Default</span>
+		</span>
+		<span class="hovertext1" data-hover="Change screen colors">
+		<span class="themeList-dropdown-option" id="preset01ThemeOption" onclick="changeTheme('preset01')">x1</span>
+		</span>
+		<span class="hovertext1" data-hover="Change screen colors">
+		<span class="themeList-dropdown-option" id="preset02ThemeOption" onclick="changeTheme('preset02')">x2</span>
+		</span>
+		<span class="hovertext1" data-hover="Change screen colors">
+		<span class="themeList-dropdown-option" id="preset03ThemeOption" onclick="changeTheme('preset03')">x3</span>
+		</span>
+		</span>
+		<!-- Dropdown Unit End -->
+		</span>
+		</span><br>  <!-- class="loadFile-dropdown-wrapper"-->
+<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
 		<input type="checkbox" id="myCheck10" onclick="setColor('toggle')">
 		<label for="myCheck10" class="settings-dropdown-option">Custom Colors</label>
@@ -266,22 +300,6 @@
 			<select id="scrollMenu"class="selectClass" style="position: relative;">
 			<option class="selectOption" value="alwaysVisible" selected>Always Visible</option>
 			<option class="selectOption" value="notAlwaysVisible">Visibility Not Imposed</option>
-			</select>
-		</span>			<!-- class="dropright" -->
-		</span>			<!-- class="hovertext" -->
-		</span><br>		<!-- class="settings-dropdown-unit" -->
-		<!-- Dropdown Unit End -->
-		<!-- Dropdown Unit Start -->
-		<span class="settings-dropdown-unit">
-		<span class="hovertext" data-hover="Select a color theme for the display">
-			<span class="settings-dropdown-option">Theme</span>
-		<span class="dropright">
-			<select id="themeMenu" class="selectClass" style="position: relative;">
-			<option class="selectOption" value="light" selected>light</option>
-			<option class="selectOption" value="dark">dark</option>
-			<option class="selectOption" value="OSDefault">OS Default</option>
-			<option class="selectOption" value="blue">blue</option>
-			<option class="selectOption" value="orange">orange</option>
 			</select>
 		</span>			<!-- class="dropright" -->
 		</span>			<!-- class="hovertext" -->
@@ -643,9 +661,6 @@
 		<span class="loadFile-dropdown-block">
 		<!-- Dropdown Unit Start -->
 		<span class="loadFile-dropdown-unit">
-		<span class="hovertext1" data-hover="Copy from row n-1 Start Time">
-		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '-1', 't1')">Row n-1 Start Time</span>
-		</span>
 		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
 		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '-1', 't2')">Row n-1 End Time</span>
 		</span>
