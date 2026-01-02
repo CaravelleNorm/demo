@@ -362,11 +362,6 @@ select {
 	font-size: 20px;
 }
 
-.selectOptionSmall {
-	font-size: 1rem;
-	background-color: color
-}
-
 .loadFile-dropdown-wrapper,
 .newFile-wrapper,
 .saveFile-wrapper {
@@ -484,7 +479,11 @@ select {
 }
 
 .settings-dropdown-option {
-	font-size: 25px;
+	font-size: 1.5rem;
+	padding-top: 0px;
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-bottom: 3px;
 }
 
 /* .settings-dropdown-option:hover {background-color: #19e8ef;} */
@@ -762,3 +761,60 @@ select {
 
 
 /* dashboard END */
+
+
+.themeList-dropdown-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+.themeList-dropdown-wrapper:hover .themeList-dropdown-block {display: block;}
+
+.themeList-dropdown-wrapper:hover .dropbtn {background-color: #3e8e41;}
+
+.themeList-dropdown-wrapper .dropdown-arrow {
+    font-size: 1rem;
+    margin: 0;
+    color: red;
+}
+
+.themeList-dropdown-block {
+	display: none;
+	border: 1px solid blue;
+	position: absolute;
+	padding: 3px;
+	background-color: #f1f1f1;
+	min-width: max-content; /* 150px; */
+	height: max-content;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1000;
+}
+
+.themeList-dropdown-block a {
+	color: black;
+	text-decoration: none;
+	display: block;
+	z-index: 1000; /* Keep it on top of other rows */
+}
+
+.themeList-dropdown-block a:hover {background-color: #ddd;}
+
+.themeList-dropdown-unit {
+	font-size: 1.25rem; /* 34px; */
+	color: black;
+}
+
+.themeList-dropdown-option {
+	font-size: 1.25rem;
+	transition: background-color 0.25s;
+	border: 2px, solid black;
+	border-radius: 4px;
+	display: block;
+	margin-bottom: 2px;
+	padding: 2px;
+}
+
+.themeList-dropdown-option:hover {background-color: hsl(182, 87%, 67%);} 
+
+.themeList-dropdown-option:active {background-color: hsl(182, 87%, 37%);}
+
