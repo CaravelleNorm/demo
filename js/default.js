@@ -56,33 +56,45 @@ let CaretUtil = { };
 let showTimePopup = false;
 let customColorsEnabled = false;
 let selectedCustomStyle;
+let dropDownArrow = "▾";
 
 let themeAttributes;
 
 let lightThemeAttributes = {
+	themeName: "light",
 	foregroundColor: "#000000", /* black */
-	backgroundColor: "#fdfff5", /* milk white */
-	highlightBackgroundColor: "#cce5ff"
+	backgroundColor: "#fdfff5", /* ceramic, milk white */
+	highlightBackgroundColor: "#cce5ff" /* Hawkes blue */
 }
 let darkThemeAttributes = {
+	themeName: "dark",
 	foregroundColor: "#ffffff", /* white */
 	backgroundColor: "#000000", /* black */
-	highlightBackgroundColor: "#768798"
+	highlightBackgroundColor: "#768798" /* steel */
 }
 let OSDefaultThemeAttributes = {
-	foregroundColor: "#000000",
-	backgroundColor: "#ffffff",
-	highlightBackgroundColor: "#338ef0"
+	themeName: "OSDefault",
+	foregroundColor: "#000000",  /* black */
+	backgroundColor: "#ffffff", /* white */
+	highlightBackgroundColor: "#338ef0" /* bleu de France */
 	}
-let blueThemeAttributes = {
-	foregroundColor: "#f5f5f5", /* white */
-	backgroundColor: "#2e9dc2", /* blue */
-	highlightBackgroundColor: "#0c6183"
+let preset01ThemeAttributes = {
+	themeName: "preset 1",
+	foregroundColor: "#f5f5f5", /* white  smoke*/
+	backgroundColor: "#2e9dc2", /* curious blue */
+	highlightBackgroundColor: "#0c6183" /* Venice blue */
 }
-let orangeThemeAttributes = {
-	foregroundColor: "#f5f5f5", /* white */
-	backgroundColor: "#c25a2e", /* blue */
-	highlightBackgroundColor: "#a0390d"
+let preset02ThemeAttributes = {
+	themeName: "preset 2",
+	foregroundColor: "#f5f5f5", /* white smoke */
+	backgroundColor: "#266a78", /* bluish cyan */
+	highlightBackgroundColor: "#153b4c" /* Nile blue */
+}
+let preset03ThemeAttributes = {
+	themeName: "preset 3",
+	foregroundColor: "#f5f5f5", /* white smoke */
+	backgroundColor: "#c25a2e", /* ruddy brown */
+	highlightBackgroundColor: "#a0390d" /* russet */
 }
 
 var helper = {
@@ -504,35 +516,38 @@ function selectRow(rowNumber,directive) {
 function setColor (type) {
 
 	console.log("setColor type = ", type);
+
 	let enforceCustomColors = false;
+
+	if (customColorsEnabled) {
+		enforceCustomColors = true;
+	}
 
 	switch (type) {
 		case 'foreground':
 		case 'background':
 		case 'highlightedRow':
-			if (customColorsEnabled) {
-				enforceCustomColors = true;
-			}
-			break;
-		case 'toggle':
-			if (!customColorsEnabled) {
-				enforceCustomColors = true;
-				customColorsEnabled = true;
-			}
-			else {
-				customColorsEnabled = false;
-				console.log("setColor calling changeTheme customColorsEnabled = ", customColorsEnabled);
-				changeTheme();
-			}
 			break;
 		case 'copyThemeColors':
 			document.getElementById("color1Input").value = themeAttributes.foregroundColor;
 			document.getElementById("color2Input").value = themeAttributes.backgroundColor;
 			document.getElementById("color3Input").value = themeAttributes.highlightBackgroundColor;
 			break;
+		case 'toggle':
+			if (customColorsEnabled) {
+				customColorsEnabled = false;
+				changeTheme(theme);
+				return;
+			}
+			else {
+				enforceCustomColors = true;
+				customColorsEnabled = true;
+			}
+			break;
 		default:
 			console.log("setColor Invalid option: ", type);
 			alert("setColor Invalid option: " + type);
+			return;
 	}
 
 	if (enforceCustomColors) {
@@ -1134,17 +1149,11 @@ function toggleVideoSection() {
 	computeSubtitleTableHeight();
 }
 
-function changeTheme() {
+function changeTheme(newTheme) {
     
-	const selectTheme = document.getElementById("themeMenu");
-	const selectedValue = selectTheme.value;
-
-	console.log("Theme changed from " + theme + " to " + selectedValue);
-	theme = selectedValue;
-
 	customColorsEnabled = false;
 
-	switch(theme) {
+	switch(newTheme) {
 	case 'light':
 		themeAttributes = lightThemeAttributes;
 		break;
@@ -1154,24 +1163,34 @@ function changeTheme() {
 	case 'OSDefault':
 		themeAttributes = OSDefaultThemeAttributes;
 		break;
-	case 'blue':
-		themeAttributes = blueThemeAttributes;
+	case 'preset01':
+		themeAttributes = preset01ThemeAttributes;
 		break;
-	case 'orange':
-		themeAttributes = orangeThemeAttributes;
+	case 'preset02':
+		themeAttributes = preset02ThemeAttributes;
+		break;
+	case 'preset03':
+		themeAttributes = preset03ThemeAttributes;
 		break;
 	default:
-		console.log("setColor Invalid option: ", type);
-		alert("setColor Invalid option: " + type);
+		console.log("changeTheme Invalid option: ", newTheme);
+		alert("changeTheme Invalid option: " + newTheme);
 		return;
 	}
+
+	console.log("Theme changed from " + theme + " to " + newTheme);
+	theme = newTheme;
 
 	document.body.style.backgroundColor = themeAttributes.backgroundColor;
 	document.body.style.color = themeAttributes.foregroundColor;
 	selectedCustomStyle.textContent = 
 		".selectedCustom {background-color: " + themeAttributes.highlightBackgroundColor + "}";
 
-	document.getElementById("myCheck10").checked = false;
+	document.getElementById("selectedTheme").style.backgroundColor = themeAttributes.backgroundColor;
+	document.getElementById("selectedTheme").style.color = themeAttributes.foregroundColor;
+	document.getElementById("selectedTheme").innerText = themeAttributes.themeName + dropDownArrow;
+
+		document.getElementById("myCheck10").checked = false;
 
 	if (selectedSubtitleNumber > 0){
 		highlightSelectedRow(selectedSubtitleNumber);
@@ -3310,7 +3329,7 @@ toggleSubtitleSection();
 
 configInitializations(); // Process config.js
 
-changeTheme();			// Initialize theme option
+changeTheme(theme);		// Initialize theme option
 changeSpacebar();		// Initialize spacebar option
 changeFont();			// Initialize font option
 changeFontSize();		// Initialize font size option
@@ -3328,7 +3347,6 @@ const controls = [
 	{id: "scrollMenu", changeFunction: changeScroll},
 	{id: "scrollStepMenu", changeFunction: changeScrollStep},
 	{id: "marginMenu", changeFunction: changeMargin},
-	{id: "themeMenu", changeFunction: changeTheme}
 ]; 
 
 controls.forEach(function(item) {
@@ -3422,11 +3440,10 @@ function configInitializations() {
 		case 'light':
 		case 'dark':
 		case 'OSDefault':
-		case 'blue':
-		case 'orange':
-			const selectTheme = document.getElementById("themeMenu");
-			selectTheme.value = theme;
-			console.log("Configuration: theme = " + selectTheme.value);
+		case 'preset01':
+		case 'preset02':
+		case 'preset03':
+			console.log("Configuration: theme = " + theme);
 			break;
 		default:
 			errorReason = 'theme = ' + theme + ' invalid';
@@ -3438,6 +3455,32 @@ function configInitializations() {
 	document.getElementById("color2Input").value = "#fdfff5";
 	document.getElementById("color3Input").value = "#cce5ff";
 
+	document.getElementById("lightThemeOption").style.color = lightThemeAttributes.foregroundColor;
+	document.getElementById("lightThemeOption").style.backgroundColor = lightThemeAttributes.backgroundColor;
+	// document.getElementById("lightThemeOption").style.backgroundColor = lightThemeAttributes.highlightBackgroundColor;
+
+	document.getElementById("darkThemeOption").style.color = darkThemeAttributes.foregroundColor;
+	document.getElementById("darkThemeOption").style.backgroundColor = darkThemeAttributes.backgroundColor;
+	// document.getElementById("darkThemeOption").style.backgroundColor = darkThemeAttributes.highlightBackgroundColor;
+
+	document.getElementById("OSDefaultThemeOption").style.color = OSDefaultThemeAttributes.foregroundColor;
+	document.getElementById("OSDefaultThemeOption").style.backgroundColor = OSDefaultThemeAttributes.backgroundColor;
+	// document.getElementById("OSDefaultThemeOption").style.backgroundColor = OSDefaultThemeAttributes.highlightBackgroundColor;
+
+	document.getElementById("preset01ThemeOption").innerText = preset01ThemeAttributes.themeName;
+	document.getElementById("preset01ThemeOption").style.color = preset01ThemeAttributes.foregroundColor;
+	document.getElementById("preset01ThemeOption").style.backgroundColor = preset01ThemeAttributes.backgroundColor;
+	// document.getElementById("preset01ThemeOption").style.backgroundColor = preset01ThemeAttributes.highlightBackgroundColor;
+
+	document.getElementById("preset02ThemeOption").innerText = preset02ThemeAttributes.themeName;
+	document.getElementById("preset02ThemeOption").style.color = preset02ThemeAttributes.foregroundColor;
+	document.getElementById("preset02ThemeOption").style.backgroundColor = preset02ThemeAttributes.backgroundColor;
+	// document.getElementById("preset02ThemeOption").style.backgroundColor = preset02ThemeAttributes.highlightBackgroundColor;
+
+	document.getElementById("preset03ThemeOption").innerText = preset03ThemeAttributes.themeName;
+	document.getElementById("preset03ThemeOption").style.color = preset03ThemeAttributes.foregroundColor;
+	document.getElementById("preset03ThemeOption").style.backgroundColor = preset03ThemeAttributes.backgroundColor;
+	// document.getElementById("preset03ThemeOption").style.backgroundColor = preset03ThemeAttributes.highlightBackgroundColor;
 
 	if (typeof spacebarOption == 'undefined') {
 		errorReason = 'spacebarOption missing';
