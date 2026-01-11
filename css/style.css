@@ -141,52 +141,29 @@ hamburger-dropdown-wrapper::after {
 	color: black;
 }
 
-/*
-
-.hamburger-dropdown-option {
-	font-size: 25px;
-}
-
-.hamburger-dropdown-option:hover {background-color: #19e8ef;}
-*/	
-
-#wrapper {
+.wrapper {
 	position: relative;
-	/* height: 50%; */
+	height: auto;
 	aspect-ratio: 16 / 9;
 	width: min(40%, 100% - 3rem);
 	/* width: min(40%, 100% - 3rem); */
 	/* width: min(700px, 100% - 3rem); */
 	margin-top: 0;
-	margin-bottom: 0;
-	margin: 0 auto;
+	margin-left: auto;
+	margin-right: auto;
+	/* margin: 0 auto; */
 	padding: 5px;
 	border-radius: 12px;
 	background-color: #3498DB;
 	border: 3px solid hsla(350, 27%, 96%, 0.75);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
 }	  
 
-.resizable{
-	background-color: lightgray;
-	width: 300px;
-	height: 400px;
-	resize: both;
-	overflow: auto;
-	min-width: 200px;
-	min-height: 200px;
-	max-width: 350px;
-	max-height: 400px;
-}
-
-video::-webkit-media-controls-panel {
-	display: flex !important;
-	opacity: 0.5 !important;
-	object-fit: fill;
-}
-	  
-#pageTitle
+.pageTitle
 {
-	position: relative;
 	border: 1px solid blue;
 	border-radius: 12px;
 	background-color: tomato;
@@ -194,7 +171,37 @@ video::-webkit-media-controls-panel {
 	padding: 3px 3px;
 	text-align: center;
 	text-decoration: none;
-	display: block;
+	font-family: Arial; /* inherit;*/
+	font-size: 2rem;
+	margin: auto;
+	height: fit-content;
+	width: fit-content;
+}
+
+.videoFileInput {
+	display: none;
+}
+
+.inputWrapper {
+	/* z-index: 1; */
+	width: stretch;
+	height: fit-content;
+	margin-left: 20%;
+	margin-right: auto;
+	margin-top: auto;
+	margin-bottom: auto;
+	/* <div style="z-index: 1; position: absolute; left: 20%; top: 40%; margin: auto;"> */
+}
+
+.videoFileContainer
+{
+	border: none; /* 1px solid blue; */
+	border-radius: 12px;
+	/* background-color: tomato; */
+	color: white;
+	padding: 3px 3px;
+	text-align: center;
+	text-decoration: none;
 	font-family: Arial; /* inherit;*/
 	font-size: 2rem;
 	margin: auto;
@@ -205,21 +212,98 @@ video::-webkit-media-controls-panel {
 	border-radius: 12px;
 	/* border: none; */
 	color: white;
+	background-color: #001858;
 	padding: 3px 3px;
 	text-align: center;
 	text-decoration: none;
-	display: inline;
 	font-family: Arial; /* inherit;*/
 	font-size: 1.25rem;
 	font-weight: bold;
 	margin: 3px 2px;
 	cursor: pointer;
 	transition: background-color 0.25s;
+	width: fit-content;
+	height: fit-content;
 }
 
 .vidButton:hover {background-color: hsl(25, 89%, 37%);}
 
 .vidButton:active {background-color: hsl(25, 89%, 67%);}
+
+.videoURLContainer,
+{
+	border: none;
+	color: hsl(0, 0%, 100%);
+	font-weight: 900;
+	padding: none;
+	margin-left: 3px;
+	font-family: Arial; /* inherit;*/
+	font-size: 1.25rem;
+}
+
+.videoURLInput {
+	width: 70%;
+	height: 2rem;
+	font-family: Arial;
+	font-size: 1rem;
+	margin: 5px;
+	padding: 5px;
+}
+
+video::-webkit-media-controls-panel {
+	display: flex !important;
+	opacity: 0.5 !important;
+	object-fit: fill;
+}
+
+.videoArea {
+	display: none;
+	width: 100%;
+	height: auto;
+	preload: auto;
+}
+
+/* ----------- seekBar ----------- */
+
+.seekBarContainer {
+	display: none; /* flex; */
+	align-items: center;
+	z-index: 9988;  /* Always on top */
+}
+
+.seekBarContainer,
+.seekBarContainer .slider {
+	width: 100%;
+}
+
+.slider {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 5px;
+	border-radius: 2px;
+	background-color: #001858;
+	outline: none;
+	transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background-color: #04AA6D;	 /* Green background */ /* #fff; */
+	cursor: pointer; /* Cursor on hover */
+	
+}
+
+.slider::-moz-range-thumb {
+  width: 10px; /* Set a specific slider handle width */
+  height: 10px; /* Slider handle height */
+  background-color:  #04AA6D;  /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
 
 .button
 {
@@ -242,19 +326,6 @@ video::-webkit-media-controls-panel {
 .button:active {background-color: hsl(25, 89%, 67%);}
 
 
-
-.URL-Label
-{
-	position: relative;
-	border: none;
-	color: hsl(0, 0%, 100%);
-	font-weight: 900;
-	padding: none;
-	margin-left: 3px;
-	display: block;
-	font-family: Arial; /* inherit;*/
-	font-size: 1.25rem;
-}
 
 .color1 {
 	background-color: #001858;
@@ -487,48 +558,6 @@ select {
 }
 
 /* .settings-dropdown-option:hover {background-color: #19e8ef;} */
-
-/* ----------- seekBar ----------- */
-
-.seek-container {
-	display: none; /* flex; */
-	align-items: center;
-	z-index: 9988;  /* Always on top */
-}
-
-.seek-container,
-.seek-container .slider {
-	width: 100%;
-}
-
-.slider {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 100%;
-	height: 5px;
-	border-radius: 2px;
-	background-color: #001858;
-	outline: none;
-	transition: all 0.2s ease;
-}
-
-.slider::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	background-color: #04AA6D;	 /* Green background */ /* #fff; */
-	cursor: pointer; /* Cursor on hover */
-	
-}
-
-.slider::-moz-range-thumb {
-  width: 10px; /* Set a specific slider handle width */
-  height: 10px; /* Slider handle height */
-  background-color:  #04AA6D;  /* Green background */
-  cursor: pointer; /* Cursor on hover */
-}
 
 /* timeEditPopup BEGIN */
 
