@@ -368,32 +368,31 @@
 
 <!-- Media File section -->
 <!-- Media File section -->
-<div id="wrapper">
-<div id="pageTitle">
+<div id="wrapper" class="wrapper">
+<div id="pageTitle" class="pageTitle">
 	<b>Subtitle Player for Browsers</b>
 </div>
 <div id="player"></div>
-<div style="z-index: 1; position: absolute; left: 20%; top: 40%; margin: auto;">
-<p>	<input id="videoFileInput" type="file" accept=".mp4,.mp3" style="display: none;"
+<div>
+	<input id="videoFileInput" type="file" accept=".mp4,.mp3" class="videoFileInput" 
 		onchange="loadVideoFile(this.files[0])" >
-</p>
-<p id="videoFileContainer">
-	<span class="hovertext" data-hover="Click to select a video file or an audio file">
-		<button id="videoFileButton" class="vidButton color1">Select a Video or Audio File</button><br><br>
-	</span>
-</p>
-<p id="videoURLContainer" class="URL-Label">
-	<label for="videoURLInput">Or paste a YouTube link:<br></label>
-	<input type="url" id="videoURLInput" name="videoURLInput" placeholder="Insert YouTube url" size="45">
-	<button id="videoURLButton" class="vidButton color1">Enter</button>
-</p>
 </div>
-<video id="videoArea" style="display: none; width: 100%; height: auto; preload: auto;"
-	controls disablePictureInPicture>
+<div id="inputWrapper" class="inputWrapper">
+<div class="videoFileContainer" id="videoFileContainer"><br><br>
+		<div id="videoFileButton" class="vidButton">Select a Video or Audio File</div><br>
+</div>
+<div id="videoURLContainer" class="videoURLContainer">
+	<div>Or paste a YouTube link:<br></div>
+	<input type="url" id="videoURLInput" name="videoURLInput" 
+		placeholder="Insert YouTube url" class="videoURLInput">
+	<div id="videoURLButton" class="vidButton">Submit</div>
+</div>
+</div>
+<video id="videoArea" class="videoArea" controls disablePictureInPicture>
 </video>
 <!-- seekBar -->
-<div id="seekBarContainer" class="seek-container">
-<input type="range" id="seekBar" min="0" max="100" value="0" class="slider">
+<div id="seekBarContainer" class="seekBarContainer">
+<input type="range" id="seekBar" name="seekBar" min="0" max="100" defaultValue="0" class="slider">
 </div>
 </div>
 
