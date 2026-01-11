@@ -82,7 +82,7 @@ let preset01ThemeAttributes = {
 	themeName: "preset 1",
 	foregroundColor: "#f5f5f5", /* white  smoke*/
 	backgroundColor: "#2e9dc2", /* curious blue */
-	highlightBackgroundColor: "#0c6183" /* Venice blue */
+	highlightBackgroundColor: "#057164" /* greenish cyan */
 }
 let preset02ThemeAttributes = {
 	themeName: "preset 2",
@@ -124,7 +124,12 @@ subtitleFileDataArray[2] = {inputId: "subtitleFileInput2", defaultStyle: "File2"
 
 // sample mergeDataArray[x] member: 
 // 	{dataIndex: "1", arrayIndex: 0} means subtitleFileDataArray[1].array[0]
-mergeDataArray = [];
+let mergeDataArray = [];
+
+let changeCounter = 0;
+let undoArray = [];
+let undoArrayCurrentIndex = -1;
+const undoArraySize = 10;
 
 document.addEventListener("DOMContentLoaded", () => {
 	DOMInitializations();
@@ -634,6 +639,29 @@ function setColor (type) {
 */
 }
 
+
+function getAdjustedWidthPixels(element) {
+  // 1. Get parent width in pixels (100%)
+  const parent = element.parentElement;
+  const parentWidth = parent.getBoundingClientRect().width;
+
+  // 2. Get the root font size (1rem in pixels)
+  const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  const threeRem = 3 * rootFontSize;
+
+  // 3. Subtract 3rem from parent width
+  const adjustedWidth = parentWidth - threeRem;
+
+  return adjustedWidth; // in pixels
+}
+
+function detectInnerSizeChange(){
+
+	console.log("detectInnerSizeChange H ", window.innerHeight, " W ", window.innerWidth);
+	changeVideoSize();
+
+}
+
 function changeVideoSize(){
 
 	if (!videoFileLoaded) {
@@ -643,6 +671,15 @@ function changeVideoSize(){
 	const wrapperElement = document.getElementById("wrapper");
 	const selectVideoSize = document.getElementById("videoSizeMenu");
 	const selectedValue = selectVideoSize.value;
+
+	let oldMaxVideoWidth = maxVideoWidth;
+
+	maxVideoWidth = getAdjustedWidthPixels(wrapperElement);
+	console.log("changeVideoSize maxVideoWidth = ",maxVideoWidth);
+
+	if (oldMaxVideoWidth != maxVideoWidth) {
+		console.log("changeVideoSize maxVideoWidth changed from ", oldMaxVideoWidth, " to ", maxVideoWidth);
+	}
 
 	unFocus();
 
@@ -1061,6 +1098,64 @@ function timeEditCurrent(prefix) {
 }  // timeEditCurrent
 
 }  // changeTime
+
+
+function undo() {
+	console.log("undo undoArrayCurrentIndex = ", undoArrayCurrentIndex);
+	if (undoArrayCurrentIndex >= 0) {
+	console.log("undo undoArray[undoArrayCurrentIndex] = ", undoArray[undoArrayCurrentIndex]);
+	}
+
+	if ((undoArrayCurrentIndex < 0) || (!(undoArray[undoArrayCurrentIndex].inUse))) {
+		console.log("undo Undo stack empty");
+		return;
+	}
+
+	//undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
+	switch (undoArray[undoArrayCurrentIndex].action) {
+	case "subtitleTextChange":
+		document.getElementById(`row${undoArray[undoArrayCurrentIndex].rowNumber}SubtitleText`).innerHTML = 
+			undoArray[undoArrayCurrentIndex].oldValue;
+		break;
+	case "subtitleDeletion":
+		let deletedRowNumber = undoArray[undoArrayCurrentIndex].rowNumber;
+		insertSubtitle((deletedRowNumber - 1), 
+						undoArray[undoArrayCurrentIndex].oldValue, 
+						"selectNone");
+		document.getElementById(`row${deletedRowNumber}SubtitleStart`).innerText =
+			undoArray[undoArrayCurrentIndex].startTime;
+		document.getElementById(`row${deletedRowNumber}SubtitleEnd`).innerText =
+			undoArray[undoArrayCurrentIndex].endTime;
+		document.getElementById(`row${deletedRowNumber}SubtitleTrack`).innerText =
+			undoArray[undoArrayCurrentIndex].style;
+		document.getElementById(`row${deletedRowNumber}SubtitleText`).innerText =
+			undoArray[undoArrayCurrentIndex].oldValue;
+		subtitleStartSeconds[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleStartSeconds;
+		subtitleEndSeconds[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleEndSeconds;
+		selectRow(undoArray[undoArrayCurrentIndex].SelectedRowNumber);
+		break;
+	default:
+		console.log('undo Invalid action ', undoArray[undoArrayCurrentIndex].action);
+		alert("undo Invalid action " + undoArray[undoArrayCurrentIndex].action);
+		return;
+	}
+
+	selectRow(undoArray[undoArrayCurrentIndex].SelectedRowNumber);
+	undoArray[undoArrayCurrentIndex].inUse = false;
+
+	if ((undoArrayCurrentIndex === 0) && (undoArray[undoArraySize - 1].inUse)) {
+		undoArrayCurrentIndex = undoArraySize - 1;
+		return;
+	}
+
+	if (undoArrayCurrentIndex === 0) {
+		return;
+	}
+
+	undoArrayCurrentIndex -= 1;
+
+}
+
 
 function enableFields(checkBoxId){
 
@@ -1729,6 +1824,9 @@ function addKeyListenerForVideo() {
 
 function handleSeek(e) {
 
+	console.log("handleSeek entered");
+	//	updateSliderFill(document.getElementById("seekBar"));
+
 	let subtitleIndex = 1;
 	let stop = false;
 	let targetSeconds = (e.target.value / 100) * videoDuration;
@@ -1770,12 +1868,12 @@ function handleSeek(e) {
 
 function removeVideoPrompts() {
 	// Remove the file selection button.
-	let elem = document.getElementById('videoFileContainer');
+	let elem = document.getElementById('inputWrapper');
 	elem.style.display = 'none';
 		
 	// Remove the URL entry section.
-	elem = document.getElementById('videoURLContainer');
-	elem.style.display = 'none';
+	//elem = document.getElementById('videoURLContainer');
+	//elem.style.display = 'none';
 	// elem.parentNode.removeChild(elem);
 }
 
@@ -2193,6 +2291,10 @@ function addKeyListenerForSubtitles() {
 			console.log("n newLine after ", selectedSubtitleNumber);
 			insertSubtitle(selectedSubtitleNumber, "",  "selectNew");
 			break;
+		case "u":
+			console.log("u undo");
+			undo();
+			break;
 		case "Home":
 			selectRow(1,"scroll");
 			break;
@@ -2265,8 +2367,22 @@ function addKeyListenerForSubtitles() {
 	document.getElementById("spanSubtitle1").addEventListener('blur', () => {
 		if (spanSubtitle1Modified) {
 			console.log("spanSubtitle1 modified - updating subtitle row ", selectedSubtitleNumber);
-			document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerHTML = 
-				document.getElementById("spanSubtitle1").innerHTML;
+			let oldValue = document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerHTML;
+			let newValue = document.getElementById("spanSubtitle1").innerHTML;
+			if (oldValue != newValue) {
+				changeCounter += 1;
+				undoArrayCurrentIndex += 1;
+				if (undoArrayCurrentIndex >= (undoArraySize)){
+					undoArrayCurrentIndex = 0;
+				}
+				undoArray[undoArrayCurrentIndex].inUse = true;
+				undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
+				undoArray[undoArrayCurrentIndex].action = "subtitleTextChange";
+				undoArray[undoArrayCurrentIndex].rowNumber = selectedSubtitleNumber;
+				undoArray[undoArrayCurrentIndex].SelectedRowNumber = selectedSubtitleNumber;
+				undoArray[undoArrayCurrentIndex].oldValue = oldValue;
+				document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerHTML = newValue;
+			}
 			spanSubtitle1Modified = false;
 			computeSubtitleTableHeight();
 			unFocus();
@@ -2299,14 +2415,28 @@ function addKeyListenerForSubtitles() {
 
 	document.getElementById("spanSubtitle2").addEventListener('blur', () => {
 		if (spanSubtitle2Modified) {
-			console.log("spanSubtitle2 modified - updating subtitle row ", (selectedSubtitleNumber + 1));
-			document.getElementById(`row${(selectedSubtitleNumber + 1)}SubtitleText`).innerHTML = 
-				document.getElementById("spanSubtitle2").innerHTML;
+			let oldValue = document.getElementById(`row${(selectedSubtitleNumber + 1)}SubtitleText`).innerHTML; 
+			let newValue = document.getElementById("spanSubtitle2").innerHTML;
+			if (oldValue != newValue) {
+				changeCounter += 1;
+				undoArrayCurrentIndex += 1;
+				if (undoArrayCurrentIndex >= (undoArraySize)){
+					undoArrayCurrentIndex = 0;
+				}
+				undoArray[undoArrayCurrentIndex].inUse = true;
+				undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
+				undoArray[undoArrayCurrentIndex].action = "subtitleTextChange";
+				undoArray[undoArrayCurrentIndex].rowNumber = selectedSubtitleNumber + 1;
+				undoArray[undoArrayCurrentIndex].SelectedRowNumber = selectedSubtitleNumber;
+				undoArray[undoArrayCurrentIndex].oldValue = oldValue;
+				document.getElementById(`row${selectedSubtitleNumber + 1}SubtitleText`).innerHTML = newValue;
+			}
 			spanSubtitle2Modified = false;
 			spanSubtitle2Selected = false;
 			computeSubtitleTableHeight();
 			unFocus();
 		}
+
 	});
 
 	keyListenerForSubtitlesAdded = true;
@@ -2543,6 +2673,8 @@ function insertSubtitle(afterRowNumber, text, selectOption) {
 				processSelectOption(newRowNumber);
 			}
 			break;
+		case "selectNone": 
+			break;
 		default:
 			console.log ("insertSubtitle invalid selectOption ", selectOption);
 	}
@@ -2560,6 +2692,29 @@ function insertSubtitle(afterRowNumber, text, selectOption) {
 function deleteSubtitle(rowNumber) {
 
 	if (rowNumber <= 0) {return;}
+
+	changeCounter += 1;
+	undoArrayCurrentIndex += 1;
+	if (undoArrayCurrentIndex >= (undoArraySize)){
+		undoArrayCurrentIndex = 0;
+	}
+	undoArray[undoArrayCurrentIndex].inUse = true;
+	undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
+	undoArray[undoArrayCurrentIndex].action = "subtitleDeletion";
+	undoArray[undoArrayCurrentIndex].rowNumber = rowNumber;
+	undoArray[undoArrayCurrentIndex].SelectedRowNumber = selectedSubtitleNumber;
+	// undoArray[undoArrayCurrentIndex].oldValue = 
+	//	document.getElementById(`row${rowNumber}SubtitleText`).innerHTML
+	undoArray[undoArrayCurrentIndex].startTime = 
+		document.getElementById(`row${rowNumber}SubtitleStart`).innerText;
+	undoArray[undoArrayCurrentIndex].endTime = 
+		document.getElementById(`row${rowNumber}SubtitleEnd`).innerText;
+	undoArray[undoArrayCurrentIndex].style = 
+		document.getElementById(`row${rowNumber}SubtitleTrack`).innerText;
+	undoArray[undoArrayCurrentIndex].oldValue = 
+		document.getElementById(`row${rowNumber}SubtitleText`).innerText;
+	undoArray[undoArrayCurrentIndex].subtitleStartSeconds = subtitleStartSeconds[rowNumber];
+	undoArray[undoArrayCurrentIndex].subtitleEndSeconds = subtitleEndSeconds[rowNumber];
 
 	let rowCounter = rowNumber + 1;
 	let rowObject = {};
@@ -3060,8 +3215,13 @@ function addKeyListener(){
 
 	if (!((lastSubtitleNumber > 0) && videoFileLoaded)) { return; }
 
-	document.getElementById("seekBarContainer").style.display = "flex";
+	document.getElementById("seekBarContainer").style.display = "inline";
 
+	console.log("addKeyListener Adding event listener for seekBar");
+	let seekBar = document.getElementById("seekBar");
+	//seekBar.oninput = () => {
+	//	console.log(seekBar.value);
+	//}
 	seekBar.addEventListener("input", handleSeek);
 
 	const buttons = ['playVideo','currentLine','loop', 
@@ -3114,8 +3274,8 @@ function addKeyListener(){
 				break;
 			}
 			break;
-		case "u":
-			console.log("u updateTime");
+		case "U":
+			console.log("U updateTime");
 			updateTime();
 			break;
 		case "ArrowLeft":
@@ -3331,40 +3491,42 @@ document.head.appendChild(selectedCustomStyle);
 
 let viewportWidth = getViewportWidth();
 let viewportHeight = getViewportHeight();
-console.log("Viewport Width " + viewportWidth + " Height " + viewportHeight);
+console.log("DOMInitializations Viewport Width " + viewportWidth + " Height " + viewportHeight);
 
 videoElem = document.getElementById("videoArea");
 
 const urlParams = new URLSearchParams(window.location.search);
 const allUrlParamsObject = Object.fromEntries(urlParams.entries());
-console.log("All Query Parameters as Object:", allUrlParamsObject);
+console.log("DOMInitializations All Query Parameters as Object:", allUrlParamsObject);
 if (allUrlParamsObject.yturl == undefined) { console.log("parm is null");}
-else {console.log("parm is present: ",allUrlParamsObject.yturl);}
+else {console.log("DOMInitializations parm is present: ",allUrlParamsObject.yturl);}
 if (allUrlParamsObject.yturl = "") { console.log("parm is null2");}
-else {console.log("parm is present2: ", allUrlParamsObject.yturl);}
+else {console.log("DOMInitializations parm is present2: ", allUrlParamsObject.yturl);}
 
 const wrapperElement = document.getElementById("wrapper");
 maxVideoWidth = getAdjustedWidthPixels(wrapperElement);
-console.log("maxVideoWidth = ",maxVideoWidth);
-
-function getAdjustedWidthPixels(element) {
-  // 1. Get parent width in pixels (100%)
-  const parent = element.parentElement;
-  const parentWidth = parent.getBoundingClientRect().width;
-
-  // 2. Get the root font size (1rem in pixels)
-  const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-  const threeRem = 3 * rootFontSize;
-
-  // 3. Subtract 3rem from parent width
-  const adjustedWidth = parentWidth - threeRem;
-
-  return adjustedWidth; // in pixels
-}
+console.log("DOMInitializations maxVideoWidth = ",maxVideoWidth);
 
 console.log("DOMInitializations wrapper.style.width = ", wrapperElement.style.width, 
 		" wrapper.style.height = ", wrapperElement.style.height);
 
+let undoArrayIndex = 0;
+do {
+	undoArray[undoArrayIndex] = {
+		inUse: false,
+		changeNumber: 0,
+		action: "",
+		rowNumber: 0,
+		selectedRowNumber: 0,
+		startTime: "",
+		endTime: "",
+		style: "",
+		oldValue: "",
+		subtitleStartSeconds: 0,
+		subtitleEndSeconds: 0
+	};
+	undoArrayIndex += 1;
+} while (undoArrayIndex < undoArraySize);
 
 enableFileSelection();
 
@@ -3398,12 +3560,15 @@ controls.forEach(function(item) {
 	selectedControl.addEventListener("mouseout", unFocus);
 });
 
+window.addEventListener("load", detectInnerSizeChange);
+window.addEventListener("resize", detectInnerSizeChange);
+
 if (urlParams.has('yturl')) {
 	let yturl = urlParams.get('yturl');
 	let yturlFirst = yturl.substring(0,1);
 	let yturlLast = yturl.substring(yturl.length - 1);
-	console.log("yturl = ", yturl);
-	console.log("yturlFirst = ", yturlFirst, " yturlLast = ", yturlLast);
+	console.log("DOMInitializations yturl = ", yturl);
+	console.log("DOMInitializations yturlFirst = ", yturlFirst, " yturlLast = ", yturlLast);
 
 	if ((yturlFirst != yturlLast) || 
 		((yturlFirst != '"') && (yturlFirst != "'"))) {
@@ -3412,7 +3577,7 @@ if (urlParams.has('yturl')) {
 			throw new Error(errorMsg);
 		}
 	yturl = yturl.substring(1, (yturl.length - 1));	
-	console.log(" edited yturl = ", yturl);
+	console.log("DOMInitializations  edited yturl = ", yturl);
 	document.getElementById("videoURLInput").value = yturl;
 	document.getElementById("videoURLButton").click();
 }
