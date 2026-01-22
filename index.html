@@ -169,7 +169,7 @@
 		</span>
 		</span><br>
 		<!-- Dropdown Unit End -->
-				<!-- Dropdown Unit Start -->
+		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
 		<span class="hovertext" data-hover="Change screen colors">
 			<span class="settings-dropdown-option">Theme</span>
@@ -706,22 +706,41 @@
 	<div class="textEditPopupTitle color1" onclick="textEditPopupAction('playSingle')"">Play Single</div>
 	</span>
 	<div class="textEditButtonColumn">
-		<div class="textEditPopupButton1">
-		<span class="hovertext1" data-hover="Split at the cursor">
-		<button class="button color3"
-			onclick="textEditPopupAction('simpleSplit')">Split at cursor</button>
+		<div style="margin-bottom: 8px;">
+		<span class="loadFile-dropdown-wrapper">
+		<button class="button color3">Split at cursor<span class="dropdown-arrow">▾</span></button>
+		<span class="loadFile-dropdown-block">
+		<!-- Dropdown Unit Start -->
+		<span class="loadFile-dropdown-unit">
+		<span class="hovertext1" data-hover="Split at the cursor, insert new line above">
+		<span class="loadFile-dropdown-option" onclick="textEditPopupAction('splitToPrevNewline')">Split ↑ new line</span>
 		</span>
-		</div>
-		<div class="textEditPopupButton1">
-		<span class="hovertext1" data-hover="Insert before the selected subtitle">
-		<button class="button color3"
-			onclick="textEditPopupAction('insertAbove')">Insert Above</button>
+		<span class="hovertext1" data-hover="Split at the cursor, append to previous line">
+		<span class="loadFile-dropdown-option" onclick="textEditPopupAction('splitToPrev')">Split ↑ wrap</span>
 		</span>
+		<span class="hovertext1" data-hover="Split at the cursor, insert new line below">
+		<span class="loadFile-dropdown-option" onclick="textEditPopupAction('splitToNextNewline')">Split ↓ new line</span>
+		</span>
+		<span class="hovertext1" data-hover="Split at the cursor, prepend to next line">
+		<span class="loadFile-dropdown-option" onclick="textEditPopupAction('splitToNext')">Split ↓ wrap</span>
+		</span>
+		</span> <!-- Dropdown Unit End -->
+		</span> <!-- class="loadFile-dropdown-block"-->
 		</div>
-		<div class="textEditPopupButton1">
-		<span class="hovertext1" data-hover="Insert after the selected subtitle">
-		<button class="button color3"
-			onclick="textEditPopupAction('insertBelow')">Insert Below</button>
+		<div style="margin-bottom: 8px;">
+		<span class="loadFile-dropdown-wrapper">
+		<button class="button color3">Insert<span class="dropdown-arrow">▾</span></button>
+		<span class="loadFile-dropdown-block">
+		<!-- Dropdown Unit Start -->
+		<span class="loadFile-dropdown-unit">
+		<span class="hovertext1" data-hover="Before selected line">
+		<span class="loadFile-dropdown-option" onclick="textEditPopupAction('insertAbove')">↑ Insert ↑</span>
+		</span>
+		<span class="hovertext1" data-hover="After selected line">
+		<span class="loadFile-dropdown-option" onclick="textEditPopupAction('insertBelow')">↓ Insert ↓</span>
+		</span>
+		</span> <!-- Dropdown Unit End -->
+		</span> <!-- class="loadFile-dropdown-block"-->
 		</span>
 		</div>
 		<div class="textEditPopupButton1">
@@ -730,7 +749,8 @@
 			onclick="textEditPopupAction('delete')">Delete</button>
 		</span>
 		</div>
-	</div>  <!-- textEditButtonColumn -->
+	</div>
+	<!-- textEditButtonColumn -->
 	<div class="textEditButtonColumn">
 		<div class="textEditPopupButton1">
 		<span class="hovertext1" data-hover="Select the previous subtitle">
