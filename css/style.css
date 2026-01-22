@@ -757,7 +757,7 @@ select {
     vertical-align: top;
     width: auto; /* 100%; */
     position: relative;
-    border-radius: 8px;
+    border-radius: 5px;
 	border: 1px solid black;
     padding: 15px 2% 15px 2%;
 }
@@ -766,10 +766,11 @@ select {
     display: inline-block;
 	background-color: #001858;
 	width: 100%;
+    border-radius: 8px;
 }
 
 .dashboardHeader {
-	padding: 0;
+	padding: 4px;
 	display: flex;
 	float: left;
 	width: 95%;
