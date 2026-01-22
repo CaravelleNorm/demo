@@ -126,10 +126,29 @@ subtitleFileDataArray[2] = {inputId: "subtitleFileInput2", defaultStyle: "File2"
 // 	{dataIndex: "1", arrayIndex: 0} means subtitleFileDataArray[1].array[0]
 let mergeDataArray = [];
 
-let changeCounter = 0;
-let undoArray = [];
-let undoArrayCurrentIndex = -1;
 const undoArraySize = 10;
+const redoArraySize = undoArraySize;
+const [undoArray, redoArray] = Array.from({ length: 2 }, () => 
+    Array.from({ length: undoArraySize }, () => 
+	({
+		inUse: false,
+		changeNumber: 0,
+		action: "",
+		rowNumber: 0,
+		selectedRowNumber: 0,
+		startTime: "",
+		endTime: "",
+		style: "",
+		oldValue: "",
+		newValue: "",
+		subtitleStartSeconds: 0,
+		subtitleEndSeconds: 0
+	}))
+);
+
+let changeCounter = 0;
+let undoArrayCurrentIndex = -1;
+let redoArrayCurrentIndex = -1;
 
 document.addEventListener("DOMContentLoaded", () => {
 	DOMInitializations();
@@ -1103,7 +1122,8 @@ function timeEditCurrent(prefix) {
 function undo() {
 	console.log("undo undoArrayCurrentIndex = ", undoArrayCurrentIndex);
 	if (undoArrayCurrentIndex >= 0) {
-	console.log("undo undoArray[undoArrayCurrentIndex] = ", undoArray[undoArrayCurrentIndex]);
+		console.log("undo undoArray[undoArrayCurrentIndex] = ", undoArray[undoArrayCurrentIndex]);
+		console.log("redo undoArray[undoArrayCurrentIndex].inUse = ", undoArray[undoArrayCurrentIndex].inUse);
 	}
 
 	if ((undoArrayCurrentIndex < 0) || (!(undoArray[undoArrayCurrentIndex].inUse))) {
@@ -1111,10 +1131,9 @@ function undo() {
 		return;
 	}
 
-	//undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
 	switch (undoArray[undoArrayCurrentIndex].action) {
 	case "subtitleTextChange":
-		document.getElementById(`row${undoArray[undoArrayCurrentIndex].rowNumber}SubtitleText`).innerHTML = 
+		document.getElementById(`row${undoArray[undoArrayCurrentIndex].rowNumber}SubtitleText`).innerText = 
 			undoArray[undoArrayCurrentIndex].oldValue;
 		break;
 	case "subtitleDeletion":
@@ -1132,7 +1151,7 @@ function undo() {
 			undoArray[undoArrayCurrentIndex].oldValue;
 		subtitleStartSeconds[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleStartSeconds;
 		subtitleEndSeconds[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleEndSeconds;
-		selectRow(undoArray[undoArrayCurrentIndex].SelectedRowNumber);
+		selectRow(undoArray[undoArrayCurrentIndex].selectedRowNumber);
 		break;
 	default:
 		console.log('undo Invalid action ', undoArray[undoArrayCurrentIndex].action);
@@ -1140,7 +1159,10 @@ function undo() {
 		return;
 	}
 
-	selectRow(undoArray[undoArrayCurrentIndex].SelectedRowNumber);
+	selectRow(undoArray[undoArrayCurrentIndex].selectedRowNumber);
+	selectCurrentIndex("redoArray");
+	swapUndoElement();
+
 	undoArray[undoArrayCurrentIndex].inUse = false;
 
 	if ((undoArrayCurrentIndex === 0) && (undoArray[undoArraySize - 1].inUse)) {
@@ -1156,6 +1178,80 @@ function undo() {
 
 }
 
+function selectCurrentIndex(arrayName) {
+	switch (arrayName) {
+	case "undoArray":
+		undoArrayCurrentIndex += 1;
+		if (undoArrayCurrentIndex >= undoArraySize){
+			undoArrayCurrentIndex = 0;
+		}
+		break;
+	case "redoArray":
+		redoArrayCurrentIndex += 1;
+		if (redoArrayCurrentIndex >= redoArraySize){
+			redoArrayCurrentIndex = 0;
+		}
+		break;
+	default:
+		console.log('selectCurrentIndex Invalid arrayName ', arrayName);
+		alert("selectCurrentIndex Invalid arrayName " + arrayName);
+		return;
+
+	}
+}
+
+function swapUndoElement() {
+    const objFrom1 = undoArray[undoArrayCurrentIndex];
+    const objFrom2 = redoArray[redoArrayCurrentIndex];
+    undoArray[undoArrayCurrentIndex] = structuredClone(objFrom2);
+    redoArray[redoArrayCurrentIndex] = structuredClone(objFrom1);
+}
+
+function redo() {
+
+	console.log("redo redoArrayCurrentIndex = ", redoArrayCurrentIndex);
+	if (redoArrayCurrentIndex >= 0) {
+		console.log("redo redoArray[redoArrayCurrentIndex] = ", redoArray[redoArrayCurrentIndex]);
+		console.log("redo redoArray[redoArrayCurrentIndex].inUse = ", redoArray[redoArrayCurrentIndex].inUse);
+	}
+
+	if ((redoArrayCurrentIndex < 0) || (!(redoArray[redoArrayCurrentIndex].inUse))) {
+		console.log("redo Redo stack empty");
+		return;
+	}
+
+	switch (redoArray[redoArrayCurrentIndex].action) {
+	case "subtitleTextChange":
+		document.getElementById(`row${redoArray[redoArrayCurrentIndex].rowNumber}SubtitleText`).innerText = 
+			redoArray[redoArrayCurrentIndex].newValue;
+		selectRow(redoArray[redoArrayCurrentIndex].selectedRowNumber);
+		selectCurrentIndex("undoArray");
+		swapUndoElement();
+		break;
+	case "subtitleDeletion":
+		selectRow(redoArray[redoArrayCurrentIndex].selectedRowNumber);
+		textEditPopupAction('delete');
+		break;
+	default:
+		console.log('redo Invalid action ', redoArray[redoArrayCurrentIndex].action);
+		alert("redo Invalid action " + redoArray[redoArrayCurrentIndex].action);
+		return;
+	}
+
+	redoArray[redoArrayCurrentIndex].inUse = false;
+
+	if ((redoArrayCurrentIndex === 0) && (redoArray[redoArraySize - 1].inUse)) {
+		redoArrayCurrentIndex = redoArraySize - 1;
+		return;
+	}
+
+	if (redoArrayCurrentIndex === 0) {
+		return;
+	}
+
+	redoArrayCurrentIndex -= 1;
+
+}
 
 function enableFields(checkBoxId){
 
@@ -2291,6 +2387,10 @@ function addKeyListenerForSubtitles() {
 			console.log("n newLine after ", selectedSubtitleNumber);
 			insertSubtitle(selectedSubtitleNumber, "",  "selectNew");
 			break;
+		case "r":
+			console.log("r redo");
+			redo();
+			break;
 		case "u":
 			console.log("u undo");
 			undo();
@@ -2371,16 +2471,14 @@ function addKeyListenerForSubtitles() {
 			let newValue = document.getElementById("spanSubtitle1").innerHTML;
 			if (oldValue != newValue) {
 				changeCounter += 1;
-				undoArrayCurrentIndex += 1;
-				if (undoArrayCurrentIndex >= (undoArraySize)){
-					undoArrayCurrentIndex = 0;
-				}
+				selectCurrentIndex("undoArray");
 				undoArray[undoArrayCurrentIndex].inUse = true;
 				undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
 				undoArray[undoArrayCurrentIndex].action = "subtitleTextChange";
 				undoArray[undoArrayCurrentIndex].rowNumber = selectedSubtitleNumber;
-				undoArray[undoArrayCurrentIndex].SelectedRowNumber = selectedSubtitleNumber;
+				undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
 				undoArray[undoArrayCurrentIndex].oldValue = oldValue;
+				undoArray[undoArrayCurrentIndex].newValue = newValue;
 				document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerHTML = newValue;
 			}
 			spanSubtitle1Modified = false;
@@ -2419,16 +2517,14 @@ function addKeyListenerForSubtitles() {
 			let newValue = document.getElementById("spanSubtitle2").innerHTML;
 			if (oldValue != newValue) {
 				changeCounter += 1;
-				undoArrayCurrentIndex += 1;
-				if (undoArrayCurrentIndex >= (undoArraySize)){
-					undoArrayCurrentIndex = 0;
-				}
+				selectCurrentIndex("undoArray");
 				undoArray[undoArrayCurrentIndex].inUse = true;
 				undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
 				undoArray[undoArrayCurrentIndex].action = "subtitleTextChange";
 				undoArray[undoArrayCurrentIndex].rowNumber = selectedSubtitleNumber + 1;
-				undoArray[undoArrayCurrentIndex].SelectedRowNumber = selectedSubtitleNumber;
+				undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
 				undoArray[undoArrayCurrentIndex].oldValue = oldValue;
+				undoArray[undoArrayCurrentIndex].newValue = newValue;
 				document.getElementById(`row${selectedSubtitleNumber + 1}SubtitleText`).innerHTML = newValue;
 			}
 			spanSubtitle2Modified = false;
@@ -2515,7 +2611,10 @@ function textEditPopupAction(operand) {
 		case 'delete':
 			deleteSubtitle(selectedSubtitleNumber);
 			return;
-		case 'simpleSplit': // The rest of this function handles this operand.
+		case 'splitToNext':
+		case 'splitToNextNewline':
+		case 'splitToPrev':
+		case 'splitToPrevNewline':
 			break;
 		default:
 			console.log("textEditPopupAction invalid operand: ", operand);
@@ -2534,9 +2633,10 @@ function textEditPopupAction(operand) {
 		spanSubtitle2Selected = false;
 	}
 	if (selectedSpan == "") {
-		// click on subtitle span to select
+		// ?? tell user to click on subtitle span to select
 		console.log("textEditPopupAction operand ", operand, " RowNumber ", RowNumber,
 		' selectedSpan = ""', selectedSpan);
+		alert("textEditPopupAction Place cursor in edit area before choosing split action");
 		return;
 	}
 
@@ -2558,13 +2658,16 @@ function textEditPopupAction(operand) {
 //	if (!editor) return;
 // 	let cursorPosition = CaretUtil.getCaretPosition(textElement);
 
-	let text1;
-	let text2;
+	text1 = textElement.innerText.substring(0, cursorPosition);
+	text2 = textElement.innerText.substring(cursorPosition);
+/*
+	let text1 = "";
+	let text2 = "";
 	if (cursorPosition == 0) {
 		text1 = "";
 		text2 = textElement.innerText;
 	} else {
-		if (cursorPosition == (textElement.innerText.length - 1)) {
+		if (cursorPosition > (textElement.innerText.length - 1)) {
 			text1 = textElement.innerText;
 			text2 = "";
 		}
@@ -2573,17 +2676,36 @@ function textEditPopupAction(operand) {
 			text2 = textElement.innerText.substring(cursorPosition);
 			}
 		}
-
+*/
 	console.log("textEditPopupAction cursorPosition ", cursorPosition, " text1 ", text1, " text2 ", text2);
 
 	// if (text1.trim() == "") {
 	// 	text1 = "…";
 	// }
-	textElement.innerHTML = text1.trim();
-	document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerHTML = text1.trim();
+	if ((operand === "splitToNext") || (operand === "splitToNextNewline")) {
+		textElement.innerText = text1.trim();
+		document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerText = text1.trim();
+		if ((operand === "splitToNextNewline") || (selectedSubtitleNumber === lastSubtitleNumber)) {
+			insertSubtitle(RowNumber, text2.trim(), "selectOld");
+		} else {
+			document.getElementById(`row${selectedSubtitleNumber + 1}SubtitleText`).innerText = text2.trim()
+				+ document.getElementById(`row${selectedSubtitleNumber + 1}SubtitleText`).innerText;
+		}
+		return;
+	}
 
-	insertSubtitle(RowNumber, text2.trim(), "selectOld");
-	// document.getElementById("textEditPopup").style.display = "none";
+	if ((operand === "splitToPrev") || (operand === "splitToPrevNewline")) {
+		textElement.innerText = text2.trim();
+		document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerText = text2.trim();
+		if ((operand === "splitToPrevNewline") || (selectedSubtitleNumber === 1)) {
+			insertSubtitle((RowNumber - 1), text1.trim(), "selectOld");
+		} else {
+			document.getElementById(`row${selectedSubtitleNumber - 1}SubtitleText`).innerText = 
+				document.getElementById(`row${selectedSubtitleNumber - 1}SubtitleText`).innerText
+				+ text1.trim();
+		}
+		return;
+	}
 }
 
 function insertSubtitle(afterRowNumber, text, selectOption) {
@@ -2694,15 +2816,12 @@ function deleteSubtitle(rowNumber) {
 	if (rowNumber <= 0) {return;}
 
 	changeCounter += 1;
-	undoArrayCurrentIndex += 1;
-	if (undoArrayCurrentIndex >= (undoArraySize)){
-		undoArrayCurrentIndex = 0;
-	}
+	selectCurrentIndex("undoArray");
 	undoArray[undoArrayCurrentIndex].inUse = true;
 	undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
 	undoArray[undoArrayCurrentIndex].action = "subtitleDeletion";
 	undoArray[undoArrayCurrentIndex].rowNumber = rowNumber;
-	undoArray[undoArrayCurrentIndex].SelectedRowNumber = selectedSubtitleNumber;
+	undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
 	// undoArray[undoArrayCurrentIndex].oldValue = 
 	//	document.getElementById(`row${rowNumber}SubtitleText`).innerHTML
 	undoArray[undoArrayCurrentIndex].startTime = 
@@ -3509,24 +3628,6 @@ console.log("DOMInitializations maxVideoWidth = ",maxVideoWidth);
 
 console.log("DOMInitializations wrapper.style.width = ", wrapperElement.style.width, 
 		" wrapper.style.height = ", wrapperElement.style.height);
-
-let undoArrayIndex = 0;
-do {
-	undoArray[undoArrayIndex] = {
-		inUse: false,
-		changeNumber: 0,
-		action: "",
-		rowNumber: 0,
-		selectedRowNumber: 0,
-		startTime: "",
-		endTime: "",
-		style: "",
-		oldValue: "",
-		subtitleStartSeconds: 0,
-		subtitleEndSeconds: 0
-	};
-	undoArrayIndex += 1;
-} while (undoArrayIndex < undoArraySize);
 
 enableFileSelection();
 
