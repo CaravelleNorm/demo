@@ -4,6 +4,7 @@ document.addEventListener('keydown', PSDPD_KeyCheck);
 
 let videoFileLoaded = false;
 let videoElem;
+let subtitleTable;
 let videoDuration;
 let youTubeVideoId;
 let maxVideoWidth;
@@ -455,9 +456,10 @@ function highlightThemeOption(optionName, action) {
 function highlightSelectedRow(rowNumber) {
 
 	// Remove 'selected' class from previously selected row
-	document.getElementById("row" + selectedSubtitleNumber).classList.remove("selectedCustom");
-				
-	document.getElementById("row" + rowNumber).classList.add("selectedCustom");
+	if ((selectedSubtitleNumber < subtitleTable.rows.length) && (selectedSubtitleNumber > 0)) {
+		subtitleTable.rows[selectedSubtitleNumber].classList.remove("selectedCustom");
+	}			
+	subtitleTable.rows[rowNumber].classList.add("selectedCustom");
 
 	return;
 }
@@ -497,15 +499,15 @@ function selectRow(rowNumber,directive) {
 		}
 	}
 
-	document.getElementById("spanStartTime").innerHTML = "";
-	document.getElementById("spanEndTime").innerHTML = "";
-	document.getElementById("spanTrack").innerHTML = "";
-	document.getElementById("spanStartTimeOnDashboard").innerHTML = "";
-	document.getElementById("spanEndTimeOnDashboard").innerHTML = "";
-	document.getElementById("spanTrackOnDashboard").innerHTML = "";
+	document.getElementById("spanStartTime").textContent = "";
+	document.getElementById("spanEndTime").textContent = "";
+	document.getElementById("spanTrack").textContent = "";
+	document.getElementById("spanStartTimeOnDashboard").textContent = "";
+	document.getElementById("spanEndTimeOnDashboard").textContent = "";
+	document.getElementById("spanTrackOnDashboard").textContent = "";
 
-	document.getElementById("spanSubtitle1").innerHTML = "";
-	document.getElementById("spanSubtitle2").innerHTML = "";
+	document.getElementById("spanSubtitle1").textContent = "";
+	document.getElementById("spanSubtitle2").textContent = "";
 	spanSubtitle1Selected = false;
 	spanSubtitle2Selected = false;
 
@@ -541,33 +543,33 @@ function selectRow(rowNumber,directive) {
 
 	} else {
 		if (scrollOption == "alwaysVisible"){
-			document.getElementById("row" + rowNumber).scrollIntoView({ 
+			subtitleTable.rows[rowNumber].scrollIntoView({ 
 				behavior: "instant", block: "center", inline: "nearest" });
 		}
 	}
 
 	if (directive != "undefined"){
 		if (scrollOption == "alwaysVisible"){
-			document.getElementById("row" + rowNumber).scrollIntoView({
+			subtitleTable.rows[rowNumber].scrollIntoView({ 
 				behavior: "instant", block: "center", inline: "nearest" });
 		}
 	}
 
-	document.getElementById("spanStartTime").innerHTML =
-		document.getElementById(`row${rowNumber}SubtitleStart`).innerHTML;
-	document.getElementById("spanEndTime").innerHTML =
-		document.getElementById(`row${rowNumber}SubtitleEnd`).innerHTML;
-	document.getElementById("spanTrack").innerHTML =
-		document.getElementById(`row${rowNumber}SubtitleTrack`).innerHTML;
-	document.getElementById("spanSubtitle1").innerHTML =
-   		document.getElementById(`row${rowNumber}SubtitleText`).innerHTML;
+	document.getElementById("spanStartTime").textContent = 
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
+	document.getElementById("spanEndTime").textContent =
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
+	document.getElementById("spanTrack").textContent =
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
+	document.getElementById("spanSubtitle1").textContent =
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent;
 
-	document.getElementById("spanStartTimeOnDashboard").innerHTML =
-		document.getElementById("spanStartTime").innerHTML;
-	document.getElementById("spanEndTimeOnDashboard").innerHTML =
-		document.getElementById("spanEndTime").innerHTML;
-	document.getElementById("spanTrackOnDashboard").innerHTML =
-		document.getElementById("spanTrack").innerHTML;
+	document.getElementById("spanStartTimeOnDashboard").textContent =
+		document.getElementById("spanStartTime").textContent;
+	document.getElementById("spanEndTimeOnDashboard").textContent =
+		document.getElementById("spanEndTime").textContent;
+	document.getElementById("spanTrackOnDashboard").textContent =
+		document.getElementById("spanTrack").textContent;
 
 	spanSubtitle1Row = rowNumber;
 
@@ -582,9 +584,9 @@ function selectRow(rowNumber,directive) {
     console.log("selectrow (rowNumber + 1) = ", (rowNumber + 1));
 
 	if ((rowNumber + 1) <= lastSubtitleNumber) {
-    console.log("selectrow updating s2");
-		document.getElementById("spanSubtitle2").innerHTML =
-			document.getElementById(`row${rowNumber+1}SubtitleText`).innerHTML;
+    console.log("selectRow updating s2");
+		document.getElementById("spanSubtitle2").textContent =
+			subtitleTable.rows[rowNumber + 1].querySelector(".classSubtitleText").textContent;
 			spanSubtitle2Row = rowNumber + 1;
 		if (scrollStepOption == 2) {
 			computeSubtitleTableHeight();
@@ -910,17 +912,17 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 	let newSeconds;
 
 	if (elemIdTo === 't1') {
-		oldText = document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText;
+		oldText = subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent;
 		oldSeconds = subtitleStartSeconds[timeEditPopupRow];
 	} else {
-		oldText = document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText;
+		oldText = subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent;
 		oldSeconds = subtitleEndSeconds[timeEditPopupRow];
 	}
 	if (elemIdFrom === 't1') {
-		newText = document.getElementById(`row${fromRow}SubtitleStart`).innerText;
+		newText = subtitleTable.rows[fromRow].querySelector(".classSubtitleStart").textContent;
 		newSeconds = subtitleStartSeconds[fromRow];
 	} else {
-		newText = document.getElementById(`row${fromRow}SubtitleEnd`).innerText;
+		newText = subtitleTable.rows[fromRow].querySelector(".classSubtitleEnd").textContent;
 		newSeconds = subtitleEndSeconds[fromRow];
 	}
 
@@ -929,13 +931,14 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 			" seconds changed from ", oldSeconds, " to ", newSeconds);
 
 	if (elemIdTo === 't1') {
-		document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText = newText;
+		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = newText;
 		subtitleStartSeconds[timeEditPopupRow] = newSeconds;
 	} else {
-		document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText = newText;
+		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = newText;
 		subtitleEndSeconds[timeEditPopupRow] = newSeconds;
 	}
-
+	document.getElementById(`copy${elemIdTo}`).style.pointerEvents = 'none';
+	setTimeout(() => {document.getElementById(`copy${elemIdTo}`).style.pointerEvents = ''}, 500);
 	showTimeEditPopup(timeEditPopupRow);
 
 }
@@ -975,7 +978,7 @@ function changeTime(operation, elemId) {
 	}
 
 	let elem = document.getElementById(elemId);
-	let value = Number(elem.innerText);
+	let value = Number(elem.textContent);
 
 	switch(operation) {
 	case "increment":
@@ -992,30 +995,30 @@ function changeTime(operation, elemId) {
 		break;
 	}
 
-	elem.innerText = value;
+	elem.textContent = value;
 	saveTime(elemId.substring(0,2));
 
 	return;
 
 function saveTime (prefix) {
-	let fractionText = document.getElementById(prefix + "millisecondField1").innerText + 
-		document.getElementById(prefix + "millisecondField2").innerText + 
-		document.getElementById(prefix + "millisecondField3").innerText;
+	let fractionText = document.getElementById(prefix + "millisecondField1").textContent + 
+		document.getElementById(prefix + "millisecondField2").textContent + 
+		document.getElementById(prefix + "millisecondField3").textContent;
 
-	let totalSeconds = (Number(document.getElementById(prefix + "hourField1").innerText) * 3600) +
-		(Number(document.getElementById(prefix + "minuteField1").innerText) * 600) +
-		(Number(document.getElementById(prefix + "minuteField2").innerText) * 60) +
-		(Number(document.getElementById(prefix + "secondField1").innerText) * 10) +
-		(Number(document.getElementById(prefix + "secondField2").innerText)) +
+	let totalSeconds = (Number(document.getElementById(prefix + "hourField1").textContent) * 3600) +
+		(Number(document.getElementById(prefix + "minuteField1").textContent) * 600) +
+		(Number(document.getElementById(prefix + "minuteField2").textContent) * 60) +
+		(Number(document.getElementById(prefix + "secondField1").textContent) * 10) +
+		(Number(document.getElementById(prefix + "secondField2").textContent)) +
 		(Number(fractionText) / 1000);
 			
-	let timeText = document.getElementById(prefix + "hourField1").innerText + ":" +
-		document.getElementById(prefix + "minuteField1").innerText +
-		document.getElementById(prefix + "minuteField2").innerText + ":" +
-		document.getElementById(prefix + "secondField1").innerText +
-		document.getElementById(prefix + "secondField2").innerText + "." +
-		document.getElementById(prefix + "millisecondField1").innerText + 
-		document.getElementById(prefix + "millisecondField2").innerText;
+	let timeText = document.getElementById(prefix + "hourField1").textContent + ":" +
+		document.getElementById(prefix + "minuteField1").textContent +
+		document.getElementById(prefix + "minuteField2").textContent + ":" +
+		document.getElementById(prefix + "secondField1").textContent +
+		document.getElementById(prefix + "secondField2").textContent + "." +
+		document.getElementById(prefix + "millisecondField1").textContent + 
+		document.getElementById(prefix + "millisecondField2").textContent;
 
 	console.log("saveTime fractionText ", fractionText, " timeText ", timeText, 
 		" totalSeconds ", totalSeconds);
@@ -1023,19 +1026,21 @@ function saveTime (prefix) {
 	switch (prefix) {
 	case "t1":
 		console.log("saveTime Row ", timeEditPopupRow, " start ", 
-			" old ", document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText, 
+			" old ", 
+			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
 			" new ", timeText, 
 			" seconds old ", subtitleStartSeconds[timeEditPopupRow], " new ", totalSeconds);
 		subtitleStartSeconds[timeEditPopupRow] = totalSeconds;
-		document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText = timeText;
+		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = timeText;
 		break;
 	case "t2":
 		console.log("saveTime Row ", timeEditPopupRow, " end ",
-			" old ", document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText, 
+			" old ", 
+			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
 			" new ", timeText, 
 			" seconds old ", subtitleEndSeconds[timeEditPopupRow], " new ", totalSeconds);
 		subtitleEndSeconds[timeEditPopupRow] = totalSeconds;
-		document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText = timeText;
+		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = timeText;
 		break;
 	default:
 		console.log('saveTime Invalid prefix ', prefix);
@@ -1049,20 +1054,20 @@ function timeEditRestore(prefix) {
 	switch (prefix) {
 	case "t1":
 		console.log("timeEditRestore Row ", timeEditPopupRow, " start restored from ",
-			document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText, 
+			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
 			" to ", t1timeEditPopupOldTime, 
 			" seconds restored from ", subtitleStartSeconds[timeEditPopupRow], 
 			" to ", t1timeEditPopupOldSeconds);
-		document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText = t1timeEditPopupOldTime;
+		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = t1timeEditPopupOldTime;
 		subtitleStartSeconds[timeEditPopupRow] = t1timeEditPopupOldSeconds;
 		break;
 	case "t2":
 		console.log("timeEditRestore Row ", timeEditPopupRow, " end restored from ",
-			document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText, 
+			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
 			" to ", t2timeEditPopupOldTime, 
 			" seconds restored from ", subtitleEndSeconds[timeEditPopupRow], 
 			" to ", t2timeEditPopupOldSeconds);
-		document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText = t2timeEditPopupOldTime;
+			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = t2timeEditPopupOldTime;
 		subtitleEndSeconds[timeEditPopupRow] = t2timeEditPopupOldSeconds;
 		break;
 	default:
@@ -1093,20 +1098,20 @@ function timeEditCurrent(prefix) {
 	switch (prefix) {
 	case "t1":
 		console.log("timeEditCurrent Row ", timeEditPopupRow, " start changed from ",
-			document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText, 
+			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
 			" to ", timeText, 
 			" seconds changed from ", subtitleStartSeconds[timeEditPopupRow], 
 			" to ", current);
-		document.getElementById(`row${timeEditPopupRow}SubtitleStart`).innerText = timeText;
+		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = timeText;
 		subtitleStartSeconds[timeEditPopupRow] = current;
 		break;
 	case "t2":
 		console.log("timeEditCurrent Row ", timeEditPopupRow, " end changed from ",
-			document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText, 
+			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
 			" to ", t2timeEditPopupOldTime, 
 			" seconds changed from ", subtitleEndSeconds[timeEditPopupRow], 
 			" to ", current);
-		document.getElementById(`row${timeEditPopupRow}SubtitleEnd`).innerText = timeText;
+		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = timeText;
 		subtitleEndSeconds[timeEditPopupRow] = current;
 		break;
 	default:
@@ -1133,7 +1138,7 @@ function undo() {
 
 	switch (undoArray[undoArrayCurrentIndex].action) {
 	case "subtitleTextChange":
-		document.getElementById(`row${undoArray[undoArrayCurrentIndex].rowNumber}SubtitleText`).innerText = 
+		subtitleTable.rows[undoArrayCurrentIndex].querySelector(".classSubtitleText").textContent =
 			undoArray[undoArrayCurrentIndex].oldValue;
 		break;
 	case "subtitleDeletion":
@@ -1141,13 +1146,13 @@ function undo() {
 		insertSubtitle((deletedRowNumber - 1), 
 						undoArray[undoArrayCurrentIndex].oldValue, 
 						"selectNone");
-		document.getElementById(`row${deletedRowNumber}SubtitleStart`).innerText =
+		subtitleTable.rows[deletedRowNumber].querySelector(".classSubtitleStart").textContent =
 			undoArray[undoArrayCurrentIndex].startTime;
-		document.getElementById(`row${deletedRowNumber}SubtitleEnd`).innerText =
+		subtitleTable.rows[deletedRowNumber].querySelector(".classSubtitleEnd").textContent =
 			undoArray[undoArrayCurrentIndex].endTime;
-		document.getElementById(`row${deletedRowNumber}SubtitleTrack`).innerText =
+		subtitleTable.rows[deletedRowNumber].querySelector(".classSubtitleTrack").textContent =
 			undoArray[undoArrayCurrentIndex].style;
-		document.getElementById(`row${deletedRowNumber}SubtitleText`).innerText =
+		subtitleTable.rows[deletedRowNumber].querySelector(".classSubtitleText").textContent =
 			undoArray[undoArrayCurrentIndex].oldValue;
 		subtitleStartSeconds[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleStartSeconds;
 		subtitleEndSeconds[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleEndSeconds;
@@ -1222,7 +1227,7 @@ function redo() {
 
 	switch (redoArray[redoArrayCurrentIndex].action) {
 	case "subtitleTextChange":
-		document.getElementById(`row${redoArray[redoArrayCurrentIndex].rowNumber}SubtitleText`).innerText = 
+		subtitleTable.rows[redoArray[redoArrayCurrentIndex].rowNumber].querySelector(".classSubtitleText").textContent =
 			redoArray[redoArrayCurrentIndex].newValue;
 		selectRow(redoArray[redoArrayCurrentIndex].selectedRowNumber);
 		selectCurrentIndex("undoArray");
@@ -1422,7 +1427,7 @@ function changeTheme(newTheme) {
 
 	document.getElementById("selectedTheme").style.backgroundColor = themeAttributes.backgroundColor;
 	document.getElementById("selectedTheme").style.color = themeAttributes.foregroundColor;
-	document.getElementById("selectedTheme").innerText = themeAttributes.themeName + dropDownArrow;
+	document.getElementById("selectedTheme").textContent = themeAttributes.themeName + dropDownArrow;
 
 		document.getElementById("myCheck10").checked = false;
 
@@ -1461,9 +1466,9 @@ function skipBackward() {
 	let decrement = 1;
 	let stop = false;
 	while ((!stop) && ((selectedSubtitleNumber - decrement) >= 1)) {
-		if ((document.getElementById("spanTrack").innerHTML) ==
-			(document.getElementById(`row${(selectedSubtitleNumber - decrement)}SubtitleTrack`).innerHTML)) {
-			if (newTime > subtitleEndSeconds[selectedSubtitleNumber - decrement]) {
+		if ((document.getElementById("spanTrack").textContent) ==
+			(subtitleTable.rows[selectedSubtitleNumber - decrement].querySelector(".classSubtitleTrack").textContent)) {
+				if (newTime > subtitleEndSeconds[selectedSubtitleNumber - decrement]) {
 				stop = true;
 			} 
 			else {
@@ -1527,8 +1532,8 @@ function skipForward() {
 	let increment = 1;
 	let stop = false;
 	while ((!stop) && ((selectedSubtitleNumber + increment) >= 1)) {
-		if ((document.getElementById("spanTrack").innerHTML) ==
-			(document.getElementById(`row${(selectedSubtitleNumber + increment)}SubtitleTrack`).innerHTML)) {
+		if ((document.getElementById("spanTrack").textContent) ==
+			(subtitleTable.rows[selectedSubtitleNumber + increment].querySelector(".classSubtitleTrack").textContent)) {
 			if (newTime < subtitleStartSeconds[selectedSubtitleNumber + increment]) {
 				stop = true;
 			} 
@@ -1564,8 +1569,8 @@ function checkTime() {
 		let trackMatched = false;
 		while ((!trackMatched) &&
 			((selectedSubtitleNumber + increment) <= (document.getElementById("subtitleTable").rows.length - 1))){
-			if ((document.getElementById("spanTrack").innerHTML) !=
-				(document.getElementById(`row${(selectedSubtitleNumber + increment)}SubtitleTrack`).innerHTML)) {
+			if ((document.getElementById("spanTrack").textContent) !=
+				(subtitleTable.rows[selectedSubtitleNumber + increment].querySelector(".classSubtitleTrack").textContent)) {
 					increment += 1;
 				} else {
 					trackMatched = true;
@@ -2202,6 +2207,7 @@ async function loadSubtitleFile0(file) {
 
 	subtitleFileDataArray[0].loaded = false;
 	totalNumberOfSubtitlesRead = 0;
+	deleteSubtitleTable();
 
 	await extractSubtitleFile(file, subtitleFileDataArray[0]);
 
@@ -2224,10 +2230,11 @@ async function loadSubtitleFile1(file) {
 
 	subtitleFileDataArray[1].loaded = false;
 	if (selectedSubtitleNumber != 0) {
-		document.getElementById("row" + selectedSubtitleNumber).classList.remove("selectedCustom");
+		subtitleTable.rows[selectedSubtitleNumber].classList.remove("selectedCustom");
 		selectedSubtitleNumber = 0;
 	}
 	totalNumberOfSubtitlesRead = 0;
+	deleteSubtitleTable();
 
 	await extractSubtitleFile(file, subtitleFileDataArray[1]);
 
@@ -2260,6 +2267,7 @@ async function loadSubtitleFile2(file) {
 	subtitleFileDataArray[2].loaded = false;
 	selectedSubtitleNumber = 0;
 	totalNumberOfSubtitlesRead = 0;
+	deleteSubtitleTable();
 
 	await extractSubtitleFile(file, subtitleFileDataArray[2]);
 
@@ -2285,20 +2293,6 @@ async function loadSubtitleFile2(file) {
 	}
 }
 
-function hideSubtitles(numberOfSubtitles) {
-
-	while (numberOfSubtitles > 0) {
-			let rowId = "row" + lastSubtitleNumber;
-			let r = document.getElementById(rowId);
-			if (r) {
-				console.log("hideSubtitles Hiding rowId ",rowId);
-				r.style.display = 'none';
-				lastSubtitleNumber--;
-			}
-			numberOfSubtitles--;
-	}
-
-}
 
 function displaySubtitles()	 {
 
@@ -2313,20 +2307,12 @@ function displaySubtitles()	 {
 		+ " new " + totalNumberOfSubtitlesRead);
 
 	if (lastSubtitleNumber > totalNumberOfSubtitlesRead) {
-		hideSubtitles(lastSubtitleNumber - totalNumberOfSubtitlesRead);
+		console.log("displaySubtitles lastSubtitleNumber ", lastSubtitleNumber, 
+			" > totalNumberOfSubtitlesRead ", totalNumberOfSubtitlesRead);
+		errorMsg = 'displaySubtitles lastSubtitleNumber > totalNumberOfSubtitlesRead';
+		alert(errorMsg);
+		throw new Error(errorMsg);
 	}
-
-/*
-	while (lastSubtitleNumber > totalNumberOfSubtitlesRead) {
-		let rowId = "row" + lastSubtitleNumber;
-		let r = document.getElementById(rowId);
-		if (r) {
-			console.log("Hiding rowId ",rowId);
-			r.style.display = 'none';
-			lastSubtitleNumber -= 1;
-		}
-	}
-*/
 
 	lastSubtitleNumber = totalNumberOfSubtitlesRead;
 
@@ -2467,8 +2453,8 @@ function addKeyListenerForSubtitles() {
 	document.getElementById("spanSubtitle1").addEventListener('blur', () => {
 		if (spanSubtitle1Modified) {
 			console.log("spanSubtitle1 modified - updating subtitle row ", selectedSubtitleNumber);
-			let oldValue = document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerHTML;
-			let newValue = document.getElementById("spanSubtitle1").innerHTML;
+			let oldValue = subtitleTable.rows[selectedSubtitleNumber].querySelector(".classSubtitleText").textContent;
+			let newValue = document.getElementById("spanSubtitle1").textContent;
 			if (oldValue != newValue) {
 				changeCounter += 1;
 				selectCurrentIndex("undoArray");
@@ -2479,7 +2465,7 @@ function addKeyListenerForSubtitles() {
 				undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
 				undoArray[undoArrayCurrentIndex].oldValue = oldValue;
 				undoArray[undoArrayCurrentIndex].newValue = newValue;
-				document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerHTML = newValue;
+				subtitleTable.rows[selectedSubtitleNumber].querySelector(".classSubtitleText").textContent = newValue;
 			}
 			spanSubtitle1Modified = false;
 			computeSubtitleTableHeight();
@@ -2513,8 +2499,8 @@ function addKeyListenerForSubtitles() {
 
 	document.getElementById("spanSubtitle2").addEventListener('blur', () => {
 		if (spanSubtitle2Modified) {
-			let oldValue = document.getElementById(`row${(selectedSubtitleNumber + 1)}SubtitleText`).innerHTML; 
-			let newValue = document.getElementById("spanSubtitle2").innerHTML;
+			let oldValue = subtitleTable.rows[selectedSubtitleNumber + 1].querySelector(".classSubtitleText").textContent;
+			let newValue = document.getElementById("spanSubtitle2").textContent;
 			if (oldValue != newValue) {
 				changeCounter += 1;
 				selectCurrentIndex("undoArray");
@@ -2525,7 +2511,7 @@ function addKeyListenerForSubtitles() {
 				undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
 				undoArray[undoArrayCurrentIndex].oldValue = oldValue;
 				undoArray[undoArrayCurrentIndex].newValue = newValue;
-				document.getElementById(`row${selectedSubtitleNumber + 1}SubtitleText`).innerHTML = newValue;
+				subtitleTable.rows[selectedSubtitleNumber + 1].querySelector(".classSubtitleText").textContent = newValue
 			}
 			spanSubtitle2Modified = false;
 			spanSubtitle2Selected = false;
@@ -2541,14 +2527,22 @@ function addKeyListenerForSubtitles() {
 
 }  // addKeyListenerForSubtitles
 
+function deleteSubtitleTable() {
+	console.log("deleteSubtitleTable Deleting subtitle table");
+	let new_tbody = document.createElement('tbody');
+	let old_tbody = document.getElementById("subtitleTbody");
+	old_tbody.parentNode.replaceChild(new_tbody, old_tbody);
+	new_tbody.id = "subtitleTbody";
+}
+
 function newFile() {
 
 	if (lastSubtitleNumber > 0) {
 		if (!confirm("Discard all present subtitles and begin a new file?")) {
     		return;
 		}
-		hideSubtitles(lastSubtitleNumber);
-	}
+		deleteSubtitleTable();
+	} 
 
 	let rowObject = {};
 	rowObject.startSeconds = 0;
@@ -2603,10 +2597,14 @@ function textEditPopupAction(operand) {
 			buttonAction('nextST');
 			return;
 		case 'insertAbove':
-			insertSubtitle((selectedSubtitleNumber - 1), "", "selectNew");
-			return;
 		case 'insertBelow':
-			insertSubtitle(selectedSubtitleNumber, "", "selectNew");
+			document.getElementById("insertLineWrapper").style.pointerEvents = 'none';
+			setTimeout(() => {document.getElementById("insertLineWrapper").style.pointerEvents = ''}, 500);
+			if (operand === 'insertAbove') {
+				insertSubtitle((selectedSubtitleNumber - 1), "", "selectNew");
+			} else {
+				insertSubtitle(selectedSubtitleNumber, "", "selectNew");
+			}
 			return;
 		case 'delete':
 			deleteSubtitle(selectedSubtitleNumber);
@@ -2615,6 +2613,8 @@ function textEditPopupAction(operand) {
 		case 'splitToNextNewline':
 		case 'splitToPrev':
 		case 'splitToPrevNewline':
+			document.getElementById("splitLineWrapper").style.pointerEvents = 'none';
+			setTimeout(() => {document.getElementById("splitLineWrapper").style.pointerEvents = ''}, 500);
 			break;
 		default:
 			console.log("textEditPopupAction invalid operand: ", operand);
@@ -2658,22 +2658,22 @@ function textEditPopupAction(operand) {
 //	if (!editor) return;
 // 	let cursorPosition = CaretUtil.getCaretPosition(textElement);
 
-	text1 = textElement.innerText.substring(0, cursorPosition);
-	text2 = textElement.innerText.substring(cursorPosition);
+	text1 = textElement.textContent.substring(0, cursorPosition);
+	text2 = textElement.textContent.substring(cursorPosition);
 /*
 	let text1 = "";
 	let text2 = "";
 	if (cursorPosition == 0) {
 		text1 = "";
-		text2 = textElement.innerText;
+		text2 = textElement.textContent;
 	} else {
-		if (cursorPosition > (textElement.innerText.length - 1)) {
-			text1 = textElement.innerText;
+		if (cursorPosition > (textElement.textContent.length - 1)) {
+			text1 = textElement.textContent;
 			text2 = "";
 		}
 		else {
-			text1 = textElement.innerText.substring(0, cursorPosition);
-			text2 = textElement.innerText.substring(cursorPosition);
+			text1 = textElement.textContent.substring(0, cursorPosition);
+			text2 = textElement.textContent.substring(cursorPosition);
 			}
 		}
 */
@@ -2683,25 +2683,25 @@ function textEditPopupAction(operand) {
 	// 	text1 = "…";
 	// }
 	if ((operand === "splitToNext") || (operand === "splitToNextNewline")) {
-		textElement.innerText = text1.trim();
-		document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerText = text1.trim();
+		textElement.textContent = text1.trim();
+		subtitleTable.rows[selectedSubtitleNumber].querySelector(".classSubtitleText").textContent = text1.trim();
 		if ((operand === "splitToNextNewline") || (selectedSubtitleNumber === lastSubtitleNumber)) {
 			insertSubtitle(RowNumber, text2.trim(), "selectOld");
 		} else {
-			document.getElementById(`row${selectedSubtitleNumber + 1}SubtitleText`).innerText = text2.trim()
-				+ document.getElementById(`row${selectedSubtitleNumber + 1}SubtitleText`).innerText;
+			subtitleTable.rows[selectedSubtitleNumber + 1].querySelector(".classSubtitleText").textContent = text2.trim()
+				+ subtitleTable.rows[selectedSubtitleNumber + 1].querySelector(".classSubtitleText").textContent;
 		}
 		return;
 	}
 
 	if ((operand === "splitToPrev") || (operand === "splitToPrevNewline")) {
-		textElement.innerText = text2.trim();
-		document.getElementById(`row${selectedSubtitleNumber}SubtitleText`).innerText = text2.trim();
+		textElement.textContent = text2.trim();
+		subtitleTable.rows[selectedSubtitleNumber].querySelector(".classSubtitleText").textContent = text2.trim();
 		if ((operand === "splitToPrevNewline") || (selectedSubtitleNumber === 1)) {
 			insertSubtitle((RowNumber - 1), text1.trim(), "selectOld");
 		} else {
-			document.getElementById(`row${selectedSubtitleNumber - 1}SubtitleText`).innerText = 
-				document.getElementById(`row${selectedSubtitleNumber - 1}SubtitleText`).innerText
+			subtitleTable.rows[selectedSubtitleNumber - 1].querySelector(".classSubtitleText").textContent = 
+				subtitleTable.rows[selectedSubtitleNumber - 1].querySelector(".classSubtitleText").textContent
 				+ text1.trim();
 		}
 		return;
@@ -2734,21 +2734,13 @@ function insertSubtitle(afterRowNumber, text, selectOption) {
 	//		style: "File1", subtitle: "Caption text" }
 
 	let newRowNumber = afterRowNumber + 1;
-	let backwardRowCounter = lastSubtitleNumber;
+	subtitleTable.rows[selectedSubtitleNumber].classList.remove("selectedCustom");
+	let row = subtitleTable.insertRow(newRowNumber);
+	subtitleStartSeconds.splice(newRowNumber, 0, 0);
+	subtitleEndSeconds.splice(newRowNumber, 0, 0);
+
 	let rowObject = {};
-
-	while (backwardRowCounter >= newRowNumber) {
-		rowObject.startSeconds = subtitleStartSeconds[backwardRowCounter];
-		rowObject.endSeconds = subtitleEndSeconds[backwardRowCounter];
-		rowObject.startTime = document.getElementById(`row${backwardRowCounter}SubtitleStart`).innerText;
-		rowObject.endTime = document.getElementById(`row${backwardRowCounter}SubtitleEnd`).innerText;
-		rowObject.style = document.getElementById(`row${backwardRowCounter}SubtitleTrack`).innerText;
-		rowObject.subtitle = document.getElementById(`row${backwardRowCounter}SubtitleText`).innerText;
-		createSubtitleRow(rowObject, (backwardRowCounter + 1));
-		backwardRowCounter -= 1;
-	}
-
-	lastSubtitleNumber += 1;
+	lastSubtitleNumber++;
 
 	if ((newRowNumber != 1) && (newRowNumber != lastSubtitleNumber)) {
 		rowObject.startSeconds = subtitleEndSeconds[newRowNumber - 1];
@@ -2822,39 +2814,26 @@ function deleteSubtitle(rowNumber) {
 	undoArray[undoArrayCurrentIndex].action = "subtitleDeletion";
 	undoArray[undoArrayCurrentIndex].rowNumber = rowNumber;
 	undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
-	// undoArray[undoArrayCurrentIndex].oldValue = 
-	//	document.getElementById(`row${rowNumber}SubtitleText`).innerHTML
 	undoArray[undoArrayCurrentIndex].startTime = 
-		document.getElementById(`row${rowNumber}SubtitleStart`).innerText;
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
 	undoArray[undoArrayCurrentIndex].endTime = 
-		document.getElementById(`row${rowNumber}SubtitleEnd`).innerText;
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
 	undoArray[undoArrayCurrentIndex].style = 
-		document.getElementById(`row${rowNumber}SubtitleTrack`).innerText;
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
 	undoArray[undoArrayCurrentIndex].oldValue = 
-		document.getElementById(`row${rowNumber}SubtitleText`).innerText;
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent;
 	undoArray[undoArrayCurrentIndex].subtitleStartSeconds = subtitleStartSeconds[rowNumber];
 	undoArray[undoArrayCurrentIndex].subtitleEndSeconds = subtitleEndSeconds[rowNumber];
-
-	let rowCounter = rowNumber + 1;
-	let rowObject = {};
-
-	while (rowCounter <= lastSubtitleNumber) {
-		rowObject.startSeconds = subtitleStartSeconds[rowCounter];
-		rowObject.endSeconds = subtitleEndSeconds[rowCounter];
-		rowObject.startTime = document.getElementById(`row${rowCounter}SubtitleStart`).innerText;
-		rowObject.endTime = document.getElementById(`row${rowCounter}SubtitleEnd`).innerText;
-		rowObject.style = document.getElementById(`row${rowCounter}SubtitleTrack`).innerText;
-		rowObject.subtitle = document.getElementById(`row${rowCounter}SubtitleText`).innerText;
-		createSubtitleRow(rowObject, (rowCounter - 1));
-		rowCounter += 1;
-	}
 
 	let isLast = false;
 	if (rowNumber === lastSubtitleNumber) {
 		isLast = true;
 	}
 
-	hideSubtitles(1);
+	subtitleTable.deleteRow(rowNumber); 
+	subtitleStartSeconds.splice(rowNumber, 1);
+	subtitleEndSeconds.splice(rowNumber, 1);
+	lastSubtitleNumber--;
 
 	if (!isLast) {
 		selectRow(rowNumber);
@@ -2863,11 +2842,10 @@ function deleteSubtitle(rowNumber) {
 			selectRow(lastSubtitleNumber);
 		} else {
 			selectedSubtitleNumber = 0;
-			document.getElementById("spanSubtitle1").innerHTML = "";
-			document.getElementById("spanSubtitle2").innerHTML = "";
+			document.getElementById("spanSubtitle1").textContent = "";
+			document.getElementById("spanSubtitle2").textContent = "";
 		}
 	}
-
 }
 
 function createSubtitleRow(rowObject, rowIndex) {
@@ -2878,47 +2856,33 @@ function createSubtitleRow(rowObject, rowIndex) {
 	let t = document.getElementById("subtitleTable");
 
 	let rowId = "row" + (rowIndex);
-	let r = document.getElementById(rowId);
-	let rowIsNew = false;
+	let r;
 
-	if (!r) {
+	if ((rowIndex + 1) > subtitleTable.rows.length) {
 		r = document.createElement("tr");
 		r.id = rowId;
-		r.addEventListener("click", function(e) {
-			selectRow(Number(document.getElementById(`${rowId}SubtitleNumber`).innerHTML));
-		});
 		t.tBodies[0].appendChild(r);
-		rowIsNew = true;
+	} else {
+		r = subtitleTable.rows[rowIndex];
 	}
+
+//	if (!r) {
+//		r = document.createElement("tr");
+//		r.id = rowId;
+//		t.tBodies[0].appendChild(r);
+//	}
 
 	r.style.display = 'table-row'; /* Ensure that the row is visible. */
 
 	r.innerHTML = `
-			<tr style="min-height: 1.875em;">
-            <td id="${rowId}SubtitleNumber" headers="subtitleNumber"
-			 	style="font-weight: bold; font-size: 1.5em; vertical-align:top; 
-				padding-top: 10px">${rowIndex}</td>
-            <td id="${rowId}SubtitleStart" headers="subtitleStart"
-			 	style="font-size: 1.5em; vertical-align:top; 
-				padding-top: 10px">${rowObject.startTime}</td>
-            <td id="${rowId}SubtitleEnd" headers="subtitleEnd"
-			 	style="font-size: 1.5em; vertical-align:top; 
-				padding-top: 10px">${rowObject.endTime}</td>
-            <td id="${rowId}SubtitleTrack" headers="subtitleTrack "
-			 	style="font-size: 1.5em; vertical-align:top; 
-				padding-top: 10px" >${rowObject.style}</td>
-            <td id="${rowId}SubtitleText" headers="subtitleText"
-			 	style="font-size: 1.875em; 
-				vertical-align:top;">${rowObject.subtitle}</td>
+			<tr class="classSubtitleRow">
+			<td headers="subtitleNumber" class="classSubtitleNumber"></td>
+            <td headers="subtitleStart" class="classSubtitleStart">${rowObject.startTime}</td>
+            <td headers="subtitleEnd" class="classSubtitleEnd">${rowObject.endTime}</td>
+            <td headers="subtitleTrack" class="classSubtitleTrack">${rowObject.style}</td>
+            <td headers="subtitleText" class="classSubtitleText">${rowObject.subtitle}</td>
 			</tr>
         	`
-	document.getElementById(`${rowId}SubtitleStart`).addEventListener("click", function(e) {
-		showTimeEditPopup(rowIndex);
-	});
-
-	document.getElementById(`${rowId}SubtitleEnd`).addEventListener("click", function(e) {
-		showTimeEditPopup(rowIndex);
-	});
 }
 
 //  Sample syntax:
@@ -2940,9 +2904,9 @@ function showTimeEditPopup(rowNumber) {
 
 	if (timeEditPopupRow != rowNumber) {
 		timeEditPopupRow = rowNumber;
-		t1timeEditPopupOldTime = document.getElementById(`row${rowNumber}SubtitleStart`).innerText;
+		t1timeEditPopupOldTime = subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
 		t1timeEditPopupOldSeconds = subtitleStartSeconds[rowNumber];
-		t2timeEditPopupOldTime = document.getElementById(`row${rowNumber}SubtitleEnd`).innerText;
+		t2timeEditPopupOldTime = subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
 		t2timeEditPopupOldSeconds = subtitleEndSeconds[rowNumber];
 	}
 
@@ -2962,21 +2926,21 @@ function fillTimeFields (ms, prefix) {
 	let ff = Math.floor(ms % 1000);
 
 
-	document.getElementById(prefix + "hourField1").innerText = hh - (Math.floor(hh / 10) * 10);
+	document.getElementById(prefix + "hourField1").textContent = hh - (Math.floor(hh / 10) * 10);
 
-	document.getElementById(prefix + "minuteField1").innerText = Math.floor(mm / 10);
-	document.getElementById(prefix + "minuteField2").innerText = mm - (Math.floor(mm / 10) * 10);
+	document.getElementById(prefix + "minuteField1").textContent = Math.floor(mm / 10);
+	document.getElementById(prefix + "minuteField2").textContent = mm - (Math.floor(mm / 10) * 10);
 
-	document.getElementById(prefix + "secondField1").innerText = Math.floor(ss / 10);
-	document.getElementById(prefix + "secondField2").innerText = ss - (Math.floor(ss / 10) * 10);
+	document.getElementById(prefix + "secondField1").textContent = Math.floor(ss / 10);
+	document.getElementById(prefix + "secondField2").textContent = ss - (Math.floor(ss / 10) * 10);
 
 
 	let millisecondHundreds = Math.floor(ff / 100);
 	let millisecondTens = Math.floor((ff - (millisecondHundreds * 100)) / 10);
 	let millisecondsOnes = ff - (Math.floor(ff / 10) * 10);
-	document.getElementById(prefix + "millisecondField1").innerText = millisecondHundreds;
-	document.getElementById(prefix + "millisecondField2").innerText = millisecondTens;
-	document.getElementById(prefix + "millisecondField3").innerText = millisecondsOnes;
+	document.getElementById(prefix + "millisecondField1").textContent = millisecondHundreds;
+	document.getElementById(prefix + "millisecondField2").textContent = millisecondTens;
+	document.getElementById(prefix + "millisecondField3").textContent = millisecondsOnes;
 
 }  // fillTimeFields
 
@@ -3207,14 +3171,14 @@ function saveFile() {
 
 	const table = document.getElementById("subtitleTable");
 	
-	let targetTrack = document.getElementById("spanTrack").innerHTML.trim();
+	let targetTrack = document.getElementById("spanTrack").textContent.trim();
 	if (targetTrack != "") {
 		targetTrack = targetTrack.substring(0,6);
 	}
 
 	console.log("saveFile targetTrack ", targetTrack);
-	console.log("saveFile document.getElementById('spanTrack').innerHTML x", 
-		document.getElementById("spanTrack").innerHTML, "x");
+	console.log("saveFile document.getElementById('spanTrack').textContent x", 
+		document.getElementById("spanTrack").textContent, "x");
 
 	let filename = (targetTrack + " output.srt").trim();
 	
@@ -3230,22 +3194,13 @@ function saveFile() {
 			matchFound = true;
 		} else {
 			while ((!matchFound) && (subtitleIndex <= lastSubtitleNumber)) {
-				if (document.getElementById(`row${subtitleIndex}SubtitleTrack`).innerHTML.trim().startsWith(targetTrack)) {
+				if (subtitleTable.rows[subtitleIndex].querySelector(".classSubtitleTrack").textContent.trim().startsWith(targetTrack)) {
 					matchFound = true;
 				} else {
 					subtitleIndex += 1;
 				}
 			}
 		}
-		/*
-		if (document.getElementById(`row${subtitleIndex}SubtitleTrack`).innerHTML.substring(0,5) != targetTrack) {
-				subtitleIndex += 1;
-				if (subtitleIndex <= lastSubtitleNumber)
-			}
-		document.getElementById("spanTrack").innerHTML != " " {
-		
-		}
-		*/
 		
 		if (matchFound) {
 			outputIndex += 1;
@@ -3255,7 +3210,7 @@ function saveFile() {
 				" --> " + 
 				convertSecondsToSrtTime(subtitleEndSeconds[subtitleIndex]) + 
 				"\n" +
-				document.getElementById(`row${subtitleIndex}SubtitleText`).innerHTML.replaceAll('<br>', '\n').trim() +
+				subtitleTable.rows[subtitleIndex].querySelector(".classSubtitleText").textContent.replaceAll('<br>', '\n').trim() +
 				"\n\n";
 		}
 
@@ -3560,7 +3515,7 @@ function createSubtitleFontOptions(fontArray) {
 function clickSubtitleFileInput(numberOfFiles) {
 
 	console.log("clickSubtitleFileInput entered ", numberOfFiles);
-	
+
 	if ((numberOfFiles < 1) || (numberOfFiles > 2)) {
 		console.log("clickSubtitleFileInput numberOfFiles = ", numberOfFiles);
 			let errorMsg = 'Invalid numberOfFiles: ', numberOfFiles;
@@ -3613,6 +3568,7 @@ let viewportHeight = getViewportHeight();
 console.log("DOMInitializations Viewport Width " + viewportWidth + " Height " + viewportHeight);
 
 videoElem = document.getElementById("videoArea");
+subtitleTable = document.getElementById("subtitleTable");
 
 const urlParams = new URLSearchParams(window.location.search);
 const allUrlParamsObject = Object.fromEntries(urlParams.entries());
@@ -3628,6 +3584,19 @@ console.log("DOMInitializations maxVideoWidth = ",maxVideoWidth);
 
 console.log("DOMInitializations wrapper.style.width = ", wrapperElement.style.width, 
 		" wrapper.style.height = ", wrapperElement.style.height);
+
+document.getElementById("subtitleTable").addEventListener('click', (e) => {
+	const cell = e.target.closest('td');
+	if (!cell) {return;}
+	const row = cell.parentElement;
+   	console.log("EventListener-subtitleTable-click row.rowIndex:", row.rowIndex);
+   	console.log("EventListener-subtitleTable-click cell.textContent: ", cell.textContent);
+	selectRow(row.rowIndex);
+	if ((cell.classList.contains('classSubtitleStart')) || 
+		(cell.classList.contains('classSubtitleEnd'))) {
+		showTimeEditPopup(row.rowIndex);
+	}
+});
 
 enableFileSelection();
 
@@ -3769,17 +3738,17 @@ function configInitializations() {
 	document.getElementById("OSDefaultThemeOption").style.backgroundColor = OSDefaultThemeAttributes.backgroundColor;
 	// document.getElementById("OSDefaultThemeOption").style.backgroundColor = OSDefaultThemeAttributes.highlightBackgroundColor;
 
-	document.getElementById("preset01ThemeOption").innerText = preset01ThemeAttributes.themeName;
+	document.getElementById("preset01ThemeOption").textContent = preset01ThemeAttributes.themeName;
 	document.getElementById("preset01ThemeOption").style.color = preset01ThemeAttributes.foregroundColor;
 	document.getElementById("preset01ThemeOption").style.backgroundColor = preset01ThemeAttributes.backgroundColor;
 	// document.getElementById("preset01ThemeOption").style.backgroundColor = preset01ThemeAttributes.highlightBackgroundColor;
 
-	document.getElementById("preset02ThemeOption").innerText = preset02ThemeAttributes.themeName;
+	document.getElementById("preset02ThemeOption").textContent = preset02ThemeAttributes.themeName;
 	document.getElementById("preset02ThemeOption").style.color = preset02ThemeAttributes.foregroundColor;
 	document.getElementById("preset02ThemeOption").style.backgroundColor = preset02ThemeAttributes.backgroundColor;
 	// document.getElementById("preset02ThemeOption").style.backgroundColor = preset02ThemeAttributes.highlightBackgroundColor;
 
-	document.getElementById("preset03ThemeOption").innerText = preset03ThemeAttributes.themeName;
+	document.getElementById("preset03ThemeOption").textContent = preset03ThemeAttributes.themeName;
 	document.getElementById("preset03ThemeOption").style.color = preset03ThemeAttributes.foregroundColor;
 	document.getElementById("preset03ThemeOption").style.backgroundColor = preset03ThemeAttributes.backgroundColor;
 	// document.getElementById("preset03ThemeOption").style.backgroundColor = preset03ThemeAttributes.highlightBackgroundColor;
