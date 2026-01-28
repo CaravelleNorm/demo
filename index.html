@@ -220,7 +220,7 @@
 		</span>
 		<!-- Dropdown Unit End -->
 		</span>
-		</span><br>  <!-- class="loadFile-dropdown-wrapper"-->
+		</span><br>  <!-- class="themelist-dropdown-wrapper"-->
 <!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
 		<input type="checkbox" id="myCheck10" onclick="setColor('toggle')">
@@ -452,18 +452,18 @@
 
 </div>
 <!-- Subtitle Table div -->
-<div id="subtitleTableDiv" style="margin: 0; padding-left: 10px; overflow-y: auto; height: 1rem; display: none;">
+<div id="subtitleTableDiv" style="margin: 0; padding-left: 2px; overflow-y: auto; height: 1rem; display: none;">
 <table class="table" id="subtitleTable">
             <thead>
-                <tr style="font-weight: bold; font-size: 1.5rem; padding: 2px;">
-                    <th scope="col" style="width:3%" id="subtitleNumber">#</th>
-                    <th scope="col" style="width:6%" id="subtitleStart">Start</th>
-                    <th scope="col" style="width:6%" id="subtitleEnd">End</th>
-                    <th scope="col" style="width:6%" id="subtitleTrack">Track</th>
-                    <th scope="col" id="subtitleText">Subtitle</th>
+                <tr style="font-weight: bold; font-size: 1.5rem; padding: 0px;">
+                    <th scope="col" style="width: 3%" id="subtitleNumber">#</th>
+                    <th scope="col" style="width: 6%" id="subtitleStart">Start</th>
+                    <th scope="col" style="width: 6%" id="subtitleEnd">End</th>
+                    <th scope="col" style="width: 6%" id="subtitleTrack">Track</th>
+                    <th scope="col" style="width: 79%" id="subtitleText">Subtitle</th>
                 </tr>
             </thead>
-            <tbody id="task-row">
+            <tbody id="subtitleTbody">
             </tbody>
         </table>
 </div>
@@ -560,9 +560,9 @@
 			onclick="changeTime('current', 't1')">Current</button>
 		</span>
 
-		<span class="loadFile-dropdown-wrapper">
+		<span class="loadFile-dropdown-wrapper" id="copyt1">
 		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
-		<span class="loadFile-dropdown-block">
+		<span class="loadFile-dropdown-block dropup">
 		<!-- Dropdown Unit Start -->
 		<span class="loadFile-dropdown-unit">
 		<span class="hovertext1" data-hover="Copy from row n-1 Start Time">
@@ -673,9 +673,9 @@
 			onclick="changeTime('current', 't2')">Current</button>
 		</span>
 
-		<span class="loadFile-dropdown-wrapper">
+		<span class="loadFile-dropdown-wrapper" id="copyt2">
 		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
-		<span class="loadFile-dropdown-block">
+		<span class="loadFile-dropdown-block dropup">
 		<!-- Dropdown Unit Start -->
 		<span class="loadFile-dropdown-unit">
 		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
@@ -707,7 +707,7 @@
 	</span>
 	<div class="textEditButtonColumn">
 		<div style="margin-bottom: 8px;">
-		<span class="loadFile-dropdown-wrapper">
+		<span class="loadFile-dropdown-wrapper" id="splitLineWrapper">
 		<button class="button color3">Split at cursor<span class="dropdown-arrow">▾</span></button>
 		<span class="loadFile-dropdown-block">
 		<!-- Dropdown Unit Start -->
@@ -726,9 +726,10 @@
 		</span>
 		</span> <!-- Dropdown Unit End -->
 		</span> <!-- class="loadFile-dropdown-block"-->
+		</span> <!-- class="loadFile-dropdown-wrapper"-->
 		</div>
 		<div style="margin-bottom: 8px;">
-		<span class="loadFile-dropdown-wrapper">
+		<span class="loadFile-dropdown-wrapper" id="insertLineWrapper">
 		<button class="button color3">Insert<span class="dropdown-arrow">▾</span></button>
 		<span class="loadFile-dropdown-block">
 		<!-- Dropdown Unit Start -->
@@ -741,7 +742,7 @@
 		</span>
 		</span> <!-- Dropdown Unit End -->
 		</span> <!-- class="loadFile-dropdown-block"-->
-		</span>
+		</span> <!-- class="loadFile-dropdown-wrapper"-->
 		</div>
 		<div class="textEditPopupButton1">
 		<span class="hovertext1" data-hover="Delete the selected subtitle">
