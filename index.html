@@ -385,10 +385,14 @@
 	<div>Or paste a YouTube link:<br></div>
 	<input type="url" id="videoURLInput" name="videoURLInput" 
 		placeholder="Insert YouTube url" class="videoURLInput">
-	<div id="videoURLButton" class="vidButton">Submit</div>
+	<div id="videoURLButton" class="vidButton">Submit</div><br><br><br>
+</div>
+<div style="bottom: 0%;">
+	<input type="checkbox" id="displayVideoControls" onclick="enableFields('displayVideoControls')">
+	<label for="displayVideoControls" class="selectOption">Display native video controls</label>
 </div>
 </div>
-<video id="videoArea" class="videoArea" controls disablePictureInPicture>
+<video id="videoArea" class="videoArea" disablePictureInPicture>
 </video>
 <!-- seekBar -->
 <div id="seekBarContainer" class="seekBarContainer">
@@ -404,14 +408,14 @@
 
 <!-- Featured subtitle -->
 <div id="divSubtitle1Wrapper" style="overflow-y: auto;">
-<div id="divSubtitle1" style="font-size: 2rem; min-height: 2rem; padding-top: 0px;
+<div id="divSubtitle1" style="font-size: 2rem; min-height: 2rem; padding-top: 5px;
 	padding-left: 2%; padding-right: 2%; text-align: center; overflow-y: auto;">
 <span contenteditable="false" style="height: auto; text-wrap: balance; padding-left: 5px;
 	padding-right: 5px;" id="spanSubtitle1"></span><br>
 </div>
 </div>
 <div id="divSubtitle2Wrapper" style="overflow-y: auto;">
-<div id="divSubtitle2" style="font-size: 2rem; min-height: 2rem; padding-top: 0px;
+<div id="divSubtitle2" style="font-size: 2rem; min-height: 2rem; padding-top: 5px;
 	padding-left: 2%; padding-right: 2%; text-align: center; overflow-y: auto;">
 <span contenteditable="false" style="height: auto; text-wrap: balance;" id="spanSubtitle2"></span>
 </div>
