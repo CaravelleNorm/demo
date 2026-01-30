@@ -263,7 +263,7 @@ hamburger-dropdown-wrapper::after {
 
 .vidButton:active {background-color: hsl(25, 89%, 67%);}
 
-.videoURLContainer,
+.videoURLContainer
 {
 	border: none;
 	color: hsl(0, 0%, 100%);
@@ -283,11 +283,14 @@ hamburger-dropdown-wrapper::after {
 	padding: 5px;
 }
 
+/* Force display of video controls and timeline
 video::-webkit-media-controls-panel {
 	display: flex !important;
 	opacity: 0.5 !important;
 	object-fit: fill;
 }
+*/
+/*	-webkit-media-controls-timeline */
 
 .videoArea {
 	display: none;
@@ -299,7 +302,7 @@ video::-webkit-media-controls-panel {
 /* ----------- seekBar ----------- */
 
 .seekBarContainer {
-	display: none; /* flex; */
+	display: none; /* inline; */
 	align-items: center;
 	z-index: 9988;  /* Always on top */
 }
