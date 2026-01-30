@@ -4,6 +4,8 @@ document.addEventListener('keydown', PSDPD_KeyCheck);
 
 let videoFileLoaded = false;
 let videoElem;
+let audioFileLoaded = false;
+let displayVideoControls = false;
 let subtitleTable;
 let videoDuration;
 let youTubeVideoId;
@@ -1320,6 +1322,13 @@ function enableFields(checkBoxId){
 	case 'myCheck09':
 		toggleDashboard();
 		break;
+	case 'displayVideoControls':
+		if (checkBox.checked == true) {
+			displayVideoControls = true;
+		} else {
+			displayVideoControls = false;
+		}
+		break;
 	default:
 		break;
 	}
@@ -1810,7 +1819,6 @@ async function loadVideoFile(file) {
 //	const file = videoFile.files[0];
     const videourl = URL.createObjectURL(file);
     videoElem.setAttribute("src", videourl);
-
 	videoElem.onpause = function() {
 		handleVideoOnPause();
 	}
@@ -1819,11 +1827,23 @@ async function loadVideoFile(file) {
 		handleVideoOnEnded();
 	}
 
-
 	videoElem.onloadedmetadata = function() {
 
 		if (videoFileLoaded) {
 			return;
+		}
+
+		if (videoElem.videoWidth === 0 && videoElem.videoHeight === 0) {
+			audioFileLoaded = true;
+			displayVideoControls = true;
+			const selectVideoSize = document.getElementById("videoSizeMenu");
+			selectVideoSize.value = '0.10';
+		}
+
+		if (displayVideoControls) {
+			videoElem.controls = true;
+		} else {
+			videoElem.controls = false;
 		}
 
 		videoElem.style.display = 'inline-block';
@@ -1993,8 +2013,7 @@ function getYouTubeVideoId(url) {
 
 	removeVideoPrompts();
 	// Remove the file video player.
-	let elem = document.getElementById('videoArea');
-	elem.style.display = 'none';
+	videoElem.style.display = 'none';
 
 	var tag = document.createElement('script');
 
@@ -2019,6 +2038,43 @@ function onYouTubeIframeAPIReady() {
 	// This function creates an <iframe> (and YouTube player)
 	// after the API code downloads.
 
+	let playerParms = {
+		videoId: youTubeVideoId,
+		frameborder: 0,
+		width: 640,
+		height: 360,
+		autoplay: false,
+		// allowfullscreen: true,
+		class: 'video',
+		controls: 0,
+		disablekb: 1, // 1 = keyboard controls disabled
+		rel: 0,
+		iv_load_policy: 3, // 1 = annotations shown, 3 = annotations not shown
+		playerVars: {
+			'playsinline': 1, 'autoplay': 0, 'controls': 0
+		},
+		// playerVars: { 'start': 159, 'autoplay': 1, 'controls': 1, 'showinfo': 0, 'rel': 0 },
+		events: {
+			'onReady': onYouTubePlayerReady,
+			'onStateChange': onYouTubePlayerStateChange,
+			'enablejsapi': 1
+		}
+	}
+
+	console.log("onYouTubeIframeAPIReady playerParms.controls = ", playerParms.controls);
+
+	if (displayVideoControls) {
+		playerParms.controls = 1;
+		playerParms.playerVars = {'playsinline': 1, 'autoplay': 0, 'controls': 1}
+	} else {
+		playerParms.controls = 0;
+		playerParms.playerVars = {'playsinline': 1, 'autoplay': 0, 'controls': 0}
+
+	}
+
+	player = new YT.Player('player', playerParms);
+
+/*
 	player = new YT.Player('player', {
 		videoId: youTubeVideoId,
 		frameborder: 0,
@@ -2042,6 +2098,8 @@ function onYouTubeIframeAPIReady() {
 		}
 	});
 
+
+*/	
 	//let elem = document.getElementById('player');
 	//elem.classList.add('responsive-iframe');
 
@@ -2704,6 +2762,7 @@ function textEditPopupAction(operand) {
 				subtitleTable.rows[selectedSubtitleNumber - 1].querySelector(".classSubtitleText").textContent
 				+ text1.trim();
 		}
+		selectRow(selectedSubtitleNumber - 1);
 		return;
 	}
 }
