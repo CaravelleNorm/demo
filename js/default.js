@@ -455,7 +455,36 @@ function highlightThemeOption(optionName, action) {
 
 }
 
+function sanityCheck() {
+
+	if (lastSubtitleNumber === 0) {return;}
+
+	if (lastSubtitleNumber != (subtitleTable.rows.length - 1)) {
+		let errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleTable.rows.length - 1) ' 
+			+ lastSubtitleNumber + ' != ' + (subtitleTable.rows.length - 1);
+		alert(errorMsg);
+		throw new Error(errorMsg);
+	}
+
+	if (lastSubtitleNumber != (subtitleStartSeconds.length - 1)) {
+		let errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleStartSeconds.length - 1) ' 
+			+ lastSubtitleNumber + ' != ' + (subtitleStartSeconds.length - 1);
+		alert(errorMsg);
+		throw new Error(errorMsg);
+	}
+
+	if (lastSubtitleNumber != (subtitleEndSeconds.length - 1)) {
+		let errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleEndSeconds.length - 1) ' 
+			+ lastSubtitleNumber + ' != ' + (subtitleEndSeconds.length - 1);
+		alert(errorMsg);
+		throw new Error(errorMsg);
+	}
+
+}
+
 function highlightSelectedRow(rowNumber) {
+
+	sanityCheck();
 
 	// Remove 'selected' class from previously selected row
 	if ((selectedSubtitleNumber < subtitleTable.rows.length) && (selectedSubtitleNumber > 0)) {
@@ -565,6 +594,10 @@ function selectRow(rowNumber,directive) {
 		subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
 	document.getElementById("spanSubtitle1").textContent =
 		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent;
+	if (document.getElementById("spanSubtitle1").textContent === "") {
+		document.getElementById("spanSubtitle1").textContent = "_";
+	}
+		
 
 	document.getElementById("spanStartTimeOnDashboard").textContent =
 		document.getElementById("spanStartTime").textContent;
@@ -589,7 +622,10 @@ function selectRow(rowNumber,directive) {
     console.log("selectRow updating s2");
 		document.getElementById("spanSubtitle2").textContent =
 			subtitleTable.rows[rowNumber + 1].querySelector(".classSubtitleText").textContent;
-			spanSubtitle2Row = rowNumber + 1;
+		if (document.getElementById("spanSubtitle2").textContent === "") {
+			document.getElementById("spanSubtitle2").textContent = "_";
+		}
+		spanSubtitle2Row = rowNumber + 1;
 		if (scrollStepOption == 2) {
 			computeSubtitleTableHeight();
 			return;
@@ -1921,6 +1957,7 @@ function addKeyListenerForVideo() {
 			if (!event.shiftKey) {
 				break;
 			}
+		case "{":
 			var x = document.getElementById("videoSizeMenu");
 			if (x.selectedIndex > 0) {
 				x.selectedIndex -= 1;
@@ -1931,6 +1968,7 @@ function addKeyListenerForVideo() {
 			if (!event.shiftKey) {
 				break;
 			}
+		case "}":
 			var x = document.getElementById("videoSizeMenu");
 			if (x.selectedIndex < (x.length - 1)) {
 				x.selectedIndex += 1;
@@ -2393,6 +2431,59 @@ function displaySubtitles()	 {
 	
 }  // displaySubtitles
 
+function updateRow() {
+
+	let selectedSpan = "";
+	let RowNumber = 0;
+	let doNothing = true;
+
+	if (spanSubtitle1Selected) {
+		selectedSpan = "spanSubtitle1";
+		RowNumber = spanSubtitle1Row;
+		spanSubtitle1Selected = false;
+		if (spanSubtitle1Modified) {
+			doNothing = false;
+			spanSubtitle1Modified = false;
+		}
+	} else if (spanSubtitle2Selected) {
+		selectedSpan = "spanSubtitle2";
+		RowNumber = spanSubtitle2Row;
+		spanSubtitle2Selected = false;
+		if (spanSubtitle2Modified) {
+			doNothing = false;
+			spanSubtitle2Modified = false;
+		}
+	}
+
+	console.log("updateRow ", selectedSpan, " rowNumber ", RowNumber, " modified = ", !doNothing);
+
+	if (doNothing) { return; }
+
+	let oldValue = subtitleTable.rows[RowNumber].querySelector(".classSubtitleText").textContent;
+	let newValue = document.getElementById(selectedSpan).textContent;
+	console.log("updateRow ", selectedSpan, " oldValue = ", oldValue);
+	console.log("updateRow ", selectedSpan, " newValue = ", newValue);
+	if (newValue === "_") {
+		newValue = oldValue;
+	} 
+	if (oldValue != newValue) {
+		changeCounter += 1;
+		selectCurrentIndex("undoArray");
+		undoArray[undoArrayCurrentIndex].inUse = true;
+		undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
+		undoArray[undoArrayCurrentIndex].action = "subtitleTextChange";
+		undoArray[undoArrayCurrentIndex].rowNumber = RowNumber;
+		undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
+		undoArray[undoArrayCurrentIndex].oldValue = oldValue;
+		undoArray[undoArrayCurrentIndex].newValue = newValue;
+		subtitleTable.rows[RowNumber].querySelector(".classSubtitleText").textContent = newValue;
+	}
+
+	computeSubtitleTableHeight();
+	unFocus();
+
+}  // updateRow
+
 function addKeyListenerForSubtitles() {
 
 	if (keyListenerForSubtitlesAdded) { return; }
@@ -2402,6 +2493,12 @@ function addKeyListenerForSubtitles() {
 		if ((document.activeElement.hasAttribute("contentEditable")) && 
 			(document.activeElement.isContentEditable)) {
 			switch (event.key) {
+			case "Escape":
+				spanSubtitle1Modified = false;
+				spanSubtitle2Modified = false;
+				selectRow(selectedSubtitleNumber);
+				event.preventDefault();
+				return;
 			default:
 				return;	
 			}
@@ -2463,6 +2560,7 @@ function addKeyListenerForSubtitles() {
 			if (event.shiftKey) {
 				break;
 			}
+		case "[":
 			var x = document.getElementById("subtitleFontSizeMenu");
 			if (x.selectedIndex > 0) {
 				x.selectedIndex -= 1;
@@ -2473,6 +2571,7 @@ function addKeyListenerForSubtitles() {
 			if (event.shiftKey) {
 				break;
 			}
+		case "]":
 			var x = document.getElementById("subtitleFontSizeMenu");
 			if (x.selectedIndex < (x.length - 1)) {
 				x.selectedIndex += 1;
@@ -2489,62 +2588,23 @@ function addKeyListenerForSubtitles() {
 		spanSubtitle1Modified = true;
 	});
 
-/*	document.getElementById("spanSubtitle1").addEventListener('contextmenu', (e) => {
-		if (e.ctrlKey)	{
-			spanSubtitle1Selected = true;
-			document.getElementById("textEditPopup").style.display = "inline-block";
-			e.preventDefault();
-		}
-		return;
-	});
-*/
-
 	document.getElementById("spanSubtitle1").addEventListener('click', (e) => {
 		if (!(document.getElementById("myCheck07").checked)) { return;}
 		spanSubtitle1Selected = true;
 		spanSubtitle2Selected = false;
-		//document.getElementById("textEditPopup").style.display = "inline-block";
 		e.preventDefault();
 		return;
 	});
 
 	document.getElementById("spanSubtitle1").addEventListener('blur', () => {
-		if (spanSubtitle1Modified) {
-			console.log("spanSubtitle1 modified - updating subtitle row ", selectedSubtitleNumber);
-			let oldValue = subtitleTable.rows[selectedSubtitleNumber].querySelector(".classSubtitleText").textContent;
-			let newValue = document.getElementById("spanSubtitle1").textContent;
-			if (oldValue != newValue) {
-				changeCounter += 1;
-				selectCurrentIndex("undoArray");
-				undoArray[undoArrayCurrentIndex].inUse = true;
-				undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
-				undoArray[undoArrayCurrentIndex].action = "subtitleTextChange";
-				undoArray[undoArrayCurrentIndex].rowNumber = selectedSubtitleNumber;
-				undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
-				undoArray[undoArrayCurrentIndex].oldValue = oldValue;
-				undoArray[undoArrayCurrentIndex].newValue = newValue;
-				subtitleTable.rows[selectedSubtitleNumber].querySelector(".classSubtitleText").textContent = newValue;
-			}
-			spanSubtitle1Modified = false;
-			computeSubtitleTableHeight();
-			unFocus();
-		}
+		console.log("onBlur spanSubtitle1 spanSubtitle1Modified = ", spanSubtitle1Modified);
+		updateRow();
 	});
 
 
 	document.getElementById("spanSubtitle2").addEventListener('input', () => {
 		spanSubtitle2Modified = true;
 	});
-
-/*	document.getElementById("spanSubtitle2").addEventListener('contextmenu', (e) => {
-		if (e.ctrlKey)	{
-			spanSubtitle2Selected = true;
-			document.getElementById("textEditPopup").style.display = "inline-block";
-			e.preventDefault();
-		}
-	return;
-	});
-*/
 
 	document.getElementById("spanSubtitle2").addEventListener('click', (e) => {
 		if (!(document.getElementById("myCheck07").checked)) { return;}
@@ -2556,27 +2616,8 @@ function addKeyListenerForSubtitles() {
 	});
 
 	document.getElementById("spanSubtitle2").addEventListener('blur', () => {
-		if (spanSubtitle2Modified) {
-			let oldValue = subtitleTable.rows[selectedSubtitleNumber + 1].querySelector(".classSubtitleText").textContent;
-			let newValue = document.getElementById("spanSubtitle2").textContent;
-			if (oldValue != newValue) {
-				changeCounter += 1;
-				selectCurrentIndex("undoArray");
-				undoArray[undoArrayCurrentIndex].inUse = true;
-				undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
-				undoArray[undoArrayCurrentIndex].action = "subtitleTextChange";
-				undoArray[undoArrayCurrentIndex].rowNumber = selectedSubtitleNumber + 1;
-				undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
-				undoArray[undoArrayCurrentIndex].oldValue = oldValue;
-				undoArray[undoArrayCurrentIndex].newValue = newValue;
-				subtitleTable.rows[selectedSubtitleNumber + 1].querySelector(".classSubtitleText").textContent = newValue
-			}
-			spanSubtitle2Modified = false;
-			spanSubtitle2Selected = false;
-			computeSubtitleTableHeight();
-			unFocus();
-		}
-
+		console.log("onBlur spanSubtitle2 spanSubtitle2Modified = ", spanSubtitle2Modified);
+		updateRow();
 	});
 
 	keyListenerForSubtitlesAdded = true;
@@ -2643,8 +2684,24 @@ function getCharacterOffsetWithin(range, node) {
 
  
 function textEditPopupAction(operand) {
-	
+
+	console.log("textEditPopupAction operand = ", operand);
+
 	switch (operand) {
+		case 'mousedown':
+			spanSubtitle1Modified = false;
+			spanSubtitle2Modified = false;
+			return;
+		case 'updateRow':
+			updateRow();
+			return;
+		case 'splitToNext':
+		case 'splitToNextNewline':
+		case 'splitToPrev':
+		case 'splitToPrevNewline':
+			document.getElementById("splitLineWrapper").style.pointerEvents = 'none';
+			setTimeout(() => {document.getElementById("splitLineWrapper").style.pointerEvents = ''}, 500);
+			break;
 		case 'playSingle':
 			buttonAction('currentLine');
 			return;
@@ -2667,13 +2724,6 @@ function textEditPopupAction(operand) {
 		case 'delete':
 			deleteSubtitle(selectedSubtitleNumber);
 			return;
-		case 'splitToNext':
-		case 'splitToNextNewline':
-		case 'splitToPrev':
-		case 'splitToPrevNewline':
-			document.getElementById("splitLineWrapper").style.pointerEvents = 'none';
-			setTimeout(() => {document.getElementById("splitLineWrapper").style.pointerEvents = ''}, 500);
-			break;
 		default:
 			console.log("textEditPopupAction invalid operand: ", operand);
 			return;
@@ -2681,6 +2731,7 @@ function textEditPopupAction(operand) {
 
 	let selectedSpan = "";
 	let RowNumber = 0;
+
 	if (spanSubtitle1Selected) {
 		selectedSpan = "spanSubtitle1";
 		RowNumber = spanSubtitle1Row;
@@ -2690,8 +2741,8 @@ function textEditPopupAction(operand) {
 		RowNumber = spanSubtitle2Row;
 		spanSubtitle2Selected = false;
 	}
+
 	if (selectedSpan == "") {
-		// ?? tell user to click on subtitle span to select
 		console.log("textEditPopupAction operand ", operand, " RowNumber ", RowNumber,
 		' selectedSpan = ""', selectedSpan);
 		alert("textEditPopupAction Place cursor in edit area before choosing split action");
@@ -2707,7 +2758,7 @@ function textEditPopupAction(operand) {
 	//document.getElementById("textEditPopup").style.display = "none";
 	//return;
 	
-	var range = window.getSelection().getRangeAt(0);
+	let range = window.getSelection().getRangeAt(0);
 	let cursorPosition = getCharacterOffsetWithin(range, textElement);
 	
 //	var editor = document.activeElement;
@@ -2716,8 +2767,8 @@ function textEditPopupAction(operand) {
 //	if (!editor) return;
 // 	let cursorPosition = CaretUtil.getCaretPosition(textElement);
 
-	text1 = textElement.textContent.substring(0, cursorPosition);
-	text2 = textElement.textContent.substring(cursorPosition);
+	const text1 = textElement.textContent.substring(0, cursorPosition);
+	const text2 = textElement.textContent.substring(cursorPosition);
 /*
 	let text1 = "";
 	let text2 = "";
@@ -2748,6 +2799,7 @@ function textEditPopupAction(operand) {
 		} else {
 			subtitleTable.rows[selectedSubtitleNumber + 1].querySelector(".classSubtitleText").textContent = text2.trim()
 				+ subtitleTable.rows[selectedSubtitleNumber + 1].querySelector(".classSubtitleText").textContent;
+			selectRow(selectedSubtitleNumber);
 		}
 		return;
 	}
@@ -2756,27 +2808,27 @@ function textEditPopupAction(operand) {
 		textElement.textContent = text2.trim();
 		subtitleTable.rows[selectedSubtitleNumber].querySelector(".classSubtitleText").textContent = text2.trim();
 		if ((operand === "splitToPrevNewline") || (selectedSubtitleNumber === 1)) {
-			insertSubtitle((RowNumber - 1), text1.trim(), "selectOld");
+			insertSubtitle((RowNumber - 1), text1.trim(), "selectNew");
 		} else {
 			subtitleTable.rows[selectedSubtitleNumber - 1].querySelector(".classSubtitleText").textContent = 
 				subtitleTable.rows[selectedSubtitleNumber - 1].querySelector(".classSubtitleText").textContent
 				+ text1.trim();
+			selectRow(selectedSubtitleNumber - 1);
 		}
-		selectRow(selectedSubtitleNumber - 1);
 		return;
 	}
 }
 
 function insertSubtitle(afterRowNumber, text, selectOption) {
 
-	var helper = {
+	let helper = {
   		toTimeString: function(ms) {
-    		var hh = Math.floor(ms / 1000 / 3600);
-    		var mm = Math.floor(ms / 1000 / 60 % 60);
-    		var ss = Math.floor(ms / 1000 % 60);
-			var ff = Math.floor(ms % 1000);
+    		let hh = Math.floor(ms / 1000 / 3600);
+    		let mm = Math.floor(ms / 1000 / 60 % 60);
+    		let ss = Math.floor(ms / 1000 % 60);
+			let ff = Math.floor(ms % 1000);
 			ff = Math.floor(ff / 10);
-    		var time = hh + ":" + (mm < 10 ? "0" : "") + mm + ":" 
+    		let time = hh + ":" + (mm < 10 ? "0" : "") + mm + ":" 
 				+ (ss < 10 ? "0" : "") + ss + "." 
 				+ (ff < 10 ? "0" : "") + ff;
     		return time;
@@ -3006,7 +3058,7 @@ function fillTimeFields (ms, prefix) {
 }  // showTimeEditPopup
 
 function dragElement(elmnt) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   if (document.getElementById(elmnt.id + "Header")) {
     /* if present, the header is where you move the DIV from:*/
     document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
@@ -3159,19 +3211,19 @@ function captureSingleSubtitle(content, inputId) {
 
 // helper adapted from https://github.com/papnkukn/subsrt/blob/master/lib/format/srt.js
 
-	var helper = {
+	let helper = {
   		toTimeString: function(ms) {
-    		var hh = Math.floor(ms / 1000 / 3600);
-    		var mm = Math.floor(ms / 1000 / 60 % 60);
-    		var ss = Math.floor(ms / 1000 % 60);
-			var ff = Math.floor(ms % 1000);
+    		let hh = Math.floor(ms / 1000 / 3600);
+    		let mm = Math.floor(ms / 1000 / 60 % 60);
+    		let ss = Math.floor(ms / 1000 % 60);
+			let ff = Math.floor(ms % 1000);
 			ff = Math.floor(ff / 10);
-    		/* var time = (hh < 10 ? "0" : "") 
+    		/* let time = (hh < 10 ? "0" : "") 
 				+ hh + ":" + (mm < 10 ? "0" : "") + mm + ":" 
 				+ (ss < 10 ? "0" : "") + ss + "," 
 				+ (ff < 100 ? "0" : "") + (ff < 10 ? "0" : "") + ff;
 			*/
-    		var time = hh + ":" + (mm < 10 ? "0" : "") + mm + ":" 
+    		let time = hh + ":" + (mm < 10 ? "0" : "") + mm + ":" 
 				+ (ss < 10 ? "0" : "") + ss + "." 
 				+ (ff < 10 ? "0" : "") + ff;
     		return time;
@@ -3643,6 +3695,14 @@ console.log("DOMInitializations maxVideoWidth = ",maxVideoWidth);
 
 console.log("DOMInitializations wrapper.style.width = ", wrapperElement.style.width, 
 		" wrapper.style.height = ", wrapperElement.style.height);
+
+document.getElementById("subtitleTable").addEventListener('mousedown', (e) => {
+	const cell = e.target.closest('td');
+	if (!cell) {return;}
+	const row = cell.parentElement;
+   	console.log("EventListener-subtitleTable-mousedown row.rowIndex:", row.rowIndex);
+	updateRow();
+});
 
 document.getElementById("subtitleTable").addEventListener('click', (e) => {
 	const cell = e.target.closest('td');
