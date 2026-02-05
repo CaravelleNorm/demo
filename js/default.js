@@ -50,17 +50,21 @@ const loadFontFileOptionText = 'Load Font List from a File';
 let callUpdateTimeTimeoutId;
 const checkTimeInterval = 200;
 const updateTimeInterval = 1000;
+let timeEditSynchronizeWithTrack1 = true;
 let timeEditPopupRow = 0;
 let t1timeEditPopupOldTime;
 let t1timeEditPopupOldSeconds;
 let t2timeEditPopupOldTime;
 let t2timeEditPopupOldSeconds;
+let t1timeEditPopupOldTimeOnTrack2;
+let t1timeEditPopupOldSecondsOnTrack2;
+let t2timeEditPopupOldTimeOnTrack2;
+let t2timeEditPopupOldSecondsOnTrack2;
 let CaretUtil = { };
 let showTimePopup = false;
 let customColorsEnabled = false;
 let selectedCustomStyle;
 let dropDownArrow = "▾";
-
 let themeAttributes;
 
 let lightThemeAttributes = {
@@ -98,6 +102,12 @@ let preset03ThemeAttributes = {
 	foregroundColor: "#f5f5f5", /* white smoke */
 	backgroundColor: "#c25a2e", /* ruddy brown */
 	highlightBackgroundColor: "#a0390d" /* russet */
+}
+let preset04ThemeAttributes = {
+	themeName: "preset 4",
+	foregroundColor: "#0a0a0a", /* ? */
+	backgroundColor: "#99caf0", /* ? */
+	highlightBackgroundColor: "#5e95b0" /* ? */
 }
 
 var helper = {
@@ -418,6 +428,9 @@ function findThemeAttributeObject(name) {
 		break;
 	case 'preset03':
 		themeAttributeObject = preset03ThemeAttributes;
+		break;
+	case 'preset04':
+		themeAttributeObject = preset04ThemeAttributes;
 		break;
 	default:
 		themeAttributeObject = 0;
@@ -971,9 +984,15 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 	if (elemIdTo === 't1') {
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = newText;
 		subtitleStartSeconds[timeEditPopupRow] = newSeconds;
+		if ((subtitleFileDataArray[2].loaded) && (timeEditSynchronizeWithTrack1)) {
+			synchronizeWithTrack1(timeEditPopupRow, "t1", newSeconds, newText);
+		}
 	} else {
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = newText;
 		subtitleEndSeconds[timeEditPopupRow] = newSeconds;
+		if ((subtitleFileDataArray[2].loaded) && (timeEditSynchronizeWithTrack1)) {
+			synchronizeWithTrack1(timeEditPopupRow, "t2", newSeconds, newText);
+		}
 	}
 	document.getElementById(`copy${elemIdTo}`).style.pointerEvents = 'none';
 	setTimeout(() => {document.getElementById(`copy${elemIdTo}`).style.pointerEvents = ''}, 500);
@@ -1070,6 +1089,9 @@ function saveTime (prefix) {
 			" seconds old ", subtitleStartSeconds[timeEditPopupRow], " new ", totalSeconds);
 		subtitleStartSeconds[timeEditPopupRow] = totalSeconds;
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = timeText;
+		if ((subtitleFileDataArray[2].loaded) && (timeEditSynchronizeWithTrack1)) {
+			synchronizeWithTrack1(timeEditPopupRow, "t1", totalSeconds, timeText);
+		}
 		break;
 	case "t2":
 		console.log("saveTime Row ", timeEditPopupRow, " end ",
@@ -1079,6 +1101,9 @@ function saveTime (prefix) {
 			" seconds old ", subtitleEndSeconds[timeEditPopupRow], " new ", totalSeconds);
 		subtitleEndSeconds[timeEditPopupRow] = totalSeconds;
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = timeText;
+		if ((subtitleFileDataArray[2].loaded) && (timeEditSynchronizeWithTrack1)) {
+			synchronizeWithTrack1(timeEditPopupRow, "t2", totalSeconds, timeText);
+		}
 		break;
 	default:
 		console.log('saveTime Invalid prefix ', prefix);
@@ -1098,6 +1123,9 @@ function timeEditRestore(prefix) {
 			" to ", t1timeEditPopupOldSeconds);
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = t1timeEditPopupOldTime;
 		subtitleStartSeconds[timeEditPopupRow] = t1timeEditPopupOldSeconds;
+		if ((subtitleFileDataArray[2].loaded) && (timeEditSynchronizeWithTrack1)) {
+			synchronizeWithTrack1(timeEditPopupRow, "t1", t1timeEditPopupOldSecondsOnTrack2, t1timeEditPopupOldTimeOnTrack2);
+		}
 		break;
 	case "t2":
 		console.log("timeEditRestore Row ", timeEditPopupRow, " end restored from ",
@@ -1106,7 +1134,10 @@ function timeEditRestore(prefix) {
 			" seconds restored from ", subtitleEndSeconds[timeEditPopupRow], 
 			" to ", t2timeEditPopupOldSeconds);
 			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = t2timeEditPopupOldTime;
-		subtitleEndSeconds[timeEditPopupRow] = t2timeEditPopupOldSeconds;
+			subtitleEndSeconds[timeEditPopupRow] = t2timeEditPopupOldSeconds;
+			if ((subtitleFileDataArray[2].loaded) && (timeEditSynchronizeWithTrack1)) {
+				synchronizeWithTrack1(timeEditPopupRow, "t2", t2timeEditPopupOldSecondsOnTrack2, t2timeEditPopupOldTimeOnTrack2);
+			}
 		break;
 	default:
 		console.log('timeEditRestore Invalid prefix ', prefix);
@@ -1142,15 +1173,21 @@ function timeEditCurrent(prefix) {
 			" to ", current);
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = timeText;
 		subtitleStartSeconds[timeEditPopupRow] = current;
+		if ((subtitleFileDataArray[2].loaded) && (timeEditSynchronizeWithTrack1)) {
+			synchronizeWithTrack1(timeEditPopupRow, "t1", current, timeText);
+		}
 		break;
 	case "t2":
 		console.log("timeEditCurrent Row ", timeEditPopupRow, " end changed from ",
 			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
-			" to ", t2timeEditPopupOldTime, 
+			" to ", timeText, 
 			" seconds changed from ", subtitleEndSeconds[timeEditPopupRow], 
 			" to ", current);
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = timeText;
 		subtitleEndSeconds[timeEditPopupRow] = current;
+		if ((subtitleFileDataArray[2].loaded) && (timeEditSynchronizeWithTrack1)) {
+			synchronizeWithTrack1(timeEditPopupRow, "t2", current, timeText);
+		}
 		break;
 	default:
 		console.log('timeEditCurrent Invalid prefix ', prefix);
@@ -1161,6 +1198,38 @@ function timeEditCurrent(prefix) {
 
 }  // changeTime
 
+function synchronizeWithTrack1(rowNumber, prefix, time, timeText) {
+	let sourceTrack = subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent.trim();
+	if (!sourceTrack.startsWith(subtitleFileDataArray[1].defaultStyle)) { return; }
+
+	let targetRow = rowNumber + 1;
+	let targetRowFound = false;
+	while ((!targetRowFound) && (targetRow <= lastSubtitleNumber)) {
+		let targetRowTrack = subtitleTable.rows[targetRow].querySelector(".classSubtitleTrack").textContent.trim();
+		if (targetRowTrack.startsWith(subtitleFileDataArray[2].defaultStyle)) {
+			targetRowFound = true;
+		} else {
+			targetRow++;
+		}
+	}
+
+	if (!targetRowFound) { return; }
+
+	switch (prefix) {
+		case "t1":
+			subtitleStartSeconds[targetRow] = time;
+			subtitleTable.rows[targetRow].querySelector(".classSubtitleStart").textContent = timeText;
+			break;
+		case "t2":
+			subtitleEndSeconds[targetRow] = time;
+			subtitleTable.rows[targetRow].querySelector(".classSubtitleEnd").textContent = timeText;
+			break;
+		default:
+			let errorMsg = 'synchronizeWithTrack1 invalid prefix: ', prefix;
+			alert(errorMsg);
+			throw new Error(errorMsg);
+	}
+}  // synchronizeWithTrack1
 
 function undo() {
 	console.log("undo undoArrayCurrentIndex = ", undoArrayCurrentIndex);
@@ -2302,15 +2371,16 @@ async function loadFontListFile(file) {
 async function loadSubtitleFile0(file) {
 
 	subtitleFileDataArray[0].loaded = false;
+	subtitleFileDataArray[1].loaded = false;
+	subtitleFileDataArray[2].loaded = false;
 	totalNumberOfSubtitlesRead = 0;
 	deleteSubtitleTable();
 
-	await extractSubtitleFile(file, subtitleFileDataArray[0]);
-
-	document.getElementById("scrollStepMenu").value = '1';
-	changeScrollStep();
+	await extractSubtitleFile(file, subtitleFileDataArray[0]); 
 
 	displaySubtitles();
+	document.getElementById("scrollStepMenu").value = '1';
+	changeScrollStep();
 
 	console.log("loadSubtitleFile0 subtitleFileDataArray[0].loaded = ", subtitleFileDataArray[0].loaded);
 }
@@ -2381,10 +2451,9 @@ async function loadSubtitleFile2(file) {
 			(index + 1));
 		});
 
+		displaySubtitles();
 		document.getElementById("scrollStepMenu").value = '2';
 		changeScrollStep();
-
-		displaySubtitles();
 
 	}
 }
@@ -3019,6 +3088,14 @@ function showTimeEditPopup(rowNumber) {
 		t1timeEditPopupOldSeconds = subtitleStartSeconds[rowNumber];
 		t2timeEditPopupOldTime = subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
 		t2timeEditPopupOldSeconds = subtitleEndSeconds[rowNumber];
+		if ((timeEditSynchronizeWithTrack1) && (subtitleFileDataArray[2].loaded)) {
+			t1timeEditPopupOldTimeOnTrack2 = 
+				subtitleTable.rows[rowNumber + 1].querySelector(".classSubtitleStart").textContent;
+			t1timeEditPopupOldSecondsOnTrack2 = subtitleStartSeconds[rowNumber + 1];
+			t2timeEditPopupOldTimeOnTrack2 = 
+				subtitleTable.rows[rowNumber + 1].querySelector(".classSubtitleEnd").textContent;
+			t2timeEditPopupOldSecondsOnTrack2 = subtitleEndSeconds[rowNumber + 1];
+		}
 	}
 
 	fillTimeFields((subtitleStartSeconds[rowNumber] * 1000), "t1");
@@ -3649,7 +3726,7 @@ function clickSubtitleFileInput(numberOfFiles) {
 	if (!subtitleFileElem2) {return;}
 
 	console.log("clickSubtitleFileInput proceeding");
-	
+
 	if (numberOfFiles == 1) {
 		subtitleFileElem0.value = ""; //Clear .value to make this file element reusable
 		subtitleFileElem0.click();
@@ -3871,6 +3948,11 @@ function configInitializations() {
 	document.getElementById("preset03ThemeOption").style.color = preset03ThemeAttributes.foregroundColor;
 	document.getElementById("preset03ThemeOption").style.backgroundColor = preset03ThemeAttributes.backgroundColor;
 	// document.getElementById("preset03ThemeOption").style.backgroundColor = preset03ThemeAttributes.highlightBackgroundColor;
+
+	document.getElementById("preset04ThemeOption").textContent = preset04ThemeAttributes.themeName;
+	document.getElementById("preset04ThemeOption").style.color = preset04ThemeAttributes.foregroundColor;
+	document.getElementById("preset04ThemeOption").style.backgroundColor = preset04ThemeAttributes.backgroundColor;
+	// document.getElementById("preset04ThemeOption").style.backgroundColor = preset04ThemeAttributes.highlightBackgroundColor;
 
 	if (typeof spacebarOption == 'undefined') {
 		errorReason = 'spacebarOption missing';
