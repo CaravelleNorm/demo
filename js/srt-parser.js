@@ -39,7 +39,7 @@ function parseSrtLine(line) {
   return {
     start: srtTimeToSeconds(match[1] + match[2]),
     end:   srtTimeToSeconds(match[3] + match[4]),
-    style: '',
+    subtitleStyle: '',
     text:  match[5].replaceAll('\n', '<br>').trim() // tempText3 // match[3].trim()
   };
 }

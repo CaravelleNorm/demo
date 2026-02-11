@@ -88,7 +88,7 @@ function parse(content, options) {
               }
               caption.start = ssaHelper.toSeconds(caption.data["Start"]);
               caption.end = ssaHelper.toSeconds(caption.data["End"]);
-              caption.style = caption.data["Style"];   // added NWP
+              caption.subtitleStyle = caption.data["Style"];   // added NWP
               caption.duration = caption.end - caption.start;
               caption.content = caption.data["Text"];
 
