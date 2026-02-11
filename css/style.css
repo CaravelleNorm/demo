@@ -59,11 +59,17 @@ body {
     vertical-align: middle;
 }
 
+thead {
+	position: sticky; /* sticky; */
+	color:   #ffffff; 
+	background-color: #001858;
+}
 
 th {
+	/* position: -webkit-sticky; */
 	position: sticky; /* sticky; */
 	top: 0;
-	z-index: 1; /* Keep it on top of other rows */
+	z-index: 9999; /* Keep it on top of other rows */
 	color:   #ffffff; 
 	background-color: #001858;
 	/* background-color: #87CEEB;  */
@@ -107,6 +113,14 @@ table tr td:first-child::before {
 	vertical-align: middle;
 }
 
+/* Layout for the horizontal row */
+.button-row {
+    display: flex;
+    gap: 10px;
+    font-family: Arial, sans-serif;
+	width: max-content;
+	padding: 6px;
+}
 
 .hamburger-dropdown-wrapper > .line {
 	content: "";
@@ -131,21 +145,7 @@ table tr td:first-child::before {
 	background-color: #ffffff;
 }
 
-/*
-hamburger-dropdown-wrapper__line,
-hamburger-dropdown-wrapper::before,
-hamburger-dropdown-wrapper::after {
-	content: "";
-	width: 18px;
-	height: 2px;
-	background-color: #333333;
-	border-radius: 1px;
-	transition: transform 0.3s, opacity 0.3s;
-}
-*/
 .hamburger-dropdown-wrapper:hover .hamburger-dropdown-block {display: block;}
-
-.hamburger-dropdown-wrapper:hover .dropbtn {background-color: #3e8e41;}
 
 .hamburger-dropdown-block {
 	display: none;
@@ -157,25 +157,13 @@ hamburger-dropdown-wrapper::after {
 	background-color: #f1f1f1;
 	min-width: 400px;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border-radius: 12px;
 	z-index: 1000;
-}
-
-.hamburger-dropdown-block a {
-	color: black;
-	text-decoration: none;
-	display: block;
-	z-index: 1000; /* Keep it on top of other rows */
-}
-
-.hamburger-dropdown-block a:hover {background-color: #ddd;}
-
-.hamburger-dropdown-unit {
-	font-size: 1.5rem;
-	color: black;
 }
 
 .wrapper {
 	position: relative;
+	flex-direction: column;
 	height: auto;
 	aspect-ratio: 16 / 9;
 	width: min(40%, 100% - 3rem);
@@ -195,6 +183,18 @@ hamburger-dropdown-wrapper::after {
 	box-sizing: border-box;
 }	  
 
+.pageTitleWrapper {
+	position: relative;
+	flex-direction: column;
+	height: auto;
+	width: 100%;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
+}	  
+
 .pageTitle
 {
 	border: 1px solid blue;
@@ -206,7 +206,7 @@ hamburger-dropdown-wrapper::after {
 	text-decoration: none;
 	font-family: Arial; /* inherit;*/
 	font-size: 2rem;
-	margin: auto;
+	margin-top: 10px;
 	height: fit-content;
 	width: fit-content;
 }
@@ -216,14 +216,12 @@ hamburger-dropdown-wrapper::after {
 }
 
 .inputWrapper {
-	/* z-index: 1; */
 	width: stretch;
 	height: fit-content;
 	margin-left: 20%;
 	margin-right: auto;
 	margin-top: auto;
 	margin-bottom: auto;
-	/* <div style="z-index: 1; position: absolute; left: 20%; top: 40%; margin: auto;"> */
 }
 
 .videoFileContainer
@@ -446,14 +444,6 @@ video::-webkit-media-controls-panel {
 	gap: 4px;
 }
 
-.dropbtn {
-  background-color: #04AA6D;
-  color: white;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: none;
-}
-
 select {
 	font-size: 20px;
 	color: black;
@@ -469,25 +459,22 @@ select {
 	font-size: 20px;
 }
 
-.loadFile-dropdown-wrapper,
-.dropup-wrapper,
-.newFile-wrapper,
-.saveFile-wrapper {
+.general-dropdown-wrapper {
 	position: relative;
 	display: inline-block;
 }
 
-.loadFile-dropdown-wrapper:hover .loadFile-dropdown-block {display: block;}
+.general-dropdown-wrapper:hover .general-dropdown-block {display: block;}
 
-.loadFile-dropdown-wrapper:hover .dropbtn {background-color: #3e8e41;}
+#save2Files { display: none; }
 
-.loadFile-dropdown-wrapper .dropdown-arrow {
+.general-dropdown-wrapper .dropdown-arrow {
     font-size: 1rem;
     margin: 0;
     color: red;
 }
 
-.loadFile-dropdown-block {
+.general-dropdown-block {
 	display: none;
 	border: 2px solid rgb(6, 6, 94);
 	border-radius: 4px;
@@ -500,35 +487,27 @@ select {
 	z-index: 1000;
 }
 
-.loadFile-dropdown-block a {
-	color: black;
-	text-decoration: none;
-	display: block;
-	z-index: 1000; /* Keep it on top of other rows */
-}
-
-.loadFile-dropdown-block a:hover {background-color: #ddd;}
-
-.loadFile-dropdown-unit {
+.general-dropdown-unit {
 	font-size: 1.25rem; /* 34px; */
 	color: black;
 
 }
 
-.loadFile-dropdown-option {
+.general-dropdown-option {
 	background-color: rgba(247, 243, 238, 0.486); /* #f1f1f1; */
 	font-size: 1.25rem;
 	transition: background-color 0.25s;
 	border: 2px, solid black;
-	border-radius: 4px;
+	border-radius: 0px;
+    border-top: none; /* Prevents double borders between stacked buttons */
 	display: block;
 	margin-bottom: 2px;
 	padding: 2px;
 }
 
-.loadFile-dropdown-option:hover {background-color: hsl(182, 87%, 67%);} 
+.general-dropdown-option:hover {background-color: hsl(182, 87%, 67%);} 
 
-.loadFile-dropdown-option:active {background-color: hsl(182, 87%, 37%);}
+.general-dropdown-option:active {background-color: hsl(182, 87%, 37%);}
 
 
 .dropleft {
@@ -574,15 +553,6 @@ select {
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 	z-index: 500;
 }
-.settings-dropdown-block a {
-	color: black;
-	padding: 12px 16px;
-	text-decoration: none;
-	display: block;
-	z-index: 500; /* Keep it on top of other rows */
-}
-
-.settings-dropdown-block a:hover {background-color: #ddd;}
 
 .settings-dropdown-innerblock {
 	margin: 0px;
@@ -847,8 +817,6 @@ select {
 
 .themeList-dropdown-wrapper:hover .themeList-dropdown-block {display: block;}
 
-.themeList-dropdown-wrapper:hover .dropbtn {background-color: #3e8e41;}
-
 .themeList-dropdown-wrapper .dropdown-arrow {
     font-size: 1rem;
     margin: 0;
@@ -866,15 +834,6 @@ select {
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 	z-index: 1000;
 }
-
-.themeList-dropdown-block a {
-	color: black;
-	text-decoration: none;
-	display: block;
-	z-index: 1000; /* Keep it on top of other rows */
-}
-
-.themeList-dropdown-block a:hover {background-color: #ddd;}
 
 .themeList-dropdown-unit {
 	font-size: 1.25rem; /* 34px; */
@@ -895,3 +854,14 @@ select {
 
 .themeList-dropdown-option:active {background-color: hsl(182, 87%, 37%);}
 
+.subtitleTableDiv {
+	margin: 0;
+	padding-left: 2px; 
+	overflow-y: auto; 
+	height: 1rem; 
+	display: none;
+}
+
+.notDisplayed {
+	display: none;
+}
