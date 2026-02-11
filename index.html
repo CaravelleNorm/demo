@@ -39,31 +39,31 @@
     <span class="line"></span>
     <span class="line"></span>
     <span class="line"></span>
-<span class="hamburger-dropdown-block">
-<!-- Dropdown Unit Start -->
-<span class="hamburger-dropdown-unit">
-<span class="loadFile-dropdown-wrapper">
+<div class="hamburger-dropdown-block">
+<div class="button-row">
+	<div class="general-dropdown-wrapper">
 		<span class="button color4">Load Subtitles<span class="dropdown-arrow">▾</span></span>
-		<span class="loadFile-dropdown-block">
+		<span class="general-dropdown-block">
 		<!-- Dropdown Unit Start -->
-		<span class="loadFile-dropdown-unit">
+		<span class="general-dropdown-unit">
 		<input id="subtitleFileInput0" type="file" accept=".ass,.srt" style="display:none"
-			onchange="loadSubtitleFile0(this.files[0])" >
+			onchange="loadSubtitleFile(0, this.files[0])" >
 		<input id="subtitleFileInput1" type="file" accept=".ass,.srt" style="display:none"
-			onchange="loadSubtitleFile1(this.files[0])" >
+			onchange="loadSubtitleFile(1, this.files[0])" >
 		<input id="subtitleFileInput2" type="file" accept=".ass,.srt" style="display:none"
-			onchange="loadSubtitleFile2(this.files[0])" >
+			onchange="loadSubtitleFile(2, this.files[0])" >
 		<span class="hovertext1" data-hover="Load subtitles from 1 file">
-		<span class="loadFile-dropdown-option" onclick="clickSubtitleFileInput(1)">Load 1 file</span>
+		<span class="general-dropdown-option" onclick="clickSubtitleFileInput(1)">Load 1 file</span>
 		</span>
 		<span class="hovertext1" data-hover="Load subtitles from 2 files and interleave them">
-		<span class="loadFile-dropdown-option" onclick="clickSubtitleFileInput(2)">Load 2 files</span>
+		<span class="general-dropdown-option" onclick="clickSubtitleFileInput(2)">Load 2 files</span>
 		</span>
 		</span>
 		<!-- Dropdown Unit End -->
 		</span>
-</span>  <!-- class="loadFile-dropdown-wrapper"-->
-<span class="settings-dropdown-wrapper">
+	</div>  <!-- class="general-dropdown-wrapper"-->
+
+	<div class="settings-dropdown-wrapper">
 		<span class="button color5">Settings<span class="dropdown-arrow">▾</span></span>
 		<span class="settings-dropdown-block">
 		<span class="settings-dropdown-innerblock">
@@ -227,7 +227,7 @@
 		<!-- Dropdown Unit End -->
 		</span>
 		</span><br>  <!-- class="themelist-dropdown-wrapper"-->
-<!-- Dropdown Unit Start -->
+		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
 		<input type="checkbox" id="myCheck10" onclick="setColor('toggle')">
 		<label for="myCheck10" class="settings-dropdown-option">Custom Colors</label>
@@ -358,26 +358,43 @@
 		<!-- Dropdown Unit End -->
 		</span>  <!-- class="settings-dropdown-innerblock" -->
 		</span>  <!-- class="settings-dropdown-block" -->
-</span>  <!-- class="settings-dropdown-wrapper" -->
-<span class="saveFile-wrapper">
-	<span class="button color4" onclick="saveFile()">Save File</span>
-</span>  <!-- class="savefile-wrapper"-->
-<span class="newFile-wrapper">
-	<span class="button color4" onclick="newFile()">New File</span>
-</span>  <!-- class="newfile-wrapper"-->
+	</div>  <!-- class="settings-dropdown-wrapper" -->
 
-</span>  <!-- class="hamburger-dropdown-unit" -->
-<!-- Dropdown Unit End -->
-</span>
+	<div class="general-dropdown-wrapper" id="save1File">
+		<span class="hovertext1" data-hover="Save the single track to a .srt file">
+		<span class="button color4" onclick="saveFile(0)">Save File</span>
+		</span>
+	</div>  <!-- class="general-dropdown-wrapper"-->
 
-</div
+	<div class="general-dropdown-wrapper" id="save2Files">
+		<span class="button color4">Save File<span class="dropdown-arrow">▾</span></span>
+		<span class="general-dropdown-block">
+		<!-- Dropdown Unit Start -->
+		<span class="general-dropdown-unit">
+		<span class="hovertext1" data-hover="Save track 1 to a .srt file">
+		<span class="general-dropdown-option" onclick="saveFile(1)">Track 1</span>
+		</span>
+		<span class="hovertext1" data-hover="Save track 2 to a .srt file">
+		<span class="general-dropdown-option" onclick="saveFile(2)">Track 2</span>
+		</span>
+		</span>
+		<!-- Dropdown Unit End -->
+		</span>
+	</div>  <!-- class="general-dropdown-wrapper"-->
+
+	<div class="general-dropdown-wrapper">
+		<span class="button color4" onclick="newFile()">New File</span>
+	</div>  <!-- class="general-dropdown-wrapper"-->
+</div>  <!-- button-row -->
+</div>  <!-- class="hamburger-dropdown-block" -->
+</div>  <!-- class="hamburger-dropdown-wrapper" -->
 
 <!-- Media File section -->
 <!-- Media File section -->
 <div id="wrapper" class="wrapper">
-<div id="pageTitle" class="pageTitle">
-	<b>Subtitle Player for Browsers</b>
-</div>
+<div class="pageTitleWrapper">
+<div id="pageTitle" class="pageTitle"><b>Subtitle Player & Editor for Browsers</b></div>
+</div>  <!-- id="wrapperWrapper" class="wrapperWrapper" -->
 <div id="player"></div>
 <div>
 	<input id="videoFileInput" type="file" accept=".mp4,.mp3" class="videoFileInput" 
@@ -405,6 +422,7 @@
 <input type="range" id="seekBar" name="seekBar" min="0" max="100" defaultValue="0" class="slider">
 </div>
 </div>
+
 
 
 <!-- BlankLine -->
@@ -462,9 +480,9 @@
 
 </div>
 <!-- Subtitle Table div -->
-<div id="subtitleTableDiv" style="margin: 0; padding-left: 2px; overflow-y: auto; height: 1rem; display: none;">
+<div id="subtitleTableDiv" class="subtitleTableDiv">
 <table class="table" id="subtitleTable">
-            <thead>
+            <thead id="subtitleTableHeader">
                 <tr style="font-weight: bold; font-size: 1.5rem; padding: 0px;">
                     <th scope="col" style="width: 3%" id="subtitleNumber">#</th>
                     <th scope="col" style="width: 6%" id="subtitleStart">Start</th>
@@ -570,27 +588,27 @@
 			onclick="changeTime('current', 't1')">Current</button>
 		</span>
 
-		<span class="loadFile-dropdown-wrapper" id="copyt1">
+		<span class="general-dropdown-wrapper" id="copyt1">
 		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
-		<span class="loadFile-dropdown-block dropup">
+		<span class="general-dropdown-block dropup">
 		<!-- Dropdown Unit Start -->
-		<span class="loadFile-dropdown-unit">
+		<span class="general-dropdown-unit">
 		<span class="hovertext1" data-hover="Copy from row n-1 Start Time">
-		<span class="loadFile-dropdown-option" onclick="copyTime('t1', '-1', 't1')">Row n-1 Start Time</span>
+		<span class="general-dropdown-option" onclick="copyTime('t1', '-1', 't1')">Row n-1 Start Time</span>
 		</span>
 		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
-		<span class="loadFile-dropdown-option" onclick="copyTime('t1', '-1', 't2')">Row n-1 End Time</span>
+		<span class="general-dropdown-option" onclick="copyTime('t1', '-1', 't2')">Row n-1 End Time</span>
 		</span>
 		<span class="hovertext1" data-hover="Copy from row n-2 Start Time">
-		<span class="loadFile-dropdown-option" onclick="copyTime('t1', '+1', 't1')">Row n+1 Start Time</span>
+		<span class="general-dropdown-option" onclick="copyTime('t1', '+1', 't1')">Row n+1 Start Time</span>
 		</span>
 		<span class="hovertext1" data-hover="Copy from row n-2 End Time">
-		<span class="loadFile-dropdown-option" onclick="copyTime('t1', '+1', 't2')">Row n+1 End Time</span>
+		<span class="general-dropdown-option" onclick="copyTime('t1', '+1', 't2')">Row n+1 End Time</span>
 		</span>
 		</span>
 		<!-- Dropdown Unit End -->
 		</span>
-		</span>  <!-- class="loadFile-dropdown-wrapper"-->
+		</span>  <!-- class="general-dropdown-wrapper"-->
 
 		<span style="position: absolute; right: 15px;">
 		<span class="hovertext1" data-hover="Restore the selected time.">
@@ -683,24 +701,24 @@
 			onclick="changeTime('current', 't2')">Current</button>
 		</span>
 
-		<span class="loadFile-dropdown-wrapper" id="copyt2">
+		<span class="general-dropdown-wrapper" id="copyt2">
 		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
-		<span class="loadFile-dropdown-block dropup">
+		<span class="general-dropdown-block dropup">
 		<!-- Dropdown Unit Start -->
-		<span class="loadFile-dropdown-unit">
+		<span class="general-dropdown-unit">
 		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
-		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '-1', 't2')">Row n-1 End Time</span>
+		<span class="general-dropdown-option" onclick="copyTime('t2', '-1', 't2')">Row n-1 End Time</span>
 		</span>
 		<span class="hovertext1" data-hover="Copy from row n-2 Start Time">
-		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '+1', 't1')">Row n+1 Start Time</span>
+		<span class="general-dropdown-option" onclick="copyTime('t2', '+1', 't1')">Row n+1 Start Time</span>
 		</span>
 		<span class="hovertext1" data-hover="Copy from row n-2 End Time">
-		<span class="loadFile-dropdown-option" onclick="copyTime('t2', '+1', 't2')">Row n+1 End Time</span>
+		<span class="general-dropdown-option" onclick="copyTime('t2', '+1', 't2')">Row n+1 End Time</span>
 		</span>
 		</span>
 		<!-- Dropdown Unit End -->
 		</span>
-		</span>  <!-- class="loadFile-dropdown-wrapper"-->
+		</span>  <!-- class="general-dropdown-wrapper"-->
 
 		<span style="position: absolute; right: 15px;">
 		<span class="hovertext1" data-hover="Restore the selected time.">
@@ -717,49 +735,49 @@
 	</span>
 	<div class="textEditButtonColumn">
 		<div style="margin-bottom: 8px;">
-		<span class="loadFile-dropdown-wrapper" id="splitLineWrapper">
+		<span class="general-dropdown-wrapper" id="splitLineWrapper">
 		<button class="button color3">Split at cursor<span class="dropdown-arrow">▾</span></button>
-		<span class="loadFile-dropdown-block">
+		<span class="general-dropdown-block">
 		<!-- Dropdown Unit Start -->
-		<span class="loadFile-dropdown-unit">
+		<span class="general-dropdown-unit">
 		<span class="hovertext1" data-hover="Split at the cursor, append the first segment to the previous line">
-		<span class="loadFile-dropdown-option" 
+		<span class="general-dropdown-option" 
 			onmousedown="textEditPopupAction('mousedown')"
 			onclick="textEditPopupAction('splitToPrev')">Split ↑ wrap</span>
 		</span>
 		<span class="hovertext1" data-hover="Split at the cursor, insert new line below">
-		<span class="loadFile-dropdown-option" 
+		<span class="general-dropdown-option" 
 			onmousedown="textEditPopupAction('mousedown')"
 			onclick="textEditPopupAction('splitToNextNewline')">Split ↓ new line</span>
 		</span>
 		<span class="hovertext1" data-hover="Split at the cursor, prepend the second segment to the next line">
-		<span class="loadFile-dropdown-option" 
+		<span class="general-dropdown-option" 
 			onmousedown="textEditPopupAction('mousedown')"
 			onclick="textEditPopupAction('splitToNext')">Split ↓ wrap</span>
 		</span>
 		</span> <!-- Dropdown Unit End -->
-		</span> <!-- class="loadFile-dropdown-block"-->
-		</span> <!-- class="loadFile-dropdown-wrapper"-->
+		</span> <!-- class="general-dropdown-block"-->
+		</span> <!-- class="general-dropdown-wrapper"-->
 		</div>
 		<div style="margin-bottom: 8px;">
-		<span class="loadFile-dropdown-wrapper" id="insertLineWrapper">
+		<span class="general-dropdown-wrapper" id="insertLineWrapper">
 		<button class="button color3">Insert<span class="dropdown-arrow">▾</span></button>
-		<span class="loadFile-dropdown-block">
+		<span class="general-dropdown-block">
 		<!-- Dropdown Unit Start -->
-		<span class="loadFile-dropdown-unit">
+		<span class="general-dropdown-unit">
 		<span class="hovertext1" data-hover="Before selected line">
-		<span class="loadFile-dropdown-option" 
+		<span class="general-dropdown-option" 
 			onmousedown="textEditPopupAction('updateRow')"
 			onclick="textEditPopupAction('insertAbove')">↑ Insert ↑</span>
 		</span>
 		<span class="hovertext1" data-hover="After selected line">
-		<span class="loadFile-dropdown-option" 
+		<span class="general-dropdown-option" 
 			onmousedown="textEditPopupAction('updateRow')"
 			onclick="textEditPopupAction('insertBelow')">↓ Insert ↓</span>
 		</span>
 		</span> <!-- Dropdown Unit End -->
-		</span> <!-- class="loadFile-dropdown-block"-->
-		</span> <!-- class="loadFile-dropdown-wrapper"-->
+		</span> <!-- class="general-dropdown-block"-->
+		</span> <!-- class="general-dropdown-wrapper"-->
 		</div>
 		<div class="textEditPopupButton1">
 		<span class="hovertext1" data-hover="Delete the selected subtitle">
