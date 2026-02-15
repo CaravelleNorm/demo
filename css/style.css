@@ -647,7 +647,14 @@ select {
 	-webkit-user-select: none; /* Safari */
 	-ms-user-select: none; /* IE 10 and IE 11 */
 	user-select: none; /* Standard syntax */
+	opacity: 0.1;
+
 }
+
+#timeEditPopup:hover {opacity: 1;}
+
+#timeEditPopup:active {opacity: 1;} 
+
 
 .timeEditPopupWrapper {
 	background-color: #fff; 
