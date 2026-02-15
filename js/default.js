@@ -67,51 +67,59 @@ let showTimePopup = false;
 let customColorsEnabled = false;
 let selectedCustomStyle;
 let dropDownArrow = "▾";
+let selectedThemeNumber;
 let themeAttributes;
 
-
-let lightThemeAttributes = {
+let themeAttributesArray = [
+{
 	themeName: "light",
 	foregroundColor: "#000000", /* black */
 	backgroundColor: "#fdfff5", /* ceramic, milk white */
 	highlightBackgroundColor: "#cce5ff" /* Hawkes blue */
-}
-let darkThemeAttributes = {
+},
+{
 	themeName: "dark",
 	foregroundColor: "#ffffff", /* white */
 	backgroundColor: "#000000", /* black */
 	highlightBackgroundColor: "#768798" /* steel */
-}
-let OSDefaultThemeAttributes = {
+},
+{
 	themeName: "OSDefault",
 	foregroundColor: "#000000",  /* black */
 	backgroundColor: "#ffffff", /* white */
 	highlightBackgroundColor: "#338ef0" /* bleu de France */
-	}
-let preset01ThemeAttributes = {
+},
+{
 	themeName: "preset 1",
 	foregroundColor: "#f5f5f5", /* white  smoke*/
 	backgroundColor: "#2e9dc2", /* curious blue */
 	highlightBackgroundColor: "#057164" /* greenish cyan */
-}
-let preset02ThemeAttributes = {
+},
+{
 	themeName: "preset 2",
 	foregroundColor: "#f5f5f5", /* white smoke */
 	backgroundColor: "#266a78", /* bluish cyan */
 	highlightBackgroundColor: "#153b4c" /* Nile blue */
-}
-let preset03ThemeAttributes = {
+},
+{
 	themeName: "preset 3",
 	foregroundColor: "#f5f5f5", /* white smoke */
 	backgroundColor: "#c25a2e", /* ruddy brown */
 	highlightBackgroundColor: "#a0390d" /* russet */
-}
-let preset04ThemeAttributes = {
+},
+{
 	themeName: "preset 4",
 	foregroundColor: "#0a0a0a", /* ? */
 	backgroundColor: "#99caf0", /* ? */
 	highlightBackgroundColor: "#5e95b0" /* ? */
+},
+{
+	themeName: "preset 5",
+	foregroundColor: "#0a0a0a", /* ? */
+	backgroundColor: "#d29e0f", /* ? */
+	highlightBackgroundColor: "#5e95b0" /* ? */
 }
+];
 
 var helper = {
 	toTimeString: function(ms) {
@@ -422,64 +430,45 @@ function convertToSeconds(time){
 }
 
 
-function findThemeAttributeObject(name) {
+function findThemeAttributeObject(themeNumber) {
 
-	let themeAttributeObject;
-
-	switch(name) {
-	case 'light':
-		themeAttributeObject = lightThemeAttributes;
-		break;
-	case 'dark':
-		themeAttributeObject = darkThemeAttributes;
-		break;
-	case 'OSDefault':
-		themeAttributeObject = OSDefaultThemeAttributes;
-		break;
-	case 'preset01':
-		themeAttributeObject = preset01ThemeAttributes;
-		break;
-	case 'preset02':
-		themeAttributeObject = preset02ThemeAttributes;
-		break;
-	case 'preset03':
-		themeAttributeObject = preset03ThemeAttributes;
-		break;
-	case 'preset04':
-		themeAttributeObject = preset04ThemeAttributes;
-		break;
-	default:
-		themeAttributeObject = 0;
-		break;
+	if (!Number.isInteger(themeNumber)) {
+		let errorMsg = 'findThemeAttributeObject themeNumber not an integer: ' + themeNumber;
+		alert(errorMsg);
+		throw new Error(errorMsg);
 	}
+
+	if ((themeNumber < 0) || ((themeNumber + 1) > themeAttributesArray.length)) {
+		let errorMsg = 'findThemeAttributeObject themeNumber invalid: ' + themeNumber;
+		alert(errorMsg);
+		throw new Error(errorMsg);
+	}
+
+	let themeAttributeObject = themeAttributesArray[themeNumber];
 
 	return themeAttributeObject;
 
 }
 
 
-function highlightThemeOption(optionName, action) {
+function highlightThemeOption(themeNumber, action) {
 
-	let themeAttributeObject = findThemeAttributeObject(optionName);
-
-	if (!themeAttributeObject) { 
-		console.log("highlightThemeOption Invalid optionName: ", optionName);
-		alert("highlightThemeOption Invalid optionName: " + optionName);
-		return;
-	}
+	let themeAttributeObject = findThemeAttributeObject(themeNumber);
 
 	switch (action) {
 	case 'off':
-		document.getElementById(optionName + 'ThemeOption').style.backgroundColor = themeAttributeObject.backgroundColor;
+		document.getElementById("theme" + themeNumber).style.backgroundColor = 
+			themeAttributeObject.backgroundColor;
 		break;
 	case 'on':
-		document.getElementById(optionName + 'ThemeOption').style.backgroundColor = 
+		document.getElementById("theme" + themeNumber).style.backgroundColor = 
 			themeAttributeObject.highlightBackgroundColor;
 		break;
 	default:
-		console.log("highlightThemeOption Invalid action: ", action);
-		alert("highlightThemeOption Invalid action: " + action);
-		return;
+		let errorMsg = "highlightThemeOption Invalid action: " + action;
+		console.log(errorMsg);
+		alert(errorMsg);
+		throw new Error(errorMsg);
 	}
 
 }
@@ -700,7 +689,7 @@ function setColor (type) {
 		case 'toggle':
 			if (customColorsEnabled) {
 				customColorsEnabled = false;
-				changeTheme(theme);
+				changeTheme(selectedThemeNumber);
 				return;
 			}
 			else {
@@ -1619,20 +1608,13 @@ function toggleVideoSection() {
 	computeSubtitleTableHeight();
 }
 
-function changeTheme(newTheme) {
+function changeTheme(newThemeNumber) {
     
 	customColorsEnabled = false;
+	themeAttributes = findThemeAttributeObject(newThemeNumber);
 
-	themeAttributes = findThemeAttributeObject(newTheme);
-
-	if (!themeAttributes) { 
-		console.log("changeTheme Invalid newTheme: ", newTheme);
-		alert("changeTheme Invalid newTheme: " + newTheme);
-		return;
-	}
-
-	console.log("Theme changed from " + theme + " to " + newTheme);
-	theme = newTheme;
+	console.log("Theme changed from " + selectedThemeNumber + " to " + newThemeNumber);
+	selectedThemeNumber = newThemeNumber;
 
 	document.body.style.backgroundColor = themeAttributes.backgroundColor;
 	document.body.style.color = themeAttributes.foregroundColor;
@@ -1643,7 +1625,7 @@ function changeTheme(newTheme) {
 	document.getElementById("selectedTheme").style.color = themeAttributes.foregroundColor;
 	document.getElementById("selectedTheme").textContent = themeAttributes.themeName + dropDownArrow;
 
-		document.getElementById("myCheck10").checked = false;
+	document.getElementById("myCheck10").checked = false;
 
 	if (selectedSubtitleNumber > 0){
 		highlightSelectedRow(selectedSubtitleNumber);
@@ -3969,7 +3951,7 @@ toggleSubtitleSection();
 
 configInitializations(); // Process config.js
 
-changeTheme(theme);		// Initialize theme option
+changeTheme(selectedThemeNumber); // Initialize theme option
 changeSpacebar();		// Initialize spacebar option
 changeFont();			// Initialize font option
 changeFontSize();		// Initialize font size option
@@ -4079,50 +4061,46 @@ function configInitializations() {
 		errorReason = 'theme missing';
 		initError(errorReason);
 	}
-	
-	let themeAttributeObject = findThemeAttributeObject(theme);
 
-	if (!themeAttributeObject) { 
-		errorReason = 'theme = ' + theme + ' invalid';
-		initError(errorReason);
-		return;
+	let index = 0;
+	let found = false;
+	do {
+		if (themeAttributesArray[index].themeName === theme) {
+			selectedThemeNumber = index;
+			found = true;
+		} else {
+			index++;
+		}
+	} while ((!found) && (index < themeAttributesArray.length));
+
+	if (!found) {
+		let errorMsg = "configInitializations Invalid theme: " + theme;
+		console.log(errorMsg);
+		alert(errorMsg);
+		throw new Error(errorMsg);
 	}
+
+	let themeAttributeObject = findThemeAttributeObject(selectedThemeNumber);
 
 	document.getElementById("color1Input").value = themeAttributeObject.foregroundColor;
 	document.getElementById("color2Input").value = themeAttributeObject.backgroundColor;
 	document.getElementById("color3Input").value = themeAttributeObject.highlightBackgroundColor;
 
-	document.getElementById("lightThemeOption").style.color = lightThemeAttributes.foregroundColor;
-	document.getElementById("lightThemeOption").style.backgroundColor = lightThemeAttributes.backgroundColor;
-	// document.getElementById("lightThemeOption").style.backgroundColor = lightThemeAttributes.highlightBackgroundColor;
-
-	document.getElementById("darkThemeOption").style.color = darkThemeAttributes.foregroundColor;
-	document.getElementById("darkThemeOption").style.backgroundColor = darkThemeAttributes.backgroundColor;
-	// document.getElementById("darkThemeOption").style.backgroundColor = darkThemeAttributes.highlightBackgroundColor;
-
-	document.getElementById("OSDefaultThemeOption").style.color = OSDefaultThemeAttributes.foregroundColor;
-	document.getElementById("OSDefaultThemeOption").style.backgroundColor = OSDefaultThemeAttributes.backgroundColor;
-	// document.getElementById("OSDefaultThemeOption").style.backgroundColor = OSDefaultThemeAttributes.highlightBackgroundColor;
-
-	document.getElementById("preset01ThemeOption").textContent = preset01ThemeAttributes.themeName;
-	document.getElementById("preset01ThemeOption").style.color = preset01ThemeAttributes.foregroundColor;
-	document.getElementById("preset01ThemeOption").style.backgroundColor = preset01ThemeAttributes.backgroundColor;
-	// document.getElementById("preset01ThemeOption").style.backgroundColor = preset01ThemeAttributes.highlightBackgroundColor;
-
-	document.getElementById("preset02ThemeOption").textContent = preset02ThemeAttributes.themeName;
-	document.getElementById("preset02ThemeOption").style.color = preset02ThemeAttributes.foregroundColor;
-	document.getElementById("preset02ThemeOption").style.backgroundColor = preset02ThemeAttributes.backgroundColor;
-	// document.getElementById("preset02ThemeOption").style.backgroundColor = preset02ThemeAttributes.highlightBackgroundColor;
-
-	document.getElementById("preset03ThemeOption").textContent = preset03ThemeAttributes.themeName;
-	document.getElementById("preset03ThemeOption").style.color = preset03ThemeAttributes.foregroundColor;
-	document.getElementById("preset03ThemeOption").style.backgroundColor = preset03ThemeAttributes.backgroundColor;
-	// document.getElementById("preset03ThemeOption").style.backgroundColor = preset03ThemeAttributes.highlightBackgroundColor;
-
-	document.getElementById("preset04ThemeOption").textContent = preset04ThemeAttributes.themeName;
-	document.getElementById("preset04ThemeOption").style.color = preset04ThemeAttributes.foregroundColor;
-	document.getElementById("preset04ThemeOption").style.backgroundColor = preset04ThemeAttributes.backgroundColor;
-	// document.getElementById("preset04ThemeOption").style.backgroundColor = preset04ThemeAttributes.highlightBackgroundColor;
+	themeAttributesArray.forEach(function(content, index) {
+		let themeElement = document.getElementById("theme" + index);
+		if (!themeElement) {
+			let errorMsg = "configInitializations HTML element not found: theme" + index;
+			console.log(errorMsg);
+			alert(errorMsg);
+			throw new Error(errorMsg);
+		}
+		themeElement.textContent = themeAttributesArray[index].themeName;
+		themeElement.style.color = themeAttributesArray[index].foregroundColor;
+		themeElement.style.backgroundColor = themeAttributesArray[index].backgroundColor;
+		themeElement.addEventListener('click', (e) => { changeTheme(index); } );
+		themeElement.addEventListener('mouseover', (e) => { highlightThemeOption(index, "on"); } );
+		themeElement.addEventListener('mouseleave', (e) => { highlightThemeOption(index, "off"); } );
+	});
 
 	if (typeof spacebarOption == 'undefined') {
 		errorReason = 'spacebarOption missing';
