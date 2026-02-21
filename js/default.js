@@ -2042,6 +2042,7 @@ async function loadVideoFile(file) {
 	videoElem.onpause = function() {
 		handleVideoOnPause();
 	}
+console.log("loadVideoFile videourl = ", videourl);
 
 	videoElem.onended = function() {
 		handleVideoOnEnded();
@@ -4257,5 +4258,6 @@ CaretUtil.createRange = function(node,chars,range) {
 	}
 	return range;
 };
+
 
 } 
