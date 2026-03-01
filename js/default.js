@@ -1966,7 +1966,13 @@ async function issuePlayVideo2() {
 		}
 
 	} catch (err) {
-    	console.log('issuePlayVideo: Play request failed.');
+		let errMsg = 'issuePlayVideo2: Play request failed. err = ' + err;
+    	console.log(errMsg);
+		let playPauseError = "The play() request was interrupted by a call to pause()."
+		if ((err.name != 'AbortError') || 
+			(err.message.substring(0, (playPauseError.length)) != playPauseError)) {
+			alert(errMsg);
+		}
 	}
 }
 
@@ -2035,14 +2041,17 @@ async function loadVideoFile(file) {
 		console.log("loadVideoFile videoFileLoaded true");
 	}
 
-	// ??
 //	const file = videoFile.files[0];
-    const videourl = URL.createObjectURL(file);
-    videoElem.setAttribute("src", videourl);
+    const fileURL = URL.createObjectURL(file);
+    videoElem.setAttribute("src", fileURL);
+	console.log("loadVideoFile fileURL = ", fileURL);
+	// console.log("loadVideoFile videoElem.getAttribute('src') = ", videoElem.getAttribute("src"));
+	// console.log("loadVideoFile videoElem.src = ", videoElem.src);
+	console.log("loadVideoFile file.name = ", file.name);
+
 	videoElem.onpause = function() {
 		handleVideoOnPause();
 	}
-console.log("loadVideoFile videourl = ", videourl);
 
 	videoElem.onended = function() {
 		handleVideoOnEnded();
@@ -2100,10 +2109,13 @@ console.log("loadVideoFile videourl = ", videourl);
 
 		handleVideoFileLoaded();
 		
-		console.log("loadVideoFile Exiting");
+		console.log("videoElem.onloadedmetadata Exiting");
 
 	}
-}
+
+	console.log("loadVideoFile Exiting");
+
+}  // loadVideoFile
 
 function handleVideoFileLoaded() {
 
@@ -2495,21 +2507,27 @@ async function loadSubtitleFile(trackNumber, file) {
 	// 	{track: 0; startSeconds: 120, endSeconds: 123, startTime: "0:02.00", endTime: "0:02.03", 
 	//		subtitleStyle: "File1", subtitle: "Caption text" }
 
+	let oldSelectedSubtitleNumber = 0;
+
 	if (trackNumber < 2) {
-		subtitleFileDataArray[trackNumber].loaded = false;
-		if (selectedSubtitleNumber != 0) {
-			subtitleTable.rows[selectedSubtitleNumber].classList.remove("selectedCustom");
-			selectedSubtitleNumber = 0;
+		if (trackNumber === 0) {
+			oldSelectedSubtitleNumber = selectedSubtitleNumber;
 		}
 		deleteSubtitleTable();
 	}
 
 	await extractSubtitleFile(file, subtitleFileDataArray[trackNumber]);
-
+//?? What if totalNumberOfSubtitlesRead = 0?
 	if (trackNumber === 0) {
 		document.getElementById("save1File").style.display = "inline-block";
 		document.getElementById("save2Files").style.display = "none";
 		document.getElementById("subtitleTrack").classList.add('notDisplayed');
+		if (oldSelectedSubtitleNumber <= totalNumberOfSubtitlesRead) {
+			selectedSubtitleNumber = oldSelectedSubtitleNumber;
+		}
+		if (selectedSubtitleNumber == 0) {	// If no subtitle has yet been selected
+			selectedSubtitleNumber = 1;		// by default, select the first subtitle
+		}
 		displaySubtitles();
 		document.getElementById("scrollStepMenu").value = '1';
 		changeScrollStep();
@@ -2536,6 +2554,7 @@ async function loadSubtitleFile(trackNumber, file) {
 			createSubtitleRow(subtitleFileDataArray[dataElement.dataIndex].array[dataElement.arrayIndex], 
 			(index + 1));
 		});
+		selectedSubtitleNumber = 1;		// by default, select the first subtitle
 		statusMsg("loadSubtitleFile", "Displaying subtitles");
 		displaySubtitles();
 		if (trackNumber === 2) {
@@ -2690,6 +2709,10 @@ function addKeyListenerForSubtitles() {
 		case "r":
 			console.log("r redo");
 			redo();
+			break;
+		case "t":
+			var d = new Date();
+			alert(d);
 			break;
 		case "u":
 			console.log("u undo");
@@ -3363,10 +3386,6 @@ async function extractSubtitleFile(file, subtitleFile) {
 	subtitleFile.array = [];
 	subtitleFile.loaded = false;
 
-	if (selectedSubtitleNumber == 0) {	// If no subtitle has yet been selected
-		selectedSubtitleNumber = 1;		// by default, select the first subtitle
-	}
-
 	let counter = 0;
 
 	switch(extension) {
@@ -3664,6 +3683,18 @@ function addKeyListener(){
 				console.log('keyup Invalid spacebar option: ', spacebarOption);
 				break;
 			}
+			break;
+		case "p":
+			buttonAction('playVideo');
+			break;
+		case "l":
+			buttonAction('loop');
+			break;
+		case "s":
+			buttonAction('currentLine');
+			break;
+		case "S":
+			buttonAction('restOfcurrentLine');
 			break;
 		case "U":
 			console.log("U updateTime");
@@ -4258,6 +4289,5 @@ CaretUtil.createRange = function(node,chars,range) {
 	}
 	return range;
 };
-
 
 } 
