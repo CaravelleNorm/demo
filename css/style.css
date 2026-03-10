@@ -23,11 +23,13 @@ html,body {
     margin: 0px;
     padding: 0px;
     overflow-x: hidden; 
+    overflow-y: hidden; 
 }
 
 body {
 	font-size: 100%;
 	display: flex;
+	flex: 1;
 	flex-direction: column;
 	min-height: 100vh;
 }
@@ -301,6 +303,9 @@ video::-webkit-media-controls-panel {
 
 .seekBarContainer {
 	display: none; /* inline; */
+	margin-top: 0;
+	margin-left: auto;
+	margin-right: auto;
 	align-items: center;
 	z-index: 9988;  /* Always on top */
 }
@@ -549,7 +554,7 @@ select {
 	border: 1px solid blue;
 	position: absolute;
 	background-color: #f1f1f1;
-	min-width: 900px;
+	min-width: 1200px;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 	z-index: 500;
 }
@@ -627,19 +632,37 @@ select {
 	color: #000; 
 }
 
-
-#timeEditPopup{
-    /* background-color:rgba(0,0,0,.4); */
-    display:none;
-    height:auto;
+.timeEditPopupThumb {
+    display: none;
+    height: auto;
 	padding: none;
     position: absolute; 
     /* text-align:center; */
-    top:65%;
+    top: 65%;
+	left: 50%;
+    width: 2rem;
+	height: 2rem;
+    z-index:10000;
+    background-color: #c71f1f; 
+	box-shadow: 5px 5px 10px hsla(241, 86%, 77%, 0.431);
+    border-radius: 50%;
+	-webkit-user-select: none; /* Safari */
+	-ms-user-select: none; /* IE 10 and IE 11 */
+	user-select: none; /* Standard syntax */
+	opacity: 1;
+}
+
+.timeEditPopup{
+    /* background-color:rgba(0,0,0,.4); */
+    display: none;
+    height: auto;
+	padding: none;
+    position: absolute; 
+    /* text-align:center; */
+    top: 65%;
 	left: 50%;
     width: 795px; /* 740px;*/
-    z-index:10000;
-	opacity: 1;
+    z-index: 9000;
     background-color: #fff; 
 	/* border: 1px solid black; */
 	box-shadow: 5px 5px 10px hsla(241, 86%, 77%, 0.431);
@@ -648,13 +671,7 @@ select {
 	-ms-user-select: none; /* IE 10 and IE 11 */
 	user-select: none; /* Standard syntax */
 	opacity: 0.1;
-
 }
-
-#timeEditPopup:hover {opacity: 1;}
-
-#timeEditPopup:active {opacity: 1;} 
-
 
 .timeEditPopupWrapper {
 	background-color: #fff; 
@@ -671,16 +688,40 @@ select {
     padding: 15px 2% 15px 2%;
 }
 
-#timeEditPopupHeader {
+.timeEditPopupLabel {
 	padding: 0;
 	display: flex;
+	flex-direction: row;
+	float: left;
 	width: 100%;
+	height: fit-content;
 	cursor: move;
 	z-index: 10;
 	margin-bottom: 3px;
 	background-color: #001858;
 	color: #fff;
 	border-radius: 4px;
+}
+
+.timeEditPopupHeaderBlock {
+    display: flex;
+	flex-direction: row;
+	background-color: #001858;
+	width: 100%;
+	height: fit-content;
+	margin-bottom: 3px;
+    border-radius: 4px;
+}
+
+.timeEditPopupV,
+.timeEditPopupO,
+.timeEditPopupX {
+	/* float: right; */
+	color: #fff;
+	max-width: 2rem; /* 5%; */
+	font-size: 1rem;
+	cursor: pointer;
+	border: 2px solid rgba(146, 210, 16, 0.439);
 }
 
 /* timeEditPopup END */
@@ -805,6 +846,7 @@ select {
 	border-radius: 4px;
 }
 
+.dashboardO,
 .dashboardX {
 	float: right;
 	color: #fff;
@@ -871,4 +913,8 @@ select {
 
 .notDisplayed {
 	display: none;
+}
+
+.selected {
+	background-color: #c71f1f; 
 }
