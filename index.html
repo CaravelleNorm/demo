@@ -99,6 +99,36 @@
 		<!-- Dropdown Unit End -->
 		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Subtitle width scale">
+			<span class="settings-dropdown-option">Subtitle Width</span>
+		<span class="dropright">
+			<select id="subtitleWidthMenu" class="selectClass" style="position: relative; ">
+			<option class="selectOption" value="10">10%</option>
+			<option class="selectOption" value="15">15%</option>
+			<option class="selectOption" value="20">20%</option>
+			<option class="selectOption" value="25">25%</option>
+			<option class="selectOption" value="30">30%</option>
+			<option class="selectOption" value="35">35%</option>
+			<option class="selectOption" value="40">40%</option>
+			<option class="selectOption" value="45">45%</option>
+			<option class="selectOption" value="50">50%</option>
+			<option class="selectOption" value="55">55%</option>
+			<option class="selectOption" value="60">60%</option>
+			<option class="selectOption" value="65">65%</option>
+			<option class="selectOption" value="70">70%</option>
+			<option class="selectOption" value="75">75%</option>
+			<option class="selectOption" value="80">80%</option>
+			<option class="selectOption" value="85">85%</option>
+			<option class="selectOption" value="90">90%</option>
+			<option class="selectOption" value="95">95%</option>
+			<option class="selectOption" value="100">100%</option>
+			</select>
+		</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
 		<span class="hovertext" data-hover="Select the font of the featured subtitle">
 			<span class="settings-dropdown-option">Font</span>
 		<input id="fontListFileInput" type="file" accept=".txt" style="display:none"
@@ -323,6 +353,44 @@
 		</span><br>		<!-- class="settings-dropdown-unit" -->
 		<!-- Dropdown Unit End -->
 		</span>  <!-- class="settings-dropdown-innerblock" -->
+
+			<!-- 3rd Block of Controls -->
+		<span class="settings-dropdown-innerblock">
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Change the margin above the Track 1 Subtitle">
+			<span class="settings-dropdown-option">Subtitle 1 Top Margin</span>
+		<span class="dropright">
+			<select id="marginLine1Menu" class="selectClass" style="position: relative;">
+			<option class="selectOption" value="0">0</option>
+			<option class="selectOption" value="1" selected>1</option>
+			<option class="selectOption" value="2">2</option>
+			<option class="selectOption" value="3">3</option>
+			<option class="selectOption" value="4">4</option>
+			<option class="selectOption" value="5">5</option>
+			</select>
+		</span>			<!-- class="dropright" -->
+		</span>			<!-- class="hovertext" -->
+		</span><br>		<!-- class="settings-dropdown-unit" -->
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Change the margin above the Track 2 Subtitle">
+			<span class="settings-dropdown-option">Subtitle 2 Top Margin</span>
+		<span class="dropright">
+			<select id="marginLine2Menu" class="selectClass" style="position: relative;">
+			<option class="selectOption" value="0">0</option>
+			<option class="selectOption" value="1" selected>1</option>
+			<option class="selectOption" value="2">2</option>
+			<option class="selectOption" value="3">3</option>
+			<option class="selectOption" value="4">4</option>
+			<option class="selectOption" value="5">5</option>
+			</select>
+		</span>			<!-- class="dropright" -->
+		</span>			<!-- class="hovertext" -->
+		</span><br>		<!-- class="settings-dropdown-unit" -->
+		<!-- Dropdown Unit End -->
+		</span>  <!-- class="settings-dropdown-innerblock" -->
 		</span>  <!-- class="settings-dropdown-block" -->
 	</div>  <!-- class="settings-dropdown-wrapper" -->
 
@@ -385,32 +453,36 @@
 </div>
 <video id="videoArea" class="videoArea" disablePictureInPicture>
 </video>
+</div>
+
 <!-- seekBar -->
 <div id="seekBarContainer" class="seekBarContainer">
-<input type="range" id="seekBar" name="seekBar" min="0" max="100" defaultValue="0" class="slider">
-</div>
+<input type="range" id="seekBar" name="seekBar" min="0" max="100" value="0" class="slider">
 </div>
 
-
-
-<!-- BlankLine -->
-<div id="blankLine" style="display: none;">
-<p style="height: 1rem"> </p>
-</div>
+<!-- marginLine1 -->
+<div id="marginLine1" style="display: none; min-height: 1rem; width: 100%;"></div>
 
 <!-- Featured subtitle -->
-<div id="divSubtitle1Wrapper" style="overflow-y: auto;">
-<div id="divSubtitle1" style="font-size: 2rem; min-height: 2rem; padding-top: 5px;
-	padding-left: 2%; padding-right: 2%; text-align: center; overflow-y: auto;">
-<span contenteditable="false" style="height: auto; text-wrap: balance; padding-left: 5px;
-	padding-right: 5px;" id="spanSubtitle1"></span><br>
+<div id="divSubtitle1" style="font-size: 2rem; min-height: 2rem; padding-top: 0;
+	padding-left: 2%; padding-right: 2%; padding-bottom: 0; text-align: center; 
+	box-sizing: border-box; outline: none; min-width: 1rem;
+	width: 50%; margin-top: 0; margin-bottom: 0px;
+	margin-left: auto; margin-right: auto; align-items: center;">
+<span contenteditable="false" style="text-wrap: balance; padding-left: 5px;
+	padding-right: 5px; min-width: 50px;" id="spanSubtitle1"></span><br>
 </div>
-</div>
-<div id="divSubtitle2Wrapper" style="overflow-y: auto;">
-<div id="divSubtitle2" style="font-size: 2rem; min-height: 2rem; padding-top: 5px;
-	padding-left: 2%; padding-right: 2%; text-align: center; overflow-y: auto;">
-<span contenteditable="false" style="height: auto; text-wrap: balance;" id="spanSubtitle2"></span>
-</div>
+
+<!-- marginLine2 -->
+<div id="marginLine2" style="display: none; min-height: 1rem; width: 100%;"></div>
+
+<div id="divSubtitle2" style="font-size: 2rem; min-height: 2rem; padding-top: 0;
+	padding-left: 2%; padding-right: 2%; padding-bottom: 0; text-align: center; 
+	box-sizing: border-box; outline: none; min-width: 1rem;
+	width: 50%; margin-top: 0; margin-bottom: 0;
+	margin-left: auto; margin-right: auto; align-items: center;">
+<span contenteditable="false" style="text-wrap: balance; padding-left: 5px;
+	padding-right: 5px; min-width: 50px;" id="spanSubtitle2"></span><br>
 </div>
 
 <!-- Video counter -->
@@ -420,6 +492,7 @@
 		<span id="duration" class="time" style="margin-right: 10px;">0:00:00</span>
 		</b>
 </div>
+
 <!-- Selection info -->
 <div id="selectionInfoDiv" style="margin: 0; padding-left: 10px; font-size: 1.25rem; height: 1.5rem; overflow: hidden;">
 		<span id="selectionLabel" style="display: none;">Selection: </span>
@@ -428,6 +501,7 @@
 		<span id="spanEndTime" style="margin-right: auto;"></span>
 		<span id="spanTrack"></span>
 </div>
+
 <!-- Controls -->
 <div id="buttonSection" style="margin: 0; padding-left: 10px; height: 2rem; ">
 	<p>
@@ -444,9 +518,11 @@
 		</span>
 
 	</p>
-
-
 </div>
+
+<!-- marginLine3 -->
+<div id="marginLine3" style="min-height: 1rem; width: 100%;"></div>
+
 <!-- Subtitle Table div -->
 <div id="subtitleTableDiv" class="subtitleTableDiv">
 <table class="table" id="subtitleTable">
@@ -468,11 +544,15 @@
 <div id="EOT" style="height: 5px; background-color: #87CEEB;"> </div>
 
 <!-- timeEditPopup -->
-<div id="timeEditPopup">
-<!-- <span id="timeEditPopupHeader">Editing</span> -->
-<div class="dashboardHeaderBlock">
-	<span class="dashboardHeader">Editing</span>
-	<span class="dashboardX" onclick="changeTime('close')">X</span>
+<div class="timeEditPopupThumb" id="timeEditPopupThumb"></div>
+<div class="timeEditPopup" id="timeEditPopup">
+<div class="timeEditPopupHeaderBlock">
+	<div class="timeEditPopupLabel">Editing</div>
+	<div style="float: right; display: flex; flex-direction: row;">
+	<div class="timeEditPopupV color3" id="timeEditPopupV" onclick="toggleHideShow('timeEditPopupV')">👁</div>
+	<div class="timeEditPopupO color3" id="timeEditPopupO" onclick="toggleHideShow('timeEditPopupO')">◯</div>
+	<div class="timeEditPopupX" onclick="changeTime('close')">X</div>
+	</div>
 </div>
 <div class="timeEditPopupWrapper">
 	<span class="hovertext1" data-hover="Click on Subtitle Start Time to select the current video time">
