@@ -41,9 +41,11 @@ selectedFont = 'Kaiti';
 
 videoWidthScale = '0.55'; // videoWidthScale rescales the video size by a fraction of its width.
 
+subtitleWidthScale = '70'; // subtitleWidthScale rescales the featured subtitle width by a fraction of the total display width.
+
 fontSize = '200%';
 
-theme = 'light'; // light | dark | OSDefault | blue
+theme = 'light'; // 'light' | 'dark' | 'OSDefault' | 'preset n' (n=1, ..., 5)
 
 editEnabled = true;
 

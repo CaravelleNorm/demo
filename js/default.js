@@ -4,6 +4,10 @@ document.addEventListener('keydown', PSDPD_KeyCheck);
 
 let videoFileLoaded = false;
 let videoElem;
+let timeEditPopup;
+let timeEditPopupO;
+let timeEditPopupV;
+let timeEditPopupThumb;
 let audioFileLoaded = false;
 let displayVideoControls = false;
 let subtitleTable;
@@ -35,6 +39,10 @@ let	scrollStepOption = 0;
 let marginOption = 0				// Margin (seconds) added around a subtitle; useful when timing is not accurate
 let skipForwardSeconds = 3;
 let skipBackwardSeconds = 3;
+let showMarginLine1 = false;
+let showMarginLine2 = false;
+let marginLine1MinHeight = 1;
+let marginLine2MinHeight = 1;
 let showSubtitleTrack1 = true;
 let showSubtitleTrack2 = false;
 let spanSubtitle1Modified = false;
@@ -43,6 +51,7 @@ let spanSubtitle1Selected = false;
 let spanSubtitle2Selected = false;
 let spanSubtitle1Row = 0;
 let spanSubtitle2Row = 0;
+let showSeekBarContainer = false;
 let showCounter = true;
 let showSelectionInfo = true;
 let showControlButtons = true;
@@ -212,25 +221,38 @@ function computeSubtitleTableHeight() {
 
 	let divNames = [];
 
-	if (toggleVideoSwitch != "on") {
-		divNames = ['blankLine'];
+	if (toggleVideoSwitch === "on") {
+		divNames = ['wrapper'];
 	}
-	else {
-		divNames = ['wrapper', 'blankLine'];
+
+	if (showSeekBarContainer) {
+		divNames = divNames.concat(['seekBarContainer']);
+	} else {
+		document.getElementById("seekBarContainer").style.display = "none";
+	}
+
+	if (showMarginLine1) {
+		divNames = divNames.concat(['marginLine1']);
+	} else {
+		document.getElementById("marginLine1").style.display = "none";
 	}
 
 	if (showSubtitleTrack1) {
 		divNames = divNames.concat(['divSubtitle1']);
 	} else {
 		document.getElementById("divSubtitle1").style.display = "none";
-		document.getElementById("divSubtitle1Wrapper").style.display = "none";
 	}
-		
+	
+	if (showMarginLine2) {
+		divNames = divNames.concat(['marginLine2']);
+	} else {
+		document.getElementById("marginLine2").style.display = "none";
+	}
+	
 	if (showSubtitleTrack2) {
 		divNames = divNames.concat(['divSubtitle2']);
 	} else {
 		document.getElementById("divSubtitle2").style.display = "none";
-		document.getElementById("divSubtitle2Wrapper").style.display = "none";
 	}
 	
 	if (showCounter) {
@@ -246,7 +268,7 @@ function computeSubtitleTableHeight() {
 	}
 
 	if (showControlButtons) {
-		divNames = divNames.concat(['buttonSection']);
+		divNames = divNames.concat(['buttonSection', 'marginLine3']);
 	} else {
 		document.getElementById("buttonSection").style.display = "none";
 	} 
@@ -254,10 +276,13 @@ function computeSubtitleTableHeight() {
 	divNames = divNames.concat(['EOT']);	
 	
 	divNames.forEach(function(divName) {
+
 		let divElem = document.getElementById(divName);
-		if (divElem.style.display != "none") {
+
+/*		if (divElem.style.display != "none") {
 			divElemWidth = divElem.offsetWidth;
 			divElemHeight = divElem.offsetHeight;
+			console.log("computeSubtitleTableHeight display != 'none' ", divName, " w" + divElemWidth + " h" + divElemHeight);
 		} else {
 			const clone = divElem.cloneNode(true);
 			clone.style.visibility = 'hidden';	
@@ -267,7 +292,37 @@ function computeSubtitleTableHeight() {
 			divElemWidth = clone.offsetWidth;
 			divElemHeight = clone.offsetHeight;
 			document.body.removeChild(clone);
+			console.log("computeSubtitleTableHeight display 'none' ", divName, " w" + divElemWidth + " h" + divElemHeight);
 		}
+*/
+
+/*		if ((divName === 'divSubtitle1') || (divName === 'divSubtitle2')) {
+			if (divName === 'divSubtitle1') {
+				document.getElementById("divSubtitle2").style.display = "none";
+			}
+			divElem.style.flexShrink = '0';
+            divElem.style.display = 'block';
+            divElem.style.height = 'auto';
+            divElem.style.overflowY = 'hidden';
+            divElemHeight = Math.ceil(divElem.getBoundingClientRect().height);
+            divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
+			console.log("computeSubtitleTableHeight ", divName, " w" + divElemWidth + " h" + divElemHeight);
+		} else {
+*/			if (divName === 'divSubtitle1') {
+				document.getElementById("divSubtitle2").style.display = "none";
+			}
+			divElem.style.flexShrink = '0';
+            divElem.style.display = 'block';
+            divElem.style.height = 'auto';
+            divElem.style.overflowY = 'hidden';
+            divElemHeight = Math.ceil(divElem.getBoundingClientRect().height);
+            divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
+			console.log("computeSubtitleTableHeight ", divName, " w" + divElemWidth + " h" + divElemHeight);
+			if ((divName != 'divSubtitle1') || (divName != 'divSubtitle2')) {
+				divElem.style.flexShrink = '1';
+			}
+//		}
+
 		let availableHeight = viewportHeight - totalHeight;
 		totalHeight += divElemHeight;
 		residualHeight = viewportHeight - totalHeight;
@@ -282,18 +337,17 @@ function computeSubtitleTableHeight() {
 			break;
 		case 'divSubtitle1':
 		case 'divSubtitle2':
-			let subtitleWrapper = document.getElementById(`${divName}Wrapper`);
 			if (availableHeight <= 0) {
 				divElem.style.display = "none";  
-				subtitleWrapper.style.display = "none";
 			} else {
 				if (residualHeight < 0)	{
-					subtitleWrapper.style.height = availableHeight + "px";
+					divElem.style.height = availableHeight + "px";
+	                divElem.style.overflowY = 'auto';
+    	            divElem.style.flexShrink = '1';
 				} else {
-					subtitleWrapper.style.height = divElemHeight + "px";
+	                divElem.style.height = 'auto';
+	                divElem.style.overflowY = 'hidden';
 				}
-				subtitleWrapper.style.display = "block";
-				divElem.style.display = "block";
 			}
 			break;
 		default:
@@ -309,7 +363,7 @@ function computeSubtitleTableHeight() {
 	console.log("computeSubtitleTableHeight totalHeight ", totalHeight, 
 		" residualHeight", residualHeight);
 
-	if (document.getElementById("timeEditPopup").style.display == "inline-block") {
+	if (timeEditPopup.style.display == "inline-block") {
 		showTimeEditPopup(selectedSubtitleNumber);
 	}
 
@@ -753,6 +807,7 @@ function detectInnerSizeChange(){
 function changeVideoSize(){
 
 	if (!videoFileLoaded) {
+		computeSubtitleTableHeight();
 		return;
 	}
 
@@ -782,10 +837,11 @@ function changeVideoSize(){
 	} else {
 		newWidth = Math.round((maxVideoWidth)*fraction);
 		let newHeight = Math.ceil((videoElem.videoHeight / videoElem.videoWidth) * newWidth);
-		console.log("changeVideoSize newHeight=",newHeight);
 		wrapperElement.style.width = newWidth + "px";
 		wrapperElement.style.height = newHeight + "px";
-		document.getElementById("seekBarContainer").style.width = videoElem.style.width;
+		document.getElementById("seekBarContainer").style.width = wrapperElement.style.width; // videoElem.style.width;
+		console.log("changeVideoSize newHeight= ", newHeight, " newWidth = ", newWidth,
+			" videoElem.style.width = ", videoElem.style.width);
 	}
 
 	if ((lastSubtitleNumber > 0) && videoFileLoaded) { 
@@ -804,6 +860,25 @@ function changeVideoSize(){
 	computeSubtitleTableHeight();
 
 } // changeVideoSize
+
+
+function changeSubtitleWidth() {
+
+	const s1 = document.getElementById("divSubtitle1");
+	const s2 = document.getElementById("divSubtitle2");
+	const selectSubtitleWidth = document.getElementById("subtitleWidthMenu");
+	const selectedValue = Number(selectSubtitleWidth.value);
+
+	console.log("changeSubtitleWidth subtitleWidth changed from ", s1.style.width, 
+		" to ", selectedValue, "%");
+	s1.style.width = selectedValue + '%';
+	s2.style.width = selectedValue + '%';
+
+	unFocus();
+
+	computeSubtitleTableHeight();
+
+} // changeSubtitleWidth
 
 function changeFont(){
 	var selectSubtitleFont = document.getElementById("subtitleFontMenu");
@@ -876,6 +951,64 @@ function changeScroll(){
 	console.log("Scroll option changed from " + scrollOption + " to " + selectedValue);
 	scrollOption = selectedValue;
 	unFocus();
+}
+
+function selectMarginLineMinHeight(e) {
+	const selectMargin = e.currentTarget;
+	const selectedValue = Number(selectMargin.value);
+	let varName;
+	let oldValue;
+	let marginElemId;
+	switch (selectMargin.id) {
+	case 'marginLine1Menu':
+		varName = "marginLine1MinHeight";
+		oldValue = marginLine1MinHeight;
+		marginLine1MinHeight = selectedValue;
+		marginElemId = "marginLine1";
+		break;
+	case 'marginLine2Menu':
+		varName = "marginLine2MinHeight";
+		oldValue = marginLine2MinHeight;
+		marginLine2MinHeight = selectedValue;
+		marginElemId = "marginLine2";
+		break;
+	default:
+		let errorMsg = 'selectMarginLineMinHeight invalid selectMargin.id: ' + selectMargin.id;
+		alert(errorMsg);
+		throw new Error(errorMsg);
+	}
+	console.log("selectMarginLineMinHeight ", varName, " changed from " + oldValue + 
+		" to " + selectedValue);
+	
+	changeMarginLineMinHeight(marginElemId);
+
+	unFocus();
+}
+
+function changeMarginLineMinHeight(marginId) {
+
+	let marginElement = document.getElementById(marginId);
+	let newMinHeight = 0;
+	switch (marginId) {
+	case 'marginLine1':
+		newMinHeight = marginLine1MinHeight;
+		showMarginLine1 = (newMinHeight > 0);
+		break;
+	case 'marginLine2':
+		newMinHeight = marginLine2MinHeight;
+		showMarginLine2 = (newMinHeight > 0);
+		break;
+	default:
+		let errorMsg = 'changeMarginLineMinHeight invalid marginId: ' + marginId;
+		alert(errorMsg);
+		throw new Error(errorMsg);
+	}
+	console.log("changeMarginLineMinHeight ", marginId, " minHeight changed from ", 
+		marginElement.style.minHeight, " to ", newMinHeight + "rem");
+	marginElement.style.minHeight = newMinHeight + "rem";
+	
+	computeSubtitleTableHeight();
+
 }
 
 function changeScrollStep(){
@@ -2106,6 +2239,7 @@ async function loadVideoFile(file) {
 		console.log({videoElem});
 
 		videoFileLoaded = true;
+		showSeekBarContainer = true;
 
 		handleVideoFileLoaded();
 		
@@ -2353,6 +2487,7 @@ function onYouTubePlayerReady(event) {
 	//setInterval(updateTime, updateTimeInterval);
 
 	videoFileLoaded = true;
+	showSeekBarContainer = true;
 
 	handleVideoFileLoaded();
 }
@@ -2731,7 +2866,7 @@ function addKeyListenerForSubtitles() {
 			if (!event.ctrlKey) {
 				return;	
 			}
-			if (document.getElementById("timeEditPopup").style.display == "inline-block") {
+			if (timeEditPopup.style.display == "inline-block") {
 				showTimeEditPopup(0);
 			} else {
 				showTimeEditPopup(selectedSubtitleNumber);
@@ -2749,7 +2884,7 @@ function addKeyListenerForSubtitles() {
 			}
 			changeFontSize();
 			break;
-		case "+":
+		case "+":addEventListener
 			if (event.shiftKey) {
 				break;
 			}
@@ -2778,6 +2913,8 @@ function addKeyListenerForSubtitles() {
 		return;
 	});
 
+	document.getElementById("spanSubtitle1").addEventListener('paste', handlePaste, false);
+		
 	document.getElementById("spanSubtitle1").addEventListener('blur', () => {
 		console.log("onBlur spanSubtitle1 spanSubtitle1Modified = ", spanSubtitle1Modified);
 		updateRow();
@@ -2797,6 +2934,8 @@ function addKeyListenerForSubtitles() {
 		return;
 	});
 
+	document.getElementById("spanSubtitle2").addEventListener('paste', handlePaste, false);
+
 	document.getElementById("spanSubtitle2").addEventListener('blur', () => {
 		console.log("onBlur spanSubtitle2 spanSubtitle2Modified = ", spanSubtitle2Modified);
 		updateRow();
@@ -2807,6 +2946,32 @@ function addKeyListenerForSubtitles() {
 
 
 }  // addKeyListenerForSubtitles
+
+function handlePaste(e) {
+		e.preventDefault();
+		const pasteText = (e.originalEvent || e).clipboardData.getData('text/plain');
+		let range = window.getSelection().getRangeAt(0);
+		let pasteTarget = e.currentTarget;
+		let cursorPosition = getCharacterOffsetWithin(range, pasteTarget);
+		const text1 = e.currentTarget.textContent.substring(0, cursorPosition);
+		const text2 = e.currentTarget.textContent.substring(cursorPosition);
+		console.log(pasteTarget.id, " paste cursorPosition ", cursorPosition, 
+			" text1 ", text1, " pasteText ", pasteText, " text2 ", text2);
+		pasteTarget.textContent = text1 + pasteText + text2;
+		switch (pasteTarget.id) {
+		case 'spanSubtitle1':
+			spanSubtitle1Modified = true;
+			break;
+		case 'spanSubtitle2':
+			spanSubtitle2Modified = true;
+			break;
+		default:
+			errorMsg = 'handlePaste unexpected pasteTarget.id ' + pasteTarget.id;
+			alert(errorMsg);
+			throw new Error(errorMsg);
+		}
+}	
+
 
 function deleteSubtitleTable() {
 	console.log("deleteSubtitleTable Deleting subtitle table");
@@ -3003,8 +3168,9 @@ function textEditPopupAction(operand) {
 		if ((operand === "splitToNextNewline") || (!nextRow)) {
 			insertSubtitle(rowNumber, text2.trim(), subtitleTrack[rowNumber], "selectNone");
 		} else {
-			subtitleTable.rows[nextRow].querySelector(".classSubtitleText").textContent = text2.trim()
-				+ subtitleTable.rows[nextRow].querySelector(".classSubtitleText").textContent;
+			subtitleTable.rows[nextRow].querySelector(".classSubtitleText").textContent = 
+				text2.trim() + 
+				subtitleTable.rows[nextRow].querySelector(".classSubtitleText").textContent;
 		}
 		selectRow(selectedSubtitleNumber);
 		return;
@@ -3220,7 +3386,7 @@ function showTimeEditPopup(rowNumber) {
 	let newDisplay = (timeEditPopupRow === 0);
 
 	if (rowNumber < 1) {
-		document.getElementById("timeEditPopup").style.display = "none";
+		timeEditPopup.style.display = "none";
 		timeEditPopupRow = 0;
 		return;
 	}
@@ -3246,7 +3412,9 @@ function showTimeEditPopup(rowNumber) {
 	fillTimeFields((subtitleEndSeconds[rowNumber] * 1000), "t2");
 
 	if (newDisplay) {
-		document.getElementById("timeEditPopup").style.display = "inline-block";
+		timeEditPopup.style.display = "inline-block";
+		// timeEditPopup.style.visibility = "visible";
+		//timeEditPopup.style.opacity = "0.1";
 	}
 
 	return;
@@ -3278,45 +3446,96 @@ function fillTimeFields (ms, prefix) {
 
 }  // showTimeEditPopup
 
+function toggleHideShow(triggerId) {
+
+	console.log("toggleHideShow ", triggerId, " timeEditPopup.style.opacity ", timeEditPopup.style.opacity);
+
+	if (triggerId === "timeEditPopupV") {
+		if (timeEditPopupV.classList.contains('selected')) {
+			timeEditPopupV.classList.remove("selected");
+		}
+		else {
+			timeEditPopupV.classList.add("selected");
+			if (timeEditPopupO.classList.contains('selected')) {
+				timeEditPopupO.classList.remove("selected");
+				timeEditPopupThumb.style.display = 'none';
+				timeEditPopup.style.visibility = "visible"; 
+				timeEditPopup.style.opacity = "1"; 
+			}
+		}
+		return;
+	}
+
+	if (timeEditPopupThumb.style.display === 'none') {
+		console.log("toggleHideShow 1 timeEditPopup.style.opacity ", timeEditPopup.style.opacity);
+		if (timeEditPopupV.classList.contains('selected')) {
+			timeEditPopupV.classList.remove("selected");
+		}
+		timeEditPopupO.classList.add("selected");
+		timeEditPopupThumb.style.display = 'block';
+		timeEditPopupThumb.addEventListener('mouseover', (e) => { 
+			timeEditPopup.style.visibility = "visible"; 
+			timeEditPopup.style.opacity = "1"; 
+		} );
+		timeEditPopupThumb.addEventListener('mouseleave', (e) => { 
+			console.log("timeEditPopupThumb mouseleave");
+			timeEditPopup.style.visibility = "hidden"; 
+		} );
+	} else {
+		console.log("toggleHideShow 2 timeEditPopup.style.opacity ", timeEditPopup.style.opacity);
+		timeEditPopupThumb.style.display = 'none';
+		if (timeEditPopupO.classList.contains('selected')) {
+			timeEditPopupO.classList.remove("selected");
+		}
+	}
+
+}
+
 function dragElement(elmnt) {
-  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById(elmnt.id + "Header")) {
-    /* if present, the header is where you move the DIV from:*/
-    document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
-  } else {
-    /* otherwise, move the DIV from anywhere inside the DIV:*/
-    elmnt.onmousedown = dragMouseDown;
-  }
+	let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+	if (document.getElementById(elmnt.id + "Header")) {
+		/* if present, the header is where you move the DIV from:*/
+		console.log("dragElement 1");
+		document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
+	} else {
+		/* otherwise, move the DIV from anywhere inside the DIV:*/
+		console.log("dragElement 2");
+		elmnt.onmousedown = dragMouseDown;
+	}
 
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
+function dragMouseDown(e) {
+	// e = e || window.event;
+	e.preventDefault();
+	// get the mouse cursor position at startup:
+	pos3 = e.clientX;
+	pos4 = e.clientY;
+	document.onmouseup = closeDragElement;
+	// call a function whenever the cursor moves:
+	document.onmousemove = elementDrag;
+}
 
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-  }
+function elementDrag(e) {
+	// e = e || window.event;
+	e.preventDefault();
+	// calculate the new cursor position:
+	pos1 = pos3 - e.clientX;
+	pos2 = pos4 - e.clientY;
+	pos3 = e.clientX;
+	pos4 = e.clientY;
+	// set the element's new position:
+	elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+	elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+	if (elmnt.style.visibility === "hidden") {
+		elmnt.style.visibility = "visible";
+	}
+}
 
-  function closeDragElement() {
-    /* stop moving when mouse button is released:*/
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
+function closeDragElement() {
+	/* stop moving when mouse button is released:*/
+	document.onmouseup = null;
+	document.onmousemove = null;
+}
+
 }  // dragElement
 
 function interleave(array1, array2) {
@@ -3931,6 +4150,11 @@ let viewportHeight = getViewportHeight();
 console.log("DOMInitializations Viewport Width " + viewportWidth + " Height " + viewportHeight);
 
 videoElem = document.getElementById("videoArea");
+timeEditPopup = document.getElementById("timeEditPopup");
+timeEditPopupO = document.getElementById("timeEditPopupO");
+timeEditPopupThumb = document.getElementById("timeEditPopupThumb");
+timeEditPopupV = document.getElementById("timeEditPopupV");
+
 
 subtitleTable = document.getElementById("subtitleTable");
 
@@ -3979,7 +4203,7 @@ console.log("DOMInitializations wrapper.style.width = ", wrapperElement.style.wi
 
 enableFileSelection();
 
-toggleSubtitleSection(); 
+toggleSubtitleSection(); // 1st invocation of computeSubtitleTableHeight
 
 configInitializations(); // Process config.js
 
@@ -3991,16 +4215,21 @@ changeAlignment();		// Initialize alignment option
 changeScroll();			// Initialize scroll option
 changeScrollStep();		// Initialize scroll step option
 changeMargin();			// Initialize margin option
+changeMarginLineMinHeight('marginLine1');
+changeMarginLineMinHeight('marginLine2');
 
 const controls = [
 	{id: "subtitleFontMenu", changeFunction: changeFont},
 	{id: "subtitleFontSizeMenu", changeFunction: changeFontSize},
 	{id: "subtitleAlignmentMenu", changeFunction: changeAlignment},
 	{id: "videoSizeMenu", changeFunction: changeVideoSize},
+	{id: "subtitleWidthMenu", changeFunction: changeSubtitleWidth},
 	{id: "spacebarMenu", changeFunction: changeSpacebar},
 	{id: "scrollMenu", changeFunction: changeScroll},
 	{id: "scrollStepMenu", changeFunction: changeScrollStep},
 	{id: "marginMenu", changeFunction: changeMargin},
+	{id: "marginLine1Menu", changeFunction: selectMarginLineMinHeight},
+	{id: "marginLine2Menu", changeFunction: selectMarginLineMinHeight},
 ]; 
 
 controls.forEach(function(item) {
@@ -4032,8 +4261,30 @@ if (urlParams.has('yturl')) {
 }
 
 dragElement(document.getElementById("dashboard"));
-dragElement(document.getElementById("timeEditPopup"));
-// dragElement(document.getElementById("textEditPopup"));
+dragElement(timeEditPopup);
+dragElement(timeEditPopupThumb);
+timeEditPopupThumb.style.display = 'none';
+timeEditPopup.addEventListener('mouseover', (e) => { 
+	timeEditPopup.style.visibility = "visible"; 
+	timeEditPopup.style.opacity = "1"; 
+} );
+timeEditPopup.addEventListener('mousedown', (e) => { 
+	console.log("timeEditPopup mousedown 1");
+	timeEditPopup.style.visibility = "visible"; 
+	timeEditPopup.style.opacity = "1"; 
+} );
+timeEditPopup.addEventListener('mouseleave', (e) => { 
+	if (timeEditPopupThumb.style.display != 'none') {
+		console.log("timeEditPopup mouseleave 1");
+		timeEditPopup.style.visibility = "hidden";
+	}
+	else {
+		console.log("timeEditPopup mouseleave 2");
+		if (!(timeEditPopupV.classList.contains('selected'))) {
+			timeEditPopup.style.opacity = "0.1"; 
+		}
+	}
+} );
 
 return;
 
@@ -4184,6 +4435,21 @@ function configInitializations() {
 	}
 
 	console.log("Configuration: videoWidthScale = " + selectVideoSize.value);
+
+	if (typeof subtitleWidthScale == 'undefined') {
+		errorReason = 'subtitleWidthScale missing';
+		initError(errorReason);
+	}
+
+	const selectSubtitleWidth = document.getElementById("subtitleWidthMenu");
+	selectSubtitleWidth.value = subtitleWidthScale;
+
+	if (selectSubtitleWidth.value != subtitleWidthScale){
+		errorReason = 'subtitleWidthScale = ' + subtitleWidthScale + ' not in list of allowed values';
+		initError(errorReason);
+	}
+
+	console.log("Configuration: videoWidthScale = " + selectSubtitleWidth.value);
 
 	if (typeof fontSize == 'undefined') {
 		errorReason = 'fontSize missing';
