@@ -34,6 +34,469 @@
 </head>
 
 <body>
+<!-- Media File section -->
+<div id="wrapper" class="wrapper">
+<div class="pageTitleWrapper">
+<div id="pageTitle" class="pageTitle"><b>Subtitle Player & Editor for Browsers</b></div>
+</div>  <!-- id="wrapperWrapper" class="wrapperWrapper" -->
+<div id="player"></div>
+<div>
+	<input id="videoFileInput" type="file" accept=".mp4,.mp3" class="videoFileInput" 
+		onchange="loadVideoFile(this.files[0])" >
+</div>
+<div id="inputWrapper" class="inputWrapper">
+<div class="videoFileContainer" id="videoFileContainer"><br><br>
+		<div id="videoFileButton" class="vidButton">Select a Video or Audio File</div><br>
+</div>
+<div id="videoURLContainer" class="videoURLContainer">
+	<div>Or paste a YouTube link:<br></div>
+	<input type="url" id="videoURLInput" name="videoURLInput" 
+		placeholder="Insert YouTube url" class="videoURLInput">
+	<div id="videoURLButton" class="vidButton">Submit</div><br><br><br>
+</div>
+<div style="bottom: 0%;">
+	<input type="checkbox" id="displayVideoControls" onclick="enableFields('displayVideoControls')">
+	<label for="displayVideoControls" class="selectOption">Display native video controls</label>
+</div>
+</div>
+<video id="videoArea" class="videoArea" disablePictureInPicture>
+</video>
+</div>
+
+<!-- seekBar -->
+<div id="seekBarContainer" class="seekBarContainer">
+<input type="range" id="seekBar" name="seekBar" min="0" max="100" value="0" class="slider">
+</div>
+
+<!-- marginLine1 -->
+<div id="marginLine1" style="display: none; min-height: 1rem; width: 100%;"></div>
+
+<!-- Featured subtitle -->
+<div id="divSubtitle1" style="font-size: 2rem; min-height: 2rem; padding-top: 0;
+	padding-left: 2%; padding-right: 2%; padding-bottom: 0; text-align: center; 
+	box-sizing: border-box; outline: none; min-width: 1rem;
+	width: 50%; margin-top: 0; margin-bottom: 0px;
+	margin-left: auto; margin-right: auto; align-items: center;">
+<span contenteditable="false" style="text-wrap: balance; padding-left: 5px;
+	padding-right: 5px; min-width: 50px;" id="spanSubtitle1"></span><br>
+</div>
+
+<!-- marginLine2 -->
+<div id="marginLine2" style="display: none; min-height: 1rem; width: 100%;"></div>
+
+<div id="divSubtitle2" style="font-size: 2rem; min-height: 2rem; padding-top: 0;
+	padding-left: 2%; padding-right: 2%; padding-bottom: 0; text-align: center; 
+	box-sizing: border-box; outline: none; min-width: 1rem;
+	width: 50%; margin-top: 0; margin-bottom: 0;
+	margin-left: auto; margin-right: auto; align-items: center;">
+<span contenteditable="false" style="text-wrap: balance; padding-left: 5px;
+	padding-right: 5px; min-width: 50px;" id="spanSubtitle2"></span><br>
+</div>
+
+<!-- Video counter -->
+<div id="videoCounterDiv" style="margin: 0; padding-left: 10px; font-size: 1.5rem; height: 1.5rem; overflow: hidden; ">
+		<b><span id="currentTime" class="time">0:00:00</span>
+		<span><b>/</b></span>
+		<span id="duration" class="time" style="margin-right: 10px;">0:00:00</span>
+		</b>
+</div>
+
+<!-- Selection info -->
+<div id="selectionInfoDiv" style="margin: 0; padding-left: 10px; font-size: 1.25rem; height: 1.5rem; overflow: hidden;">
+		<span id="selectionLabel" style="display: none;">Selection: </span>
+		<span id="spanStartTime" style="margin-right: auto;"></span>
+		<span><b id="selectionHyphen" style="display: none;">-</b></span>
+		<span id="spanEndTime" style="margin-right: auto;"></span>
+		<span id="spanTrack"></span>
+</div>
+
+<!-- Controls -->
+<div id="buttonSection" style="margin: 0; padding-left: 10px; height: 2rem; ">
+	<p>
+		<span class="hovertext1" data-hover="Play the selection and pause">
+		<button id="currentLine" class="button color1">Play single</button>
+		</span>
+
+		<span class="hovertext1" data-hover="Play the video continuously or pause">
+		<button id="playVideo" class="button color2">Play/Pause</button>
+		</span>
+
+		<span class="hovertext1" data-hover="Repeat the selection in a loop">
+		<button id="loop" class="button color3">Loop</button>
+		</span>
+
+	</p>
+</div>
+
+<!-- marginLine3 -->
+<div id="marginLine3" style="min-height: 1rem; width: 100%;"></div>
+
+<!-- Subtitle Table div -->
+<div id="subtitleTableDiv" class="subtitleTableDiv">
+<table class="table" id="subtitleTable">
+            <thead id="subtitleTableHeader">
+                <tr style="font-weight: bold; font-size: 1.5rem; padding: 0px;">
+                    <th scope="col" style="width: 3%" id="subtitleNumber">#</th>
+                    <th scope="col" style="width: 6%" id="subtitleStart">Start</th>
+                    <th scope="col" style="width: 6%" id="subtitleEnd">End</th>
+                    <th scope="col" style="width: 6%" id="subtitleTrack">Track</th>
+                    <th scope="col" style="width: 79%" id="subtitleText">Subtitle</th>
+                </tr>
+            </thead>
+            <tbody id="subtitleTbody">
+            </tbody>
+        </table>
+</div>
+
+<!-- End-of-table delimiter -->
+<div id="EOT" style="height: 5px; background-color: #87CEEB;"> </div>
+
+<!-- timeEditPopup -->
+<div class="timeEditPopupThumb" id="timeEditPopupThumb"></div>
+<div class="timeEditPopup" id="timeEditPopup">
+<div class="timeEditPopupHeaderBlock">
+	<div class="timeEditPopupLabel">Editing</div>
+	<div style="float: right; display: flex; flex-direction: row;">
+	<div class="timeEditPopupV color3" id="timeEditPopupV" onclick="toggleHideShow('timeEditPopupV')">👁</div>
+	<div class="timeEditPopupO color3" id="timeEditPopupO" onclick="toggleHideShow('timeEditPopupO')">◯</div>
+	<div class="timeEditPopupX" onclick="changeTime('close')">X</div>
+	</div>
+</div>
+<div class="timeEditPopupWrapper">
+	<span class="hovertext1" data-hover="Click on Subtitle Start Time to select the current video time">
+	<div class="timeEditPopupTitle color1" onclick="changeTime('current', 't1')">Subtitle Start Time</div>
+	</span>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1hourField1')">⇧</div>
+			<div id="t1hourField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1hourField1')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">:</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="minuteContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1minuteField1')">⇧</div>
+			<div id="t1minuteField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1minuteField1')">⇩</div>
+		</div>
+		<div class="minuteContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1minuteField2')">⇧</div>
+            <div id="t1minuteField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1minuteField2')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">:</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="secondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1secondField1')">⇧</div>
+			<div id="t1secondField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1secondField1')">⇩</div>
+		</div>
+		<div class="secondContainer">
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1secondField2')">⇧</div>
+            <div id="t1secondField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1secondField2')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">.</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="millisecondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1millisecondField1')">⇧</div>
+			<div id="t1millisecondField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1millisecondField1')">⇩</div>
+		</div>
+		<div class="millisecondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1millisecondField2')">⇧</div>
+            <div id="t1millisecondField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1millisecondField2')">⇩</div>
+		</div>
+		<div class="millisecondContainer">
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't1millisecondField3')">⇧</div>
+            <div id="t1millisecondField3" class="timeDigit3"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't1millisecondField3')">⇩</div>
+		</div>
+	<div style="padding-top: 1rem; padding-left: 0;">
+	<p>
+		<span class="hovertext1" data-hover="Select the current video time">
+		<button class="button color3"
+			onclick="changeTime('current', 't1')">Current</button>
+		</span>
+
+		<span class="general-dropdown-wrapper" id="copyt1">
+		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
+		<span class="general-dropdown-block dropup">
+		<!-- Dropdown Unit Start -->
+		<span class="general-dropdown-unit">
+		<span class="hovertext1" data-hover="Copy from row n-1 Start Time">
+		<span class="general-dropdown-option" onclick="copyTime('t1', '-1', 't1')">Row n-1 Start Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
+		<span class="general-dropdown-option" onclick="copyTime('t1', '-1', 't2')">Row n-1 End Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-2 Start Time">
+		<span class="general-dropdown-option" onclick="copyTime('t1', '+1', 't1')">Row n+1 Start Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-2 End Time">
+		<span class="general-dropdown-option" onclick="copyTime('t1', '+1', 't2')">Row n+1 End Time</span>
+		</span>
+		</span>
+		<!-- Dropdown Unit End -->
+		</span>
+		</span>  <!-- class="general-dropdown-wrapper"-->
+
+		<span style="position: absolute; right: 15px;">
+		<span class="hovertext1" data-hover="Restore the selected time.">
+		<button class="button color3"
+			onclick="changeTime('restore', 't1')">Restore</button>
+		</span>
+		</span>
+	</p>
+	</div>
+</div>  <!-- timeEditPopupWrapper -->
+<div class="timeEditPopupWrapper">
+	<span class="hovertext1" data-hover="Click on Subtitle End Time to select the current video time">
+	<div class="timeEditPopupTitle color1" onclick="changeTime('current', 't2')">Subtitle End Time</div>
+	</span>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2hourField1')">⇧</div>
+			<div id="t2hourField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2hourField1')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">:</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="minuteContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2minuteField1')">⇧</div>
+			<div id="t2minuteField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2minuteField1')">⇩</div>
+		</div>
+		<div class="minuteContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2minuteField2')">⇧</div>
+            <div id="t2minuteField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2minuteField2')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">:</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="secondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2secondField1')">⇧</div>
+			<div id="t2secondField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2secondField1')">⇩</div>
+		</div>
+		<div class="secondContainer">
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2secondField2')">⇧</div>
+            <div id="t2secondField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2secondField2')">⇩</div>
+		</div>
+		<div class="hourContainer">
+			<div class="timeEditPopupButton1"> </div>
+			<div class="timeColon">.</div>
+			<div class="timeEditPopupButton1"> </div>
+		</div>
+		<div class="millisecondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2millisecondField1')">⇧</div>
+			<div id="t2millisecondField1" class="timeDigit1"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2millisecondField1')">⇩</div>
+		</div>
+		<div class="millisecondContainer">
+			<div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2millisecondField2')">⇧</div>
+            <div id="t2millisecondField2" class="timeDigit2"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2millisecondField2')">⇩</div>
+		</div>
+		<div class="millisecondContainer">
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('increment', 't2millisecondField3')">⇧</div>
+            <div id="t2millisecondField3" class="timeDigit3"></div>
+            <div class="timeEditPopupButton1"
+				onclick="changeTime('decrement', 't2millisecondField3')">⇩</div>
+		</div>
+	<div style="padding-top: 1rem; padding-left: 0;">
+	<p>
+		<span class="hovertext1" data-hover="Select the current video time">
+		<button class="button color3"
+			onclick="changeTime('current', 't2')">Current</button>
+		</span>
+
+		<span class="general-dropdown-wrapper" id="copyt2">
+		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
+		<span class="general-dropdown-block dropup">
+		<!-- Dropdown Unit Start -->
+		<span class="general-dropdown-unit">
+		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
+		<span class="general-dropdown-option" onclick="copyTime('t2', '-1', 't2')">Row n-1 End Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-2 Start Time">
+		<span class="general-dropdown-option" onclick="copyTime('t2', '+1', 't1')">Row n+1 Start Time</span>
+		</span>
+		<span class="hovertext1" data-hover="Copy from row n-2 End Time">
+		<span class="general-dropdown-option" onclick="copyTime('t2', '+1', 't2')">Row n+1 End Time</span>
+		</span>
+		</span>
+		<!-- Dropdown Unit End -->
+		</span>
+		</span>  <!-- class="general-dropdown-wrapper"-->
+
+		<span style="position: absolute; right: 15px;">
+		<span class="hovertext1" data-hover="Restore the selected time.">
+		<button class="button color3"
+			onclick="changeTime('restore', 't2')">Restore</button>
+		</span>
+		</span>
+	</p>
+	</div>
+</div>  <!-- timeEditPopupWrapper -->
+<div class="textEditPopupWrapper">
+	<span class="hovertext1" data-hover="Play the selection and pause">
+	<div class="textEditPopupTitle color1" onclick="textEditPopupAction('playSingle')"">Play Single</div>
+	</span>
+	<div class="textEditButtonColumn">
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Select the previous subtitle">
+		<button class="button color3"
+			onclick="textEditPopupAction('selectPrev')">Previous</button>
+		</span>
+		</div>
+		<div style="margin-bottom: 8px;">
+		<span class="general-dropdown-wrapper" id="splitLineWrapper">
+		<button class="button color3">Split at cursor<span class="dropdown-arrow">▾</span></button>
+		<span class="general-dropdown-block">
+		<!-- Dropdown Unit Start -->
+		<span class="general-dropdown-unit">
+		<span class="hovertext1" data-hover="Split at the cursor, append the first segment to the previous line">
+		<span class="general-dropdown-option" 
+			onclick="textEditPopupAction('splitToPrev')">Split ↑ wrap</span>
+		</span>
+		<span class="hovertext1" data-hover="Split at the cursor, insert new line below">
+		<span class="general-dropdown-option" 
+			onclick="textEditPopupAction('splitToNextNewline')">Split ↓ new line</span>
+		</span>
+		<span class="hovertext1" data-hover="Split at the cursor, prepend the second segment to the next line">
+		<span class="general-dropdown-option" 
+			onclick="textEditPopupAction('splitToNext')">Split ↓ wrap</span>
+		</span>
+		</span> <!-- Dropdown Unit End -->
+		</span> <!-- class="general-dropdown-block"-->
+		</span> <!-- class="general-dropdown-wrapper"-->
+		</div>
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Delete the selected subtitle">
+		<button class="button color3"
+			onclick="textEditPopupAction('delete')">Delete</button>
+		</span>
+		</div>
+	</div>
+	<!-- textEditButtonColumn -->
+	<div class="textEditButtonColumn">
+		<div class="textEditPopupButton1">
+		<span class="hovertext1" data-hover="Select the next subtitle">
+		<button class="button color3"
+			onclick="textEditPopupAction('selectNext')">Next</button>
+		</span>
+		</div>
+		<div style="margin-bottom: 8px;">
+		<span class="general-dropdown-wrapper" id="insertLineWrapper">
+		<button class="button color3">Insert<span class="dropdown-arrow">▾</span></button>
+		<span class="general-dropdown-block">
+		<!-- Dropdown Unit Start -->
+		<span class="general-dropdown-unit">
+		<span class="hovertext1" data-hover="Before selected line">
+		<span class="general-dropdown-option" 
+			onclick="textEditPopupAction('insertAbove')">↑ Insert ↑</span>
+		</span>
+		<span class="hovertext1" data-hover="After selected line">
+		<span class="general-dropdown-option" 
+			onclick="textEditPopupAction('insertBelow')">↓ Insert ↓</span>
+		</span>
+		</span> <!-- Dropdown Unit End -->
+		</span> <!-- class="general-dropdown-block"-->
+		</span> <!-- class="general-dropdown-wrapper"-->
+		</div>
+		<div class="textEditPopupButton1">
+		</div>
+	</div>  <!-- textEditButtonColumn -->
+</div>  <!-- timeEditPopupWrapper -->
+</div>  <!-- timeEditPopup -->
+<!-- Dashboard -->
+<div id="dashboard">
+<div class="dashboardHeaderBlock">
+	<span class="dashboardHeader">Dashboard</span>
+	<span class="dashboardX" onclick="enableFields('myCheck09')">X</span>
+</div>
+<div class="dashboardWrapper">
+<!-- Video counter -->
+<div style="margin: 0; padding-left: 10px; font-size: 1.5rem; height: 1.5rem; overflow: hidden; ">
+		<b><span id="currentTimeOnDashboard" class="time">0:00:00</span>
+		<span><b>/</b></span>
+		<span id="durationOnDashboard" class="time" style="margin-right: 10px;">0:00:00</span>
+		</b>
+</div>
+<!-- Selection info -->
+<div style="margin: 0; padding-left: 10px; font-size: 1.25rem; height: 1.5rem; overflow: hidden;">
+		<span id="selectionLabelOnDashboard" style="display: none;">Selection: </span>
+		<span id="spanStartTimeOnDashboard" style="margin-right: auto;"></span>
+		<span><b id="selectionHyphenOnDashboard" style="display: none;">-</b></span>
+		<span id="spanEndTimeOnDashboard" style="margin-right: auto;"></span>
+		<span id="spanTrackOnDashboard"></span>
+</div>
+<!-- Controls -->
+<div style="margin: 0; padding-left: 10px; height: 2rem; ">
+	<p>
+		<span class="hovertext1" data-hover="Play the selection and pause">
+		<button id="currentLineOnDashboard" class="button color1">Play single</button>
+		</span>
+
+		<span class="hovertext1" data-hover="Play the video continuously or pause">
+		<button id="playVideoOnDashboard" class="button color2">Play/Pause</button>
+		</span>
+
+		<span class="hovertext1" data-hover="Repeat the selection in a loop">
+		<button id="loopOnDashboard" class="button color3">Loop</button>
+		</span>
+
+	</p>
+</div>
+</div>  <!-- dashboardWrapper -->
+</div>  <!-- dashboard -->
 <!-- Hamburger -->
 <div class="hamburger-dropdown-wrapper">
     <span class="line"></span>
@@ -424,479 +887,6 @@
 </div>  <!-- button-row -->
 </div>  <!-- class="hamburger-dropdown-block" -->
 </div>  <!-- class="hamburger-dropdown-wrapper" -->
-
-<!-- Media File section -->
-<!-- Media File section -->
-<div id="wrapper" class="wrapper">
-<div class="pageTitleWrapper">
-<div id="pageTitle" class="pageTitle"><b>Subtitle Player & Editor for Browsers</b></div>
-</div>  <!-- id="wrapperWrapper" class="wrapperWrapper" -->
-<div id="player"></div>
-<div>
-	<input id="videoFileInput" type="file" accept=".mp4,.mp3" class="videoFileInput" 
-		onchange="loadVideoFile(this.files[0])" >
-</div>
-<div id="inputWrapper" class="inputWrapper">
-<div class="videoFileContainer" id="videoFileContainer"><br><br>
-		<div id="videoFileButton" class="vidButton">Select a Video or Audio File</div><br>
-</div>
-<div id="videoURLContainer" class="videoURLContainer">
-	<div>Or paste a YouTube link:<br></div>
-	<input type="url" id="videoURLInput" name="videoURLInput" 
-		placeholder="Insert YouTube url" class="videoURLInput">
-	<div id="videoURLButton" class="vidButton">Submit</div><br><br><br>
-</div>
-<div style="bottom: 0%;">
-	<input type="checkbox" id="displayVideoControls" onclick="enableFields('displayVideoControls')">
-	<label for="displayVideoControls" class="selectOption">Display native video controls</label>
-</div>
-</div>
-<video id="videoArea" class="videoArea" disablePictureInPicture>
-</video>
-</div>
-
-<!-- seekBar -->
-<div id="seekBarContainer" class="seekBarContainer">
-<input type="range" id="seekBar" name="seekBar" min="0" max="100" value="0" class="slider">
-</div>
-
-<!-- marginLine1 -->
-<div id="marginLine1" style="display: none; min-height: 1rem; width: 100%;"></div>
-
-<!-- Featured subtitle -->
-<div id="divSubtitle1" style="font-size: 2rem; min-height: 2rem; padding-top: 0;
-	padding-left: 2%; padding-right: 2%; padding-bottom: 0; text-align: center; 
-	box-sizing: border-box; outline: none; min-width: 1rem;
-	width: 50%; margin-top: 0; margin-bottom: 0px;
-	margin-left: auto; margin-right: auto; align-items: center;">
-<span contenteditable="false" style="text-wrap: balance; padding-left: 5px;
-	padding-right: 5px; min-width: 50px;" id="spanSubtitle1"></span><br>
-</div>
-
-<!-- marginLine2 -->
-<div id="marginLine2" style="display: none; min-height: 1rem; width: 100%;"></div>
-
-<div id="divSubtitle2" style="font-size: 2rem; min-height: 2rem; padding-top: 0;
-	padding-left: 2%; padding-right: 2%; padding-bottom: 0; text-align: center; 
-	box-sizing: border-box; outline: none; min-width: 1rem;
-	width: 50%; margin-top: 0; margin-bottom: 0;
-	margin-left: auto; margin-right: auto; align-items: center;">
-<span contenteditable="false" style="text-wrap: balance; padding-left: 5px;
-	padding-right: 5px; min-width: 50px;" id="spanSubtitle2"></span><br>
-</div>
-
-<!-- Video counter -->
-<div id="videoCounterDiv" style="margin: 0; padding-left: 10px; font-size: 1.5rem; height: 1.5rem; overflow: hidden; ">
-		<b><span id="currentTime" class="time">0:00:00</span>
-		<span><b>/</b></span>
-		<span id="duration" class="time" style="margin-right: 10px;">0:00:00</span>
-		</b>
-</div>
-
-<!-- Selection info -->
-<div id="selectionInfoDiv" style="margin: 0; padding-left: 10px; font-size: 1.25rem; height: 1.5rem; overflow: hidden;">
-		<span id="selectionLabel" style="display: none;">Selection: </span>
-		<span id="spanStartTime" style="margin-right: auto;"></span>
-		<span><b id="selectionHyphen" style="display: none;">-</b></span>
-		<span id="spanEndTime" style="margin-right: auto;"></span>
-		<span id="spanTrack"></span>
-</div>
-
-<!-- Controls -->
-<div id="buttonSection" style="margin: 0; padding-left: 10px; height: 2rem; ">
-	<p>
-		<span class="hovertext1" data-hover="Play the selection and pause">
-		<button id="currentLine" class="button color1">Play single</button>
-		</span>
-
-		<span class="hovertext1" data-hover="Play the video continuously or pause">
-		<button id="playVideo" class="button color2">Play/Pause</button>
-		</span>
-
-		<span class="hovertext1" data-hover="Repeat the selection in a loop">
-		<button id="loop" class="button color3">Loop</button>
-		</span>
-
-	</p>
-</div>
-
-<!-- marginLine3 -->
-<div id="marginLine3" style="min-height: 1rem; width: 100%;"></div>
-
-<!-- Subtitle Table div -->
-<div id="subtitleTableDiv" class="subtitleTableDiv">
-<table class="table" id="subtitleTable">
-            <thead id="subtitleTableHeader">
-                <tr style="font-weight: bold; font-size: 1.5rem; padding: 0px;">
-                    <th scope="col" style="width: 3%" id="subtitleNumber">#</th>
-                    <th scope="col" style="width: 6%" id="subtitleStart">Start</th>
-                    <th scope="col" style="width: 6%" id="subtitleEnd">End</th>
-                    <th scope="col" style="width: 6%" id="subtitleTrack">Track</th>
-                    <th scope="col" style="width: 79%" id="subtitleText">Subtitle</th>
-                </tr>
-            </thead>
-            <tbody id="subtitleTbody">
-            </tbody>
-        </table>
-</div>
-
-<!-- End-of-table delimiter -->
-<div id="EOT" style="height: 5px; background-color: #87CEEB;"> </div>
-
-<!-- timeEditPopup -->
-<div class="timeEditPopupThumb" id="timeEditPopupThumb"></div>
-<div class="timeEditPopup" id="timeEditPopup">
-<div class="timeEditPopupHeaderBlock">
-	<div class="timeEditPopupLabel">Editing</div>
-	<div style="float: right; display: flex; flex-direction: row;">
-	<div class="timeEditPopupV color3" id="timeEditPopupV" onclick="toggleHideShow('timeEditPopupV')">👁</div>
-	<div class="timeEditPopupO color3" id="timeEditPopupO" onclick="toggleHideShow('timeEditPopupO')">◯</div>
-	<div class="timeEditPopupX" onclick="changeTime('close')">X</div>
-	</div>
-</div>
-<div class="timeEditPopupWrapper">
-	<span class="hovertext1" data-hover="Click on Subtitle Start Time to select the current video time">
-	<div class="timeEditPopupTitle color1" onclick="changeTime('current', 't1')">Subtitle Start Time</div>
-	</span>
-		<div class="hourContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't1hourField1')">⇧</div>
-			<div id="t1hourField1" class="timeDigit1"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't1hourField1')">⇩</div>
-		</div>
-		<div class="hourContainer">
-			<div class="timeEditPopupButton1"> </div>
-			<div class="timeColon">:</div>
-			<div class="timeEditPopupButton1"> </div>
-		</div>
-		<div class="minuteContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't1minuteField1')">⇧</div>
-			<div id="t1minuteField1" class="timeDigit1"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't1minuteField1')">⇩</div>
-		</div>
-		<div class="minuteContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't1minuteField2')">⇧</div>
-            <div id="t1minuteField2" class="timeDigit2"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't1minuteField2')">⇩</div>
-		</div>
-		<div class="hourContainer">
-			<div class="timeEditPopupButton1"> </div>
-			<div class="timeColon">:</div>
-			<div class="timeEditPopupButton1"> </div>
-		</div>
-		<div class="secondContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't1secondField1')">⇧</div>
-			<div id="t1secondField1" class="timeDigit1"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't1secondField1')">⇩</div>
-		</div>
-		<div class="secondContainer">
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't1secondField2')">⇧</div>
-            <div id="t1secondField2" class="timeDigit2"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't1secondField2')">⇩</div>
-		</div>
-		<div class="hourContainer">
-			<div class="timeEditPopupButton1"> </div>
-			<div class="timeColon">.</div>
-			<div class="timeEditPopupButton1"> </div>
-		</div>
-		<div class="millisecondContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't1millisecondField1')">⇧</div>
-			<div id="t1millisecondField1" class="timeDigit1"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't1millisecondField1')">⇩</div>
-		</div>
-		<div class="millisecondContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't1millisecondField2')">⇧</div>
-            <div id="t1millisecondField2" class="timeDigit2"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't1millisecondField2')">⇩</div>
-		</div>
-		<div class="millisecondContainer">
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't1millisecondField3')">⇧</div>
-            <div id="t1millisecondField3" class="timeDigit3"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't1millisecondField3')">⇩</div>
-		</div>
-	<div style="padding-top: 1rem; padding-left: 0;">
-	<p>
-		<span class="hovertext1" data-hover="Select the current video time">
-		<button class="button color3"
-			onclick="changeTime('current', 't1')">Current</button>
-		</span>
-
-		<span class="general-dropdown-wrapper" id="copyt1">
-		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
-		<span class="general-dropdown-block dropup">
-		<!-- Dropdown Unit Start -->
-		<span class="general-dropdown-unit">
-		<span class="hovertext1" data-hover="Copy from row n-1 Start Time">
-		<span class="general-dropdown-option" onclick="copyTime('t1', '-1', 't1')">Row n-1 Start Time</span>
-		</span>
-		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
-		<span class="general-dropdown-option" onclick="copyTime('t1', '-1', 't2')">Row n-1 End Time</span>
-		</span>
-		<span class="hovertext1" data-hover="Copy from row n-2 Start Time">
-		<span class="general-dropdown-option" onclick="copyTime('t1', '+1', 't1')">Row n+1 Start Time</span>
-		</span>
-		<span class="hovertext1" data-hover="Copy from row n-2 End Time">
-		<span class="general-dropdown-option" onclick="copyTime('t1', '+1', 't2')">Row n+1 End Time</span>
-		</span>
-		</span>
-		<!-- Dropdown Unit End -->
-		</span>
-		</span>  <!-- class="general-dropdown-wrapper"-->
-
-		<span style="position: absolute; right: 15px;">
-		<span class="hovertext1" data-hover="Restore the selected time.">
-		<button class="button color3"
-			onclick="changeTime('restore', 't1')">Restore</button>
-		</span>
-		</span>
-	</p>
-	</div>
-</div>  <!-- timeEditPopupWrapper -->
-<div class="timeEditPopupWrapper">
-	<span class="hovertext1" data-hover="Click on Subtitle End Time to select the current video time">
-	<div class="timeEditPopupTitle color1" onclick="changeTime('current', 't2')">Subtitle End Time</div>
-	</span>
-		<div class="hourContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't2hourField1')">⇧</div>
-			<div id="t2hourField1" class="timeDigit1"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't2hourField1')">⇩</div>
-		</div>
-		<div class="hourContainer">
-			<div class="timeEditPopupButton1"> </div>
-			<div class="timeColon">:</div>
-			<div class="timeEditPopupButton1"> </div>
-		</div>
-		<div class="minuteContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't2minuteField1')">⇧</div>
-			<div id="t2minuteField1" class="timeDigit1"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't2minuteField1')">⇩</div>
-		</div>
-		<div class="minuteContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't2minuteField2')">⇧</div>
-            <div id="t2minuteField2" class="timeDigit2"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't2minuteField2')">⇩</div>
-		</div>
-		<div class="hourContainer">
-			<div class="timeEditPopupButton1"> </div>
-			<div class="timeColon">:</div>
-			<div class="timeEditPopupButton1"> </div>
-		</div>
-		<div class="secondContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't2secondField1')">⇧</div>
-			<div id="t2secondField1" class="timeDigit1"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't2secondField1')">⇩</div>
-		</div>
-		<div class="secondContainer">
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't2secondField2')">⇧</div>
-            <div id="t2secondField2" class="timeDigit2"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't2secondField2')">⇩</div>
-		</div>
-		<div class="hourContainer">
-			<div class="timeEditPopupButton1"> </div>
-			<div class="timeColon">.</div>
-			<div class="timeEditPopupButton1"> </div>
-		</div>
-		<div class="millisecondContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't2millisecondField1')">⇧</div>
-			<div id="t2millisecondField1" class="timeDigit1"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't2millisecondField1')">⇩</div>
-		</div>
-		<div class="millisecondContainer">
-			<div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't2millisecondField2')">⇧</div>
-            <div id="t2millisecondField2" class="timeDigit2"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't2millisecondField2')">⇩</div>
-		</div>
-		<div class="millisecondContainer">
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('increment', 't2millisecondField3')">⇧</div>
-            <div id="t2millisecondField3" class="timeDigit3"></div>
-            <div class="timeEditPopupButton1"
-				onclick="changeTime('decrement', 't2millisecondField3')">⇩</div>
-		</div>
-	<div style="padding-top: 1rem; padding-left: 0;">
-	<p>
-		<span class="hovertext1" data-hover="Select the current video time">
-		<button class="button color3"
-			onclick="changeTime('current', 't2')">Current</button>
-		</span>
-
-		<span class="general-dropdown-wrapper" id="copyt2">
-		<button class="button color3">Copy<span class="dropdown-arrow">▾</span></button>
-		<span class="general-dropdown-block dropup">
-		<!-- Dropdown Unit Start -->
-		<span class="general-dropdown-unit">
-		<span class="hovertext1" data-hover="Copy from row n-1 End Time">
-		<span class="general-dropdown-option" onclick="copyTime('t2', '-1', 't2')">Row n-1 End Time</span>
-		</span>
-		<span class="hovertext1" data-hover="Copy from row n-2 Start Time">
-		<span class="general-dropdown-option" onclick="copyTime('t2', '+1', 't1')">Row n+1 Start Time</span>
-		</span>
-		<span class="hovertext1" data-hover="Copy from row n-2 End Time">
-		<span class="general-dropdown-option" onclick="copyTime('t2', '+1', 't2')">Row n+1 End Time</span>
-		</span>
-		</span>
-		<!-- Dropdown Unit End -->
-		</span>
-		</span>  <!-- class="general-dropdown-wrapper"-->
-
-		<span style="position: absolute; right: 15px;">
-		<span class="hovertext1" data-hover="Restore the selected time.">
-		<button class="button color3"
-			onclick="changeTime('restore', 't2')">Restore</button>
-		</span>
-		</span>
-	</p>
-	</div>
-</div>  <!-- timeEditPopupWrapper -->
-<div class="textEditPopupWrapper">
-	<span class="hovertext1" data-hover="Play the selection and pause">
-	<div class="textEditPopupTitle color1" onclick="textEditPopupAction('playSingle')"">Play Single</div>
-	</span>
-	<div class="textEditButtonColumn">
-		<div class="textEditPopupButton1">
-		<span class="hovertext1" data-hover="Select the previous subtitle">
-		<button class="button color3"
-			onmousedown="textEditPopupAction('updateRow')"
-			onclick="textEditPopupAction('selectPrev')">Previous</button>
-		</span>
-		</div>
-		<div style="margin-bottom: 8px;">
-		<span class="general-dropdown-wrapper" id="splitLineWrapper">
-		<button class="button color3">Split at cursor<span class="dropdown-arrow">▾</span></button>
-		<span class="general-dropdown-block">
-		<!-- Dropdown Unit Start -->
-		<span class="general-dropdown-unit">
-		<span class="hovertext1" data-hover="Split at the cursor, append the first segment to the previous line">
-		<span class="general-dropdown-option" 
-			onmousedown="textEditPopupAction('mousedown')"
-			onclick="textEditPopupAction('splitToPrev')">Split ↑ wrap</span>
-		</span>
-		<span class="hovertext1" data-hover="Split at the cursor, insert new line below">
-		<span class="general-dropdown-option" 
-			onmousedown="textEditPopupAction('mousedown')"
-			onclick="textEditPopupAction('splitToNextNewline')">Split ↓ new line</span>
-		</span>
-		<span class="hovertext1" data-hover="Split at the cursor, prepend the second segment to the next line">
-		<span class="general-dropdown-option" 
-			onmousedown="textEditPopupAction('mousedown')"
-			onclick="textEditPopupAction('splitToNext')">Split ↓ wrap</span>
-		</span>
-		</span> <!-- Dropdown Unit End -->
-		</span> <!-- class="general-dropdown-block"-->
-		</span> <!-- class="general-dropdown-wrapper"-->
-		</div>
-		<div class="textEditPopupButton1">
-		<span class="hovertext1" data-hover="Delete the selected subtitle">
-		<button class="button color3"
-			onmousedown="textEditPopupAction('updateRow')"
-			onclick="textEditPopupAction('delete')">Delete</button>
-		</span>
-		</div>
-	</div>
-	<!-- textEditButtonColumn -->
-	<div class="textEditButtonColumn">
-		<div class="textEditPopupButton1">
-		<span class="hovertext1" data-hover="Select the next subtitle">
-		<button class="button color3"
-			onmousedown="textEditPopupAction('updateRow')"
-			onclick="textEditPopupAction('selectNext')">Next</button>
-		</span>
-		</div>
-		<div style="margin-bottom: 8px;">
-		<span class="general-dropdown-wrapper" id="insertLineWrapper">
-		<button class="button color3">Insert<span class="dropdown-arrow">▾</span></button>
-		<span class="general-dropdown-block">
-		<!-- Dropdown Unit Start -->
-		<span class="general-dropdown-unit">
-		<span class="hovertext1" data-hover="Before selected line">
-		<span class="general-dropdown-option" 
-			onmousedown="textEditPopupAction('updateRow')"
-			onclick="textEditPopupAction('insertAbove')">↑ Insert ↑</span>
-		</span>
-		<span class="hovertext1" data-hover="After selected line">
-		<span class="general-dropdown-option" 
-			onmousedown="textEditPopupAction('updateRow')"
-			onclick="textEditPopupAction('insertBelow')">↓ Insert ↓</span>
-		</span>
-		</span> <!-- Dropdown Unit End -->
-		</span> <!-- class="general-dropdown-block"-->
-		</span> <!-- class="general-dropdown-wrapper"-->
-		</div>
-		<div class="textEditPopupButton1">
-		</div>
-	</div>  <!-- textEditButtonColumn -->
-</div>  <!-- timeEditPopupWrapper -->
-</div>  <!-- timeEditPopup -->
-<!-- Dashboard -->
-<div id="dashboard">
-<div class="dashboardHeaderBlock">
-	<span class="dashboardHeader">Dashboard</span>
-	<span class="dashboardX" onclick="enableFields('myCheck09')">X</span>
-</div>
-<div class="dashboardWrapper">
-<!-- Video counter -->
-<div style="margin: 0; padding-left: 10px; font-size: 1.5rem; height: 1.5rem; overflow: hidden; ">
-		<b><span id="currentTimeOnDashboard" class="time">0:00:00</span>
-		<span><b>/</b></span>
-		<span id="durationOnDashboard" class="time" style="margin-right: 10px;">0:00:00</span>
-		</b>
-</div>
-<!-- Selection info -->
-<div style="margin: 0; padding-left: 10px; font-size: 1.25rem; height: 1.5rem; overflow: hidden;">
-		<span id="selectionLabelOnDashboard" style="display: none;">Selection: </span>
-		<span id="spanStartTimeOnDashboard" style="margin-right: auto;"></span>
-		<span><b id="selectionHyphenOnDashboard" style="display: none;">-</b></span>
-		<span id="spanEndTimeOnDashboard" style="margin-right: auto;"></span>
-		<span id="spanTrackOnDashboard"></span>
-</div>
-<!-- Controls -->
-<div style="margin: 0; padding-left: 10px; height: 2rem; ">
-	<p>
-		<span class="hovertext1" data-hover="Play the selection and pause">
-		<button id="currentLineOnDashboard" class="button color1">Play single</button>
-		</span>
-
-		<span class="hovertext1" data-hover="Play the video continuously or pause">
-		<button id="playVideoOnDashboard" class="button color2">Play/Pause</button>
-		</span>
-
-		<span class="hovertext1" data-hover="Repeat the selection in a loop">
-		<button id="loopOnDashboard" class="button color3">Loop</button>
-		</span>
-
-	</p>
-</div>
-</div>  <!-- dashboardWrapper -->
-</div>  <!-- dashboard -->
 </body>
 </html>
 
