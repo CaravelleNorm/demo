@@ -23,6 +23,9 @@ let keyListenerAdded = false;
 let playing = false;				// Flag: If false, the video is not currently playing
 let playingContinuously = false;	// Flag: Enable/Disable continuous play until the user stops or the video ends
 let looping = false;				// Flag: Enable/Disable playing the currently selected subtitle in a loop
+let subsetFirstRow = 0;
+let subsetLastRow = 0;
+let subsetRange = 1;
 let checkTimeEnabled = false;		// Flag: Enable/Disable checking the endtime of a subtitle while it is playing
 let callUpdateTimeEnabled = false;
 let	lastSubtitleNumber = 0;			// Total number of subtitles
@@ -316,7 +319,9 @@ function computeSubtitleTableHeight() {
 			divElem.style.flexShrink = '0';
             divElem.style.display = 'block';
             divElem.style.height = 'auto';
+		//if (divName !== 'buttonSection') {
             divElem.style.overflowY = 'hidden';
+		//}
             divElemHeight = Math.ceil(divElem.getBoundingClientRect().height);
             divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
 			console.log("computeSubtitleTableHeight ", divName, " w" + divElemWidth + " h" + divElemHeight);
@@ -324,7 +329,7 @@ function computeSubtitleTableHeight() {
 				divElem.style.flexShrink = '1';
 			}
 //		}
-
+ 
 		let availableHeight = viewportHeight - totalHeight;
 		totalHeight += divElemHeight;
 		residualHeight = viewportHeight - totalHeight;
@@ -350,6 +355,13 @@ function computeSubtitleTableHeight() {
 	                divElem.style.height = 'auto';
 	                divElem.style.overflowY = 'hidden';
 				}
+			}
+			break;
+		case 'buttonSection':
+			if (residualHeight < 0) {
+				divElem.style.display = "none";
+			} else {
+				divElem.style.display = "flex";
 			}
 			break;
 		default:
@@ -1150,6 +1162,36 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 	setTimeout(() => {document.getElementById(`copy${elemIdTo}`).style.pointerEvents = ''}, 500);
 	showTimeEditPopup(timeEditPopupRow);
 
+}
+
+function changeRange (operation) {
+	switch(operation) {
+	case "clear":
+		subsetRange = 1;
+		break;
+	case "increment":
+		subsetRange += 1;
+		if (subsetRange > 12) {
+			subsetRange = 12;
+		}
+		break;
+	case "decrement":
+		subsetRange -= 1;
+		if (subsetRange < 1) {
+			subsetRange = 1;
+		}
+		break;
+	default:
+		console.log('changeRange Invalid operation ', operation);
+		alert("changeRange Invalid operation " + operation);
+		return;
+	}
+	rangeCount.textContent = subsetRange;
+	if (subsetRange > 1) {
+		rangeButtonRangeCount.textContent = subsetRange;
+	} else {
+		rangeButtonRangeCount.textContent = "";
+	}
 }
 
 function changeTime(operation, elemId) {
@@ -1963,22 +2005,21 @@ function checkTime() {
 	else {
 		videoCurrentTime = videoElem.currentTime;
 	}
-    	console.log('checkTime videoCurrentTime', videoCurrentTime, 
+   	console.log('checkTime videoCurrentTime', videoCurrentTime, 
 		' subtitleEndSeconds[selectedSubtitleNumber] ', subtitleEndSeconds[selectedSubtitleNumber]);
-    	console.log('checkTime looping = ', looping, ' videoStateBusy() = ', videoStateBusy()); 
+   	console.log('checkTime looping = ', looping, ' videoStateBusy() = ', videoStateBusy()); 
 		// If the end of the current selection has not been reached, return.
-	if (videoCurrentTime < (subtitleEndSeconds[selectedSubtitleNumber] + marginOption)) {
+	if (videoCurrentTime < selectionEndSeconds) {
 		if (youTubeVideoId) {
 			setTimeout(checkTime, checkTimeInterval);
 		}
 		updateTime();
-		return;
+		return; 
 	}
-		// Playing the current selection once
+
+	// Playing the current selection once
 	if (!looping) {
-		//if (videoStateBusy()) {
-			pauseVideo();
-		//}
+		pauseVideo();
 		checkTimeEnabled = false;
 		updateTime();
 		return;
@@ -1997,20 +2038,86 @@ function checkTime() {
 	else {
 		videoElem.removeEventListener("timeupdate",checkTime,true);
 		clearTimeout(timeoutId);
-		playVideo(selectionStartSeconds,selectionEndSeconds);
-		//videoElem.currentTime = subtitleStartSeconds[selectedSubtitleNumber];
-    	//videoElem.addEventListener("timeupdate", checkTime, true);
-		//let delay = (subtitleEndSeconds[selectedSubtitleNumber] 
-		//	- subtitleStartSeconds[selectedSubtitleNumber] 
-		//	+ (2 * marginOption)) * 1000;
-		//console.log("checkTime delay = ", delay);
-		//setTimeout(handleSelectionTimeOut, delay);
+		playVideo(selectionStartSeconds, selectionEndSeconds);
 	}
 
 	console.log("checkTime updateTime");
 	updateTime();
 	return;
 } // checkTime
+
+function checkTime2() {
+
+	// Playing continuously more than one subtitle in the selected track
+	// until the end time of the subtitle subset is exceeded
+
+	if (!checkTimeEnabled) {
+		console.log('checkTime2 entered while NOT Enabled');
+		if (!youTubeVideoId) {
+			videoElem.removeEventListener("timeupdate",checkTime2,true);
+		}
+		return;
+	}
+
+	let videoCurrentTime = 0;
+	if (youTubeVideoId) {
+		videoCurrentTime = player.getCurrentTime();
+	}
+	else {
+		videoCurrentTime = videoElem.currentTime;
+	}
+
+	console.log('checkTime2 videoCurrentTime', videoCurrentTime, 
+		' subtitleEndSeconds[selectedSubtitleNumber] ', subtitleEndSeconds[selectedSubtitleNumber],
+		' selectionEndSeconds ', selectionEndSeconds);
+   	console.log('checkTime2 looping = ', looping, ' videoStateBusy() = ', videoStateBusy()); 
+
+	if (videoCurrentTime >= selectionEndSeconds) {
+		// Playing the current selection once
+		if (!looping) {
+			pauseVideo();
+			checkTimeEnabled = false;
+			updateTime();
+			selectRow(subsetFirstRow);
+			return;
+		}
+		// Playing the current selection in a loop.
+		if (youTubeVideoId) {
+			if (player.getPlayerState() != YT.PlayerState.PAUSED) {
+				pauseYouTubeVideo();
+			}
+			player.seekTo(selectionStartSeconds, true);
+			console.log("checkTime2 seekTo selectionStartSeconds ", selectionStartSeconds, 
+				" player.getCurrentTime ", player.getCurrentTime());
+			setTimeout(checkTime2, checkTimeInterval);
+		}
+		else {
+			videoElem.removeEventListener("timeupdate", checkTime2, true);
+			clearTimeout(timeoutId);
+			selectRow(subsetFirstRow);
+			playVideo(selectionStartSeconds, selectionEndSeconds);
+		}
+		return;
+	}
+
+	let rowIndex = findTrackRow('next', subtitleTrack[selectedSubtitleNumber], selectedSubtitleNumber);
+	if (youTubeVideoId) {
+		videoCurrentTime = player.getCurrentTime();
+	}
+	else {
+		videoCurrentTime = videoElem.currentTime;
+	}
+	if ((rowIndex) && (videoCurrentTime >= subtitleStartSeconds[rowIndex])) {
+		selectRow(rowIndex);
+	}
+	if (youTubeVideoId) {
+		setTimeout(checkTime2, checkTimeInterval);
+	}
+
+	console.log("checkTime2 updateTime");
+	updateTime();
+
+} // checkTime2
 
 function pauseVideo() {
 	console.log('pauseVideo entered');
@@ -2063,11 +2170,16 @@ function playVideo(time1, time2) {
 	issuePlayVideo();
 	playing = true;
     if (youTubeVideoId) {
-//		setTimeout(checkTime, checkTimeInterval);
+//	??	setTimeout(checkTime, checkTimeInterval);
 	}
 	else {
     	console.log('playVideo: Adding timeupdate listener to run checkTime.');
-		videoElem.addEventListener("timeupdate", checkTime, true);
+		if (playingContinuously && (selectionEndSeconds != 0)) {
+			videoElem.addEventListener("timeupdate", checkTime2, true);
+		} else {
+			videoElem.addEventListener("timeupdate", checkTime, true);
+		}
+
 	}	
 	checkTimeEnabled = true;
 
@@ -2087,7 +2199,11 @@ function issuePlayVideo() {
 		console.log("issuePlayVideo updateTime");
 		updateTime();
 		checkTimeEnabled = true;
-		setTimeout(checkTime, checkTimeInterval);
+		if (playingContinuously && (selectionEndSeconds != 0)) {
+			setTimeout(checkTime2, checkTimeInterval);
+		} else {
+			setTimeout(checkTime, checkTimeInterval);
+		}
 	}	
 }
 
@@ -2846,6 +2962,19 @@ function addKeyListenerForSubtitles() {
 		case "d":
 			console.log("d delete row ", selectedSubtitleNumber);
 			deleteSubtitle(selectedSubtitleNumber);
+			break;
+		case "c":
+			subsetFirstRow = 0;
+			subsetLastRow = 0;
+			console.log("c subsetFirstRow & subsetLastRow = 0");
+			break;
+		case "m":
+			subsetFirstRow = selectedSubtitleNumber;
+			console.log("m subsetFirstRow = ", subsetFirstRow);
+			break;
+		case "M":
+			subsetLastRow = selectedSubtitleNumber;
+			console.log("M subsetLastRow = ", subsetLastRow);
 			break;
 		case "n":
 			console.log("n newLine after ", selectedSubtitleNumber);
@@ -4022,33 +4151,37 @@ function buttonEvents(e) {
 
 function buttonAction(actionType) {
 
+	if (selectedSubtitleNumber <= 0) {
+		return; // no action
+	}
+
 	switch(actionType) {
-		case 'prevST':
-			if ((subtitleTrack[selectedSubtitleNumber] === 0) &&
-				(selectedSubtitleNumber > scrollStepOption)) {
-				selectRow(selectedSubtitleNumber - scrollStepOption);
+	case 'prevST':
+		if ((subtitleTrack[selectedSubtitleNumber] === 0) &&
+			(selectedSubtitleNumber > scrollStepOption)) {
+			selectRow(selectedSubtitleNumber - scrollStepOption);
+			skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
+		} else {
+			nextTrack1Row = findTrackRow('prev', 1, selectedSubtitleNumber);
+			if (nextTrack1Row > 0) {
+				selectRow(nextTrack1Row);
 				skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
-			} else {
-				nextTrack1Row = findTrackRow('prev', 1, selectedSubtitleNumber);
-				if (nextTrack1Row > 0) {
-					selectRow(nextTrack1Row);
-					skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
-				}
 			}
-			return;
-		case 'nextST':
-			if ((subtitleTrack[selectedSubtitleNumber] === 0) &&
-				(selectedSubtitleNumber < subtitleTable.rows.length - scrollStepOption)) {
-				selectRow(selectedSubtitleNumber + scrollStepOption);
+		}
+		return;
+	case 'nextST':
+		if ((subtitleTrack[selectedSubtitleNumber] === 0) &&
+			(selectedSubtitleNumber < subtitleTable.rows.length - scrollStepOption)) {
+			selectRow(selectedSubtitleNumber + scrollStepOption);
+			skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
+		} else {
+			nextTrack1Row = findTrackRow('next', 1, selectedSubtitleNumber);
+			if (nextTrack1Row > 0) {
+				selectRow(nextTrack1Row);
 				skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
-			} else {
-				nextTrack1Row = findTrackRow('next', 1, selectedSubtitleNumber);
-				if (nextTrack1Row > 0) {
-					selectRow(nextTrack1Row);
-					skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
-				}
 			}
-			return;
+		}
+		return;
 	}
 
 	if (!((lastSubtitleNumber > 0) && videoFileLoaded)) { 
@@ -4061,8 +4194,23 @@ function buttonAction(actionType) {
 	}
 
 	switch(actionType) {
-		case 'playVideo':
-		case 'playVideoOnDashboard':
+	case 'currentLine':
+	case 'currentLineOnDashboard':
+		selectionStartSeconds = subtitleStartSeconds[selectedSubtitleNumber] - marginOption;
+		selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
+		break;
+	case 'restOfcurrentLine':
+		if (youTubeVideoId) {
+			selectionStartSeconds = player.getCurrentTime();
+		}
+		else {
+			selectionStartSeconds = videoElem.currentTime;
+		}
+		selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
+		break;
+	case 'playVideo':
+	case 'playVideoOnDashboard':
+		if (!(subsetting())) {
 			if (youTubeVideoId) {
 				selectionStartSeconds = player.getCurrentTime();
 			}
@@ -4070,53 +4218,66 @@ function buttonAction(actionType) {
 				selectionStartSeconds = videoElem.currentTime;
 			}
 			selectionEndSeconds = 0;
+		}
+		playingContinuously = true;
+		break;
+	case 'loop':
+		if (subsetting()) {
 			playingContinuously = true;
-			break;
-		case 'currentLine':
-		case 'currentLineOnDashboard':
-			if (selectedSubtitleNumber !== 0) {
-				selectionStartSeconds = subtitleStartSeconds[selectedSubtitleNumber] - marginOption;
-				selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
-			} else {
-				return; // no action
-			}
-			break;
-		case 'restOfcurrentLine':
-			if (selectedSubtitleNumber !== 0) {
-				if (youTubeVideoId) {
-					selectionStartSeconds = player.getCurrentTime();
-				}
-				else {
-					selectionStartSeconds = videoElem.currentTime;
-				}
-				selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
-			} else {
-				return; // no action
-			}
-			break;
-		case 'loop':
-			looping = true;
-			if (selectedSubtitleNumber !== 0) {
-				selectionStartSeconds = subtitleStartSeconds[selectedSubtitleNumber] - marginOption;
-				selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
-			} else {
-				return; // no action
-			}
+		} else {
+			selectionStartSeconds = subtitleStartSeconds[selectedSubtitleNumber] - marginOption;
+			selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
 			console.log('loop Selected row ',selectedSubtitleNumber);
 			console.log('loop subtitleStartSeconds ',subtitleStartSeconds[selectedSubtitleNumber]);
 			console.log('loop subtitleEndSeconds ',subtitleEndSeconds[selectedSubtitleNumber]);
 			console.log('loop selectionStartSeconds ',selectionStartSeconds);
 			console.log('loop selectionEndSeconds ',selectionEndSeconds);
-
-			break;
-		default:
-			console.log('buttonAction Invalid actionType: ', actionType);
-			break;
+		}
+		looping = true;
+		break;
+	default:
+		console.log('buttonAction Invalid actionType: ', actionType);
+		break;
 	}
 
 	console.log("buttonAction calling playVideo. actionType ", actionType);
     playVideo(selectionStartSeconds, selectionEndSeconds);
 
+function subsetting() {
+
+	if ((!(subsetFirstRow && subsetLastRow)) && (subsetRange === 1)){
+		return false;
+	}
+
+	if ((subsetFirstRow && subsetLastRow) && (subsetFirstRow > subsetLastRow)) {
+		let temp = subsetFirstRow;
+		subsetFirstRow = subsetLastRow;
+		subsetLastRow = temp;
+	}
+	
+	if (subsetRange > 1) {
+		subsetFirstRow = selectedSubtitleNumber;
+		let subsetFirstRowTrack = subtitleTrack[subsetFirstRow];
+		subsetLastRow = selectedSubtitleNumber;
+		for (let i = 2; i <= subsetRange; i++) {
+			let nextRow = findTrackRow('next', subsetFirstRowTrack, subsetLastRow);
+			if (nextRow) {
+				subsetLastRow = nextRow;
+			} else {
+				i = subsetRange + 1;
+			}
+		}
+	}
+
+	selectionStartSeconds = subtitleStartSeconds[subsetFirstRow] - marginOption;
+	selectionEndSeconds = subtitleEndSeconds[subsetLastRow] + marginOption;
+	
+	if (selectedSubtitleNumber != subsetFirstRow) {
+		selectRow(subsetFirstRow);
+	}
+	
+	return true;
+}  // subsetting
 }  // buttonAction
 
 function subtitleTimeCorrections(){
@@ -4224,7 +4385,9 @@ timeEditPopup = document.getElementById("timeEditPopup");
 timeEditPopupO = document.getElementById("timeEditPopupO");
 timeEditPopupThumb = document.getElementById("timeEditPopupThumb");
 timeEditPopupV = document.getElementById("timeEditPopupV");
-
+rangeCount = document.getElementById("rangeCount");
+rangeCount.textContent = subsetRange;
+rangeButtonRangeCount = document.getElementById("rangeButtonRangeCount");
 
 subtitleTable = document.getElementById("subtitleTable");
 
@@ -4354,6 +4517,34 @@ timeEditPopup.addEventListener('mouseleave', (e) => {
 		}
 	}
 } );
+
+const rangeButton = document.getElementById('rangeButton');
+const rangePopup = document.getElementById('rangePopup');
+
+rangeButton.addEventListener('mouseenter', () => {
+    // Get the exact coordinates of Button 3 on the screen
+    const rect = rangeButton.getBoundingClientRect();
+    
+    // Position the popup
+    rangePopup.style.display = 'flex';
+    rangePopup.style.left = rect.left + 'px';
+    // rangePopup.style.top = (rect.top - rangePopup.offsetHeight - 0) + 'px'; // 10px gap above button
+    rangePopup.style.top = (rect.top - rangePopup.offsetHeight + 3) + 'px'; // 10px gap above button
+});
+
+// Add a mouseleave listener to hide it
+rangeButton.addEventListener('mouseleave', () => {
+    rangePopup.style.display = 'none';
+});
+
+rangePopup.addEventListener('mouseover', () => {
+    rangePopup.style.display = 'flex';
+});
+
+rangePopup.addEventListener('mouseleave', () => {
+    rangePopup.style.display = 'none';
+});
+
 
 return;
 
