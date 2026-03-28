@@ -94,7 +94,8 @@
 </div>
 
 <!-- Video counter -->
-<div id="videoCounterDiv" style="margin: 0; padding-left: 10px; font-size: 1.5rem; height: 1.5rem; overflow: hidden; ">
+<div id="videoCounterDiv" style="position: relative; margin: 0; padding-left: 10px; font-size: 1.5rem; 
+	height: 1.5rem; overflow: hidden; z-index: 1; ">
 		<b><span id="currentTime" class="time">0:00:00</span>
 		<span><b>/</b></span>
 		<span id="duration" class="time" style="margin-right: 10px;">0:00:00</span>
@@ -102,7 +103,8 @@
 </div>
 
 <!-- Selection info -->
-<div id="selectionInfoDiv" style="margin: 0; padding-left: 10px; font-size: 1.25rem; height: 1.5rem; overflow: hidden;">
+<div id="selectionInfoDiv" style="position: relative; margin: 0; padding-left: 10px; font-size: 1.25rem; 
+	height: 1.5rem; overflow: hidden;">
 		<span id="selectionLabel" style="display: none;">Selection: </span>
 		<span id="spanStartTime" style="margin-right: auto;"></span>
 		<span><b id="selectionHyphen" style="display: none;">-</b></span>
@@ -111,25 +113,30 @@
 </div>
 
 <!-- Controls -->
-<div id="buttonSection" style="margin: 0; padding-left: 10px; height: 2rem; ">
-	<p>
-		<span class="hovertext1" data-hover="Play the selection and pause">
+<div id="buttonSection" style="position: relative; display: flex; justify-content: flex-start; padding-left: 10px; 
+		width: 100%;">
+		<div class="hovertext1" data-hover="Play the selection and pause">
 		<button id="currentLine" class="button color1">Play single</button>
-		</span>
+		</div>
 
-		<span class="hovertext1" data-hover="Play the video continuously or pause">
+		<div class="hovertext1" data-hover="Play the video continuously or pause">
 		<button id="playVideo" class="button color2">Play/Pause</button>
-		</span>
+		</div>
 
-		<span class="hovertext1" data-hover="Repeat the selection in a loop">
+		<div class="hovertext1" data-hover="Repeat the selection in a loop">
 		<button id="loop" class="button color3">Loop</button>
-		</span>
+		</div>
 
-	</p>
+		<div class="range-dropdown-wrapper">
+		<button id="rangeButton" 
+			class="button color3">Range<span class="dropdown-arrow">▾<span id="rangeButtonRangeCount"></span></span>
+		</button>
+		<!-- Dropdown Unit End -->
+		</div> <!-- class="range-dropdown-wrapper"-->
 </div>
 
 <!-- marginLine3 -->
-<div id="marginLine3" style="min-height: 1rem; width: 100%;"></div>
+<div id="marginLine3" style="position: relative; min-height: 1rem; width: 100%;"></div>
 
 <!-- Subtitle Table div -->
 <div id="subtitleTableDiv" class="subtitleTableDiv">
@@ -162,6 +169,7 @@
 	<div class="timeEditPopupX" onclick="changeTime('close')">X</div>
 	</div>
 </div>
+
 <div class="timeEditPopupWrapper">
 	<span class="hovertext1" data-hover="Click on Subtitle Start Time to select the current video time">
 	<div class="timeEditPopupTitle color1" onclick="changeTime('current', 't1')">Subtitle Start Time</div>
@@ -887,6 +895,16 @@
 </div>  <!-- button-row -->
 </div>  <!-- class="hamburger-dropdown-block" -->
 </div>  <!-- class="hamburger-dropdown-wrapper" -->
+
+<div id="rangePopup" class="range-dropdown-block">
+	<span class="range-arrowButton" onclick="changeRange('increment')">⇧</span>
+	<span id="rangeCount" class="rangeCount"></span>
+	<span class="range-arrowButton" onclick="changeRange('decrement')">⇩</span>
+	<button class="button color3"
+		onclick="changeRange('clear')">Reset</button>
+	</span>
+</div>
+
 </body>
 </html>
 
