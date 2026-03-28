@@ -34,11 +34,6 @@ body {
 	min-height: 100vh;
 }
 
-.tab {
-	display: inline-block;
-	margin-left: 20px;
-}
-
 .lightTheme {
 	color: hsl(0, 0%, 0%);   /* hsl(235, 100%, 40%)  #01c*/
 	background-color: hsl(72, 100%, 98%); /* milk white */
@@ -135,6 +130,8 @@ table tr td:first-child::before {
 .hamburger-dropdown-wrapper {
 	display: flex;
 	position: absolute;
+	left: 0;
+	top: 0;
 	z-index: 8888;  /* Always on top */
 	flex-direction: column;
 	justify-content: center;
@@ -347,12 +344,10 @@ video::-webkit-media-controls-panel {
 .button
 {
 	border-radius: 12px;
-	/* border: none; */
 	color: white;
 	padding: 3px 3px;
 	text-align: center;
 	text-decoration: none;
-	display: inline;
 	font-family: Arial; 
 	font-size: 1rem;
 	margin: 0px 2px;
@@ -391,6 +386,8 @@ video::-webkit-media-controls-panel {
 
 .hovertext1 {
   position: relative;
+  width: fit-content;
+  display: inline;
 }
 
 .hovertext1:before {
@@ -495,7 +492,6 @@ select {
 .general-dropdown-unit {
 	font-size: 1.25rem; /* 34px; */
 	color: black;
-
 }
 
 .general-dropdown-option {
@@ -531,6 +527,51 @@ select {
 	bottom: 1.8rem;
 	right: 100%; 
 	left: -80%;
+}
+
+.range-dropdown-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+.range-dropdown-wrapper:hover .range-dropdown-block {display: flex;} 
+
+.range-dropdown-wrapper .dropdown-arrow {
+    margin: 0;
+    color: red;
+}
+
+.range-dropdown-block {
+	display: none;
+	position: absolute;
+	left: 0;
+	margin-bottom: 5px;
+	border: 2px solid rgb(6, 6, 94);
+	border-radius: 4px;
+	padding: 3px;
+	background-color: #f1f1f1; 
+	color: black;
+	max-width: max-content; /* 150px; */
+	height: 2.5rem;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 9999;
+	vertical-align: middle;
+	gap: 3px;
+}
+
+.range-arrowButton {
+	color: black;
+	background-color:white;
+	padding: 0; 
+	text-align: center;
+	font-size: 1.5rem;
+	margin: 0px 2px 0px 2px; 
+	cursor: pointer;
+}
+
+.rangeCount {
+	font-size: 1.5rem;
+	color: #000; 
 }
 
 /* ----------- Settings ----------- */
