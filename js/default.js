@@ -54,8 +54,6 @@ let spanSubtitle1Selected = false;
 let spanSubtitle2Selected = false;
 let spanSubtitle1Row = 0;
 let spanSubtitle2Row = 0;
-let spanSubtitle1Text = "";
-let spanSubtitle2Text = "";
 let showSeekBarContainer = false;
 let showCounter = true;
 let showSelectionInfo = true;
@@ -195,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function statusMsg(caller, msg) {
-	document.getElementById("spanSubtitle1").textContent = msg;
+	document.getElementById("spanSubtitle1").innerHTML = msg;
 	logTimeStamp("statusMsg ", (caller + " " + msg));
 	// console.log(caller, " ", msg);
 }
@@ -631,8 +629,8 @@ function selectRow(rowNumber, directive) {
 	document.getElementById("spanEndTimeOnDashboard").textContent = "";
 	document.getElementById("spanTrackOnDashboard").textContent = "";
 
-	document.getElementById("spanSubtitle1").textContent = "";
-	document.getElementById("spanSubtitle2").textContent = "";
+	document.getElementById("spanSubtitle1").innerHTML = "";
+	document.getElementById("spanSubtitle2").innerHTML = "";
 	spanSubtitle1Selected = false;
 	console.log("spanSubtitle1Selected = f 1");
 	spanSubtitle2Selected = false;
@@ -702,10 +700,10 @@ function selectRow(rowNumber, directive) {
 		document.getElementById("spanTrack").textContent;
 
 	spanSubtitle1Row = rowNumber;
-	document.getElementById("spanSubtitle1").textContent =
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent;
-	if (document.getElementById("spanSubtitle1").textContent === "") {
-		document.getElementById("spanSubtitle1").textContent = "_";
+	document.getElementById("spanSubtitle1").innerHTML =
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
+	if (document.getElementById("spanSubtitle1").innerHTML === "") {
+		document.getElementById("spanSubtitle1").innerHTML = "_";
 	}
 		
 	let spanSubtitle2Track = 0;
@@ -723,10 +721,10 @@ function selectRow(rowNumber, directive) {
 
 	if (spanSubtitle2Row) {
 	    console.log("selectRow spanSubtitle2Row = ", spanSubtitle2Row);
-		document.getElementById("spanSubtitle2").textContent =
-			subtitleTable.rows[spanSubtitle2Row].querySelector(".classSubtitleText").textContent;
-		if (document.getElementById("spanSubtitle2").textContent === "") {
-			document.getElementById("spanSubtitle2").textContent = "_";
+		document.getElementById("spanSubtitle2").innerHTML =
+			subtitleTable.rows[spanSubtitle2Row].querySelector(".classSubtitleText").innerHTML;
+		if (document.getElementById("spanSubtitle2").innerHTML === "") {
+			document.getElementById("spanSubtitle2").innerHTML = "_";
 		}
 	}
 
@@ -1601,7 +1599,7 @@ function redo() {
 
 	switch (redoArray[redoArrayCurrentIndex].action) {
 	case "subtitleTextChange":
-		subtitleTable.rows[redoArray[redoArrayCurrentIndex].rowNumber].querySelector(".classSubtitleText").textContent =
+		subtitleTable.rows[redoArray[redoArrayCurrentIndex].rowNumber].querySelector(".classSubtitleText").innerHTML =
 			redoArray[redoArrayCurrentIndex].newValue;
 		selectRow(redoArray[redoArrayCurrentIndex].selectedRowNumber);
 		selectCurrentIndex("undoArray");
@@ -1858,25 +1856,6 @@ function skipBackward() {
 	}
 	while ((!stop))
 
-/*	
-	while ((!stop) && ((selectedSubtitleNumber - decrement) >= 1)) {
-		if ((document.getElementById("spanTrack").textContent) ==
-			(subtitleTable.rows[selectedSubtitleNumber - decrement].querySelector(".classSubtitleTrack").textContent)) {
-			if (newTime > subtitleEndSeconds[selectedSubtitleNumber - decrement]) {
-				stop = true;
-			} 
-			else {
-				if (newTime >= subtitleStartSeconds[selectedSubtitleNumber - decrement]) {
-					selectRow(selectedSubtitleNumber - decrement);
-					stop = true;
-				}
-			} 
-		}
-		if (!stop) {
-			decrement += 1;
-		}
-	}
-*/
 	skipTo(newTime);	
 
 }
@@ -2897,15 +2876,16 @@ function updateRow() {
 
 	if (doNothing) { return; }
 
-	let oldValue = subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent;
-	let newValue = spanSubtitle1Text; // document.getElementById(selectedSpan).textContent;
+	let oldValue = subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
+	let newValue = document.getElementById(selectedSpan).innerHTML;
 	console.log("updateRow ", selectedSpan, " oldValue = ", oldValue);
 	console.log("updateRow ", selectedSpan, " newValue = ", newValue);
-	if (newValue === "_") {
+	if (document.getElementById(selectedSpan).innerHTML === "_") {
 		newValue = oldValue;
 	} 
 	if (oldValue != newValue) {
 		changeCounter += 1;
+		console.log("updateRow updating with newValue ", newValue);
 		selectCurrentIndex("undoArray");
 		undoArray[undoArrayCurrentIndex].inUse = true;
 		undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
@@ -2914,7 +2894,7 @@ function updateRow() {
 		undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
 		undoArray[undoArrayCurrentIndex].oldValue = oldValue;
 		undoArray[undoArrayCurrentIndex].newValue = newValue;
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent = newValue;
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML = newValue;
 	}
 
 	computeSubtitleTableHeight();
@@ -3042,8 +3022,9 @@ function addKeyListenerForSubtitles() {
 	});
 
 	document.getElementById("spanSubtitle1").addEventListener('click', (e) => {
-	if (!(document.getElementById("myCheck07").checked)) { return;}
+		if (!(document.getElementById("myCheck07").checked)) { return;}
 		spanSubtitle1Selected = true;
+		//console.log("click spanSubtitle1Selected = true");
 		spanSubtitle2Selected = false;
 		e.preventDefault();
 		return;
@@ -3053,8 +3034,6 @@ function addKeyListenerForSubtitles() {
 		spanSubtitle1Modified = true;
 		spanSubtitle1Selected = true;
 		spanSubtitle2Selected = false;
-		spanSubtitle1Text = document.getElementById('spanSubtitle1').textContent;
-		console.log("eventListener input spanSubtitle1 ", spanSubtitle1Text);
 	});
 
 	document.getElementById("spanSubtitle1").addEventListener('paste', handlePaste, false);
@@ -3070,7 +3049,6 @@ function addKeyListenerForSubtitles() {
 		if (!(document.getElementById("myCheck07").checked)) { return;}
 		spanSubtitle2Selected = true;
 		spanSubtitle1Selected = false;
-		//document.getElementById("textEditPopup").style.display = "inline-block";
 		e.preventDefault();
 		return;
 	});
@@ -3097,40 +3075,67 @@ function addKeyListenerForSubtitles() {
 
 function handlePaste(e) {
 	
-		e.preventDefault();
-		const pasteText = (e.originalEvent || e).clipboardData.getData('text/plain');
-		let range = window.getSelection().getRangeAt(0);
-		let pasteTarget = e.currentTarget;
-		let cursorPosition = getCharacterOffsetWithin(range, pasteTarget);
-		const text1 = e.currentTarget.textContent.substring(0, cursorPosition);
-		const text2 = e.currentTarget.textContent.substring(cursorPosition);
-		console.log(pasteTarget.id, " paste cursorPosition ", cursorPosition, 
-			" text1 ", text1, " pasteText ", pasteText, " text2 ", text2);
-		pasteTarget.textContent = text1 + pasteText + text2;
-		const newCursorPosition = text1.length + pasteText.length;
-		pasteTarget.focus();
+	e.preventDefault();
+	let pasteTarget = e.currentTarget;
 
-		switch (pasteTarget.id) {
-		case 'spanSubtitle1':
-			spanSubtitle1Modified = true;
-			spanSubtitle1Selected = true;
-			spanSubtitle2Selected = false;
-			spanSubtitle1Text = document.getElementById('spanSubtitle1').textContent;
-			console.log("handlePaste spanSubtitle1 ", spanSubtitle1Text);
-			break;
-		case 'spanSubtitle2':
-			spanSubtitle2Modified = true;
-			spanSubtitle1Selected = false;
-			spanSubtitle2Selected = true;
-			spanSubtitle2Text = document.getElementById('spanSubtitle2').textContent;
-			console.log("handlePaste spanSubtitle1 ", spanSubtitle1Text);
-			break;
-		default:
-			errorMsg = 'handlePaste unexpected pasteTarget.id ' + pasteTarget.id;
-			alert(errorMsg);
-			throw new Error(errorMsg);
-		}
-		setCursor(pasteTarget.id, newCursorPosition);
+	// Get the clipboard data as plain text only
+	// This completely strips any HTML tags from the copied content
+	let pasteText = (e.originalEvent || e).clipboardData.getData('text/plain');
+
+    // Get the current cursor position (selection)
+    const selection = window.getSelection();
+
+    // Make sure the user actually has a cursor active on the page
+    if (selection.rangeCount <= 0) {
+		spanSubtitle1Modified = false;
+		spanSubtitle2Modified = false;
+		spanSubtitle1Selected = false;
+		spanSubtitle2Selected = false;
+		alert("handlePaste selection.rangeCount <= 0; pasteTarget.id = ", pasteTarget.id);
+		return;
+	}
+
+	// Get the active range of the cursor
+	const range = selection.getRangeAt(0);
+
+	// 5. Delete any text the user might have currently highlighted
+	range.deleteContents();
+
+	// 6. Create a new text node with the plain text
+	const textNode = document.createTextNode(pasteText);
+
+	// 7. Insert the text node at the cursor's exact position
+	range.insertNode(textNode);
+
+	// 8. Move the cursor to the end of the newly pasted text
+	// This ensures if the user keeps typing, it appears after the paste
+	range.setStartAfter(textNode);
+	range.collapse(true);
+
+	// Update the selection with the new cursor position
+	selection.removeAllRanges();
+	selection.addRange(range);
+
+	pasteTarget.focus();
+
+	switch (pasteTarget.id) {
+	case 'spanSubtitle1':
+		spanSubtitle1Modified = true;
+		spanSubtitle1Selected = true;
+		spanSubtitle2Selected = false;
+		break;
+	case 'spanSubtitle2':
+		spanSubtitle2Modified = true;
+		spanSubtitle1Selected = false;
+		spanSubtitle2Selected = true;
+		break;
+	default:
+		errorMsg = 'handlePaste unexpected pasteTarget.id ' + pasteTarget.id;
+		alert(errorMsg);
+		throw new Error(errorMsg);
+	}
+
+	return;
 }
 
 function setCursor(elementId, pos) {
@@ -3263,12 +3268,10 @@ function textEditPopupAction(operand) {
 			buttonAction('currentLine');
 			return;
 		case 'selectPrev':
-			console.log("textEditPopupAction selectPrev span1 ", document.getElementById('spanSubtitle1').textContent);
 			updateRow();
 			buttonAction('prevST');
 			return;
 		case 'selectNext':
-			console.log("textEditPopupAction selectNext span1 ", document.getElementById('spanSubtitle1').textContent);
 			updateRow();
 			buttonAction('nextST');
 			return;
@@ -3293,6 +3296,8 @@ function textEditPopupAction(operand) {
 			console.log("textEditPopupAction invalid operand: ", operand);
 			return;
 	}
+
+	// Handle splitToNext, splitToNextNewline, splitToPrev
 
 	let selectedSpan = "";
 	let rowNumber = 0;
@@ -3320,69 +3325,72 @@ function textEditPopupAction(operand) {
 
 	let textElement = document.getElementById(selectedSpan);
 	
-	//updateCursorPosition();
-	//document.getElementById("textEditPopup").style.display = "none";
-	//return;
-	
-	let range = window.getSelection().getRangeAt(0);
-	let cursorPosition = getCharacterOffsetWithin(range, textElement);
-	
-//	var editor = document.activeElement;
-//	var editor = textElement;
-//	while (editor && !editor.classList.contains("editor")) editor = editor.parentElement;
-//	if (!editor) return;
-// 	let cursorPosition = CaretUtil.getCaretPosition(textElement);
+    // Get the current cursor position (selection)
+    const selection = window.getSelection();
 
-	const text1 = textElement.textContent.substring(0, cursorPosition);
-	const text2 = textElement.textContent.substring(cursorPosition);
-/*
-	let text1 = "";
-	let text2 = "";
-	if (cursorPosition == 0) {
-		text1 = "";
-		text2 = textElement.textContent;
-	} else {
-		if (cursorPosition > (textElement.textContent.length - 1)) {
-			text1 = textElement.textContent;
-			text2 = "";
-		}
-		else {
-			text1 = textElement.textContent.substring(0, cursorPosition);
-			text2 = textElement.textContent.substring(cursorPosition);
-			}
-		}
-*/
-	console.log("textEditPopupAction cursorPosition ", cursorPosition, " text1 ", text1, " text2 ", text2);
+    // Make sure the user actually has a cursor active on the page
+    if (selection.rangeCount <= 0) {
+		console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
+		' selectedSpan = ""', selectedSpan);
+		alert("textEditPopupAction selection.rangeCount <= 0");
+		return;
+	}
 
-	if ((operand === "splitToNext") || (operand === "splitToNextNewline")) {
-		textElement.textContent = text1.trim();
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent = text1.trim();
-		let nextRow = findTrackRow('next', subtitleTrack[rowNumber], rowNumber);
-		if ((operand === "splitToNextNewline") || (!nextRow)) {
-			insertSubtitle(rowNumber, text2.trim(), subtitleTrack[rowNumber], "selectNone");
-		} else {
-			subtitleTable.rows[nextRow].querySelector(".classSubtitleText").textContent = 
-				text2.trim() + 
-				subtitleTable.rows[nextRow].querySelector(".classSubtitleText").textContent;
-		}
-		selectRow(selectedSubtitleNumber);
+	// Get the active range of the cursor
+	const activeRange = selection.getRangeAt(0);
+
+	// Check if the cursor is actually inside the span
+	if (textElement.contains(activeRange.startContainer)) { 
+ 	} else {
+		console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
+		' selectedSpan = ""', selectedSpan);
+		alert("textEditPopupAction The cursor is not in the expected edit area: ", selectedSpan );
+		textElement.removeAllRanges();
 		return;
 	}
 
 	if (operand === "splitToPrev") {
-		textElement.textContent = text2.trim();
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent = text2.trim();
+		// Extend the START of the range back to the very beginning of textElement.
+		// The end of the range stays exactly where the cursor is currently located.
+		// The '0' indicates the very first position inside span2.
+        activeRange.setStart(textElement, 0);
+
+	} else {
+		// Extend the range from the cursor to the very end of textElement.
+		// textElement.childNodes.length represents the absolute end of the span
+		activeRange.setEnd(textElement, textElement.childNodes.length);
+	}
+
+	// Extract the contents.
+	// This safely removes the text and <br> tags from textElement
+	// and packages them into a DocumentFragment.
+	const extractedContent = activeRange.extractContents();
+	subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML = textElement.innerHTML;
+
+	if ((operand === "splitToNext") || (operand === "splitToNextNewline")) {
+		// Insert the extracted content at the beginning of the next subtitle
+		let nextRow = findTrackRow('next', subtitleTrack[rowNumber], rowNumber);
+		if ((operand === "splitToNextNewline") || (!nextRow)) {
+			nextRow = insertSubtitle(rowNumber, "", subtitleTrack[rowNumber], "selectNone");
+		}
+		subtitleTable.rows[nextRow].querySelector(".classSubtitleText").prepend(extractedContent);
+		selectRow(selectedSubtitleNumber);
+		return;
+	} else {
+		// Insert the extracted content at the end of the previous subtitle
 		let prevRow = findTrackRow('prev', subtitleTrack[rowNumber], rowNumber);
 		if (!prevRow) {
-			insertSubtitle((rowNumber - 1), text1.trim(), subtitleTrack[rowNumber], "selectNone");
-		} else {
-			subtitleTable.rows[prevRow].querySelector(".classSubtitleText").textContent = 
-				subtitleTable.rows[prevRow].querySelector(".classSubtitleText").textContent
-				+ text1.trim();
-			selectRow(prevRow);
-		}
-		return;
+			prevRow = insertSubtitle((rowNumber - 1), "", subtitleTrack[rowNumber], "selectNone");
+		} 
+		subtitleTable.rows[prevRow].querySelector(".classSubtitleText").append(extractedContent);
+		selectRow(prevRow);
 	}
+
+	// Optional: clear the selection so the cursor doesn't jump weirdly
+	selection.removeAllRanges();
+
+	return;
+
 }
 
 function insertSubtitle(afterRowNumber, text, trackNumber, selectOption) {
@@ -3403,7 +3411,7 @@ function insertSubtitle(afterRowNumber, text, trackNumber, selectOption) {
 
 	if (lastSubtitleNumber == 0) {
 		newFile();
-		return;
+		return 1;
 	}
 
 	// sample subtitleFileDataArray[x].array[y] member: 
@@ -3467,7 +3475,7 @@ function insertSubtitle(afterRowNumber, text, trackNumber, selectOption) {
 			}
 			break;
 		case "selectNone": 
-			return;
+			return newRowNumber;
 		default:
 			console.log ("insertSubtitle invalid selectOption ", selectOption);
 	}
@@ -3476,6 +3484,8 @@ function insertSubtitle(afterRowNumber, text, trackNumber, selectOption) {
 	if (showTimePopup) {
 		showTimeEditPopup(chosenRow);
 	}
+
+	return newRowNumber;
 
 }  // insertSubtitle
 
@@ -3501,7 +3511,7 @@ function deleteSubtitle(rowNumber) {
 			subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
 	}
 	undoArray[undoArrayCurrentIndex].oldValue = 
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").textContent;
+		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
 	undoArray[undoArrayCurrentIndex].subtitleTrack = subtitleTrack[rowNumber];
 	undoArray[undoArrayCurrentIndex].subtitleStartSeconds = subtitleStartSeconds[rowNumber];
 	undoArray[undoArrayCurrentIndex].subtitleEndSeconds = subtitleEndSeconds[rowNumber];
@@ -3524,8 +3534,8 @@ function deleteSubtitle(rowNumber) {
 			selectRow(lastSubtitleNumber);
 		} else {
 			selectedSubtitleNumber = 0;
-			document.getElementById("spanSubtitle1").textContent = "";
-			document.getElementById("spanSubtitle2").textContent = "";
+			document.getElementById("spanSubtitle1").innerHTML = "";
+			document.getElementById("spanSubtitle2").innerHTML = "";
 		}
 	}
 	console.log("deleteSubtitle exiting rowNumber = ", rowNumber);
@@ -3899,7 +3909,9 @@ function captureSingleSubtitle(content, inputId) {
 		}
 	}
 
-	rowData.subtitle = content.text;
+	//rowData.subtitle = content.text;  
+	//rowData.subtitle = clearHTMLTags(content.text);  // Sanitize text to remove possibly malicious HTML code.
+	rowData.subtitle = sanitizeHTML(content.text, ['br', 'i']);  // Sanitize text to remove possibly malicious HTML code.
 
 	if (inputId == "subtitleFileInput0") {
 		createSubtitleRow(rowData, counter);
@@ -3910,6 +3922,63 @@ function captureSingleSubtitle(content, inputId) {
 	
 } // captureSingleSubtitle
 } // extractSubtitleFile
+
+function sanitizeHTML(htmlString, allowedTags) {
+    // 1. Parse the string into a temporary DOM Document
+    const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+    const allowed = new Set(allowedTags.map(tag => tag.toUpperCase()));
+
+    // 2. Recursive function to clean nodes bottom-up
+    function clean(node) {
+        // Convert to array to avoid live NodeList mutation issues
+        const children = Array.from(node.childNodes);
+        
+        for (const child of children) {
+            if (child.nodeType === Node.ELEMENT_NODE) {
+                // Clean the children first
+                clean(child);
+
+                // Remove scripts and styles completely (don't keep their text)
+                if (child.nodeName === 'SCRIPT' || child.nodeName === 'STYLE') {
+                    child.remove();
+                    continue;
+                }
+
+                if (allowed.has(child.nodeName)) {
+                    // TAG IS ALLOWED: Strip all attributes to prevent XSS (e.g., onclick="")
+                    while (child.attributes.length > 0) {
+                        child.removeAttribute(child.attributes[0].name);
+                    }
+                } else {
+                    // TAG IS NOT ALLOWED: Replace the tag with its text/children (unwrap it)
+                    // e.g., <b>Text</b> becomes just "Text"
+                    child.replaceWith(...child.childNodes);
+                }
+            }
+        }
+    }
+
+    clean(doc.body);
+    return doc.body.innerHTML;
+}
+
+
+/**
+* Returns a string containing plain text format by removing HTML tags
+* @param {string} strToSanitize - String to be sanitized
+* @returns {string} - Sanitized plain text string
+* Source: https://dev.to/alvisonhunter/removing-html-tags-in-javascript-using-regex-9h3
+*/
+const clearHTMLTags = (strToSanitize) => {
+  try {
+    let myHTML = new DOMParser().parseFromString(strToSanitize, 'text/html');
+    return myHTML.body.textContent || '';
+  } catch (error) {
+    console.error("clearHTMLTags Error parsing HTML string:", error);
+    return '';
+  }
+}
+
 
 function convertSecondsToSrtTime(seconds) {
     const hours = Math.floor(seconds / 3600);
@@ -3955,7 +4024,7 @@ function saveFile(targetTrack) {
 				" --> " + 
 				convertSecondsToSrtTime(subtitleEndSeconds[subtitleIndex]) + 
 				"\n" +
-				subtitleTable.rows[subtitleIndex].querySelector(".classSubtitleText").textContent.replaceAll('<br>', '\n').trim() +
+				subtitleTable.rows[subtitleIndex].querySelector(".classSubtitleText").innerText.replaceAll('<br>', '\n').trim() +
 				"\n\n";
 		}
 
@@ -4449,6 +4518,7 @@ changeScrollStep();		// Initialize scroll step option
 changeMargin();			// Initialize margin option
 changeMarginLineMinHeight('marginLine1');
 changeMarginLineMinHeight('marginLine2');
+changeSubtitleWidth();
 
 const controls = [
 	{id: "subtitleFontMenu", changeFunction: changeFont},
@@ -4709,7 +4779,7 @@ function configInitializations() {
 		initError(errorReason);
 	}
 
-	console.log("Configuration: videoWidthScale = " + selectSubtitleWidth.value);
+	console.log("Configuration: subtitleWidthScale = " + selectSubtitleWidth.value);
 
 	if (typeof fontSize == 'undefined') {
 		errorReason = 'fontSize missing';
