@@ -3,7 +3,18 @@ localStorage.clear(); //Clear old values left behind;
 document.addEventListener('keydown', PSDPD_KeyCheck);
 
 let videoFileLoaded = false;
+
 let videoElem;
+let playVideoButton;
+let currentLineButton;
+let loopButton;
+let currentLineOnDashboardButton;
+let playVideoOnDashboardButton;
+let loopOnDashboardButton;
+let textEditPopupPlaySingleButton;
+
+
+
 let timeEditPopup;
 let timeEditPopupO;
 let timeEditPopupV;
@@ -2170,6 +2181,14 @@ function issuePlayVideo() {
 	callUpdateTimeEnabled = true;
 	callUpdateTimeTimeoutId ??= setTimeout(callUpdateTime, updateTimeInterval);
 
+	currentLineButton.textContent = "Pause";
+	playVideoButton.textContent = "Pause";
+	loopButton.textContent = "Pause";
+	currentLineOnDashboardButton.textContent = "Pause";
+	playVideoOnDashboardButton.textContent = "Pause";
+	loopOnDashboardButton.textContent = "Pause";
+	textEditPopupPlaySingleButton.textContent = "Pause";
+
 	if (!youTubeVideoId) {
 		issuePlayVideo2();
 	}
@@ -2229,6 +2248,14 @@ function handleVideoOnPause() {
 	callUpdateTimeEnabled = false;
 	console.log("handleVideoOnPause updateTime");
 	updateTime();
+	currentLineButton.textContent = "Play single";
+	playVideoButton.textContent = "Play";
+	loopButton.textContent = "Loop";
+	currentLineOnDashboardButton.textContent = "Play single";
+	playVideoOnDashboardButton.textContent = "Play";
+	loopOnDashboardButton.textContent = "Loop";
+	textEditPopupPlaySingleButton.textContent = "Play single";
+
 }
 
 function handleVideoOnEnded() {
@@ -2261,6 +2288,14 @@ function handleVideoOnEnded() {
 	callUpdateTimeEnabled = false;
 	console.log("handleVideoOnEnded updateTime(2)");
 	updateTime();
+	currentLineButton.textContent = "Play single";
+	playVideoButton.textContent = "Play";
+	loopButton.textContent = "Loop";
+	currentLineOnDashboardButton.textContent = "Play single";
+	playVideoOnDashboardButton.textContent = "Play";
+	loopOnDashboardButton.textContent = "Loop";
+	textEditPopupPlaySingleButton.textContent = "Play single";
+
 }
 
 async function loadVideoFile(file) {
@@ -3253,6 +3288,15 @@ function getCharacterOffsetWithin(range, node) {
  
 function textEditPopupAction(operand) {
 
+	let spanSubtitle1SelectedOnEntry = spanSubtitle1Selected;
+	let spanSubtitle2SelectedOnEntry = spanSubtitle2Selected;
+
+	if (spanSubtitle1SelectedOnEntry && spanSubtitle2SelectedOnEntry) {
+		let msg = "textEditPopupAction Anomally: spanSubtitle1 & spanSubtitle2 both selected";
+		console.log(msg);
+		alert(msg);
+	}
+
 	console.log("textEditPopupAction operand = ", operand);
 
 	switch (operand) {
@@ -3302,26 +3346,31 @@ function textEditPopupAction(operand) {
 	let selectedSpan = "";
 	let rowNumber = 0;
 
-	if (spanSubtitle1Selected) {
+	if (spanSubtitle1SelectedOnEntry) {
 		selectedSpan = "spanSubtitle1";
 		rowNumber = spanSubtitle1Row;
+		if (!spanSubtitle1Selected) {
+			let msg = "textEditPopupAction spanSubtitle1Selected already set to false";
+			console.log(msg);
+			alert(msg);
+		}
 		spanSubtitle1Selected = false;
 		console.log("spanSubtitle1Selected = f 4");
-	} else if (spanSubtitle2Selected) {
+	} else if (spanSubtitle2SelectedOnEntry) {
 		selectedSpan = "spanSubtitle2";
 		rowNumber = spanSubtitle2Row;
 		spanSubtitle2Selected = false;
 	}
 
-	if (selectedSpan == "") {
-		console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
-		' selectedSpan = ""', selectedSpan);
-		alert("textEditPopupAction Place cursor in edit area before choosing split action");
-		return;
-	}
-
 	console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
 		" selectedSpan ", selectedSpan);
+
+	if (selectedSpan == "") {
+		let msg = "textEditPopupAction Place the cursor in an editable area before choosing a split action";
+		console.log(msg);
+		alert(msg);
+		return;
+	}
 
 	let textElement = document.getElementById(selectedSpan);
 	
@@ -3331,7 +3380,7 @@ function textEditPopupAction(operand) {
     // Make sure the user actually has a cursor active on the page
     if (selection.rangeCount <= 0) {
 		console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
-		' selectedSpan = ""', selectedSpan);
+		' selectedSpan = ', selectedSpan);
 		alert("textEditPopupAction selection.rangeCount <= 0");
 		return;
 	}
@@ -3558,7 +3607,7 @@ function createSubtitleRow(rowObject, rowIndex) {
 	}
 
 	newRow.style.display = 'table-row'; /* Ensure that the row is visible. */
-
+	newRow.style.borderTop = "1px solid #001858";
 
 	let rowColumns = `
 		<tr class="classSubtitleRow">
@@ -4119,13 +4168,12 @@ function addKeyListener(){
 	//}
 	seekBar.addEventListener('input', handleSeek);
 
-	const buttons = ['playVideo','currentLine','loop', 
-					'currentLineOnDashboard', 'playVideoOnDashboard', 'loopOnDashboard']; 
+	const buttons = [playVideoButton, currentLineButton, loopButton, 
+					currentLineOnDashboardButton, playVideoOnDashboardButton, loopOnDashboardButton]; 
 
 	buttons.forEach(function(bn) {
-    	document.getElementById(bn).addEventListener(
-        	'click', buttonEvents, !1
-    	);
+		//let buttonElement = bn;
+    	bn.addEventListener('click', buttonEvents);
 	});
 
 	document.addEventListener("keyup", function onEvent(event) {
@@ -4457,6 +4505,15 @@ timeEditPopupV = document.getElementById("timeEditPopupV");
 rangeCount = document.getElementById("rangeCount");
 rangeCount.textContent = subsetRange;
 rangeButtonRangeCount = document.getElementById("rangeButtonRangeCount");
+
+currentLineButton = document.getElementById("currentLine");
+playVideoButton = document.getElementById("playVideo");
+loopButton = document.getElementById("loop");
+currentLineOnDashboardButton = document.getElementById("currentLineOnDashboard");
+playVideoOnDashboardButton = document.getElementById("playVideoOnDashboard");
+loopOnDashboardButton = document.getElementById("loopOnDashboard");
+textEditPopupPlaySingleButton = document.getElementById("textEditPopupPlaySingle");
+
 
 subtitleTable = document.getElementById("subtitleTable");
 
