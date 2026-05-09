@@ -1,5 +1,8 @@
 
-localStorage.clear(); //Clear old values left behind;
+console.log("localStorage dump ",localStorage);
+// localStorage.setItem("lastname", "Smith");
+// https://www.w3schools.com/html/html5_webstorage.asp
+// localStorage.clear(); //Clear old values left behind;
 document.addEventListener('keydown', PSDPD_KeyCheck);
 
 let videoFileLoaded = false;
@@ -11,13 +14,73 @@ let loopButton;
 let currentLineOnDashboardButton;
 let playVideoOnDashboardButton;
 let loopOnDashboardButton;
+let duration;
+let durationOnDashboard;
 let textEditPopupPlaySingleButton;
-
-
+let spanStartTime;
+let spanEndTime;
+let spanTrack;
+let spanStartTimeOnDashboard;
+let spanEndTimeOnDashboard;
+let spanTrackOnDashboard;
+let spanSubtitle1;
+let spanSubtitle2;
+let currentTime;
+let currentTimeOnDashboard;
+let seekBar;
+let color1Input;
+let color2Input;
+let color3Input;
+let seekBarContainer; 
+let marginLine1; 
+let divSubtitle1; 
+let marginLine2; 
+let divSubtitle2; 
+let videoCounterDiv; 
+let selectionInfoDiv; 
+let buttonSection; 
+let subtitleTableDiv;
+let EOT;
+let subtitleWidthMenu;
+let wrapper;
+let videoSizeMenu;
+let subtitleFontMenu;
+let subtitleFontSizeMenu;
+let subtitleAlignmentMenu;
+let selectSpacebar;
+let selectScroll;
+let selectScrollStep;
+let marginMenu;
+let mycheck01;
+let myCheck02;
+let myCheck03;
+let myCheck04;
+let myCheck05;
+let myCheck06;
+let myCheck07;
+let myCheck08;
+let myCheck09;
+let myCheck10;
+let myCheck20;
+let dashboard;
+let selectedTheme;
+let customColorsCheckbox;
+let save1File;
+let save2Files;
+let subtitleTrackField;
+let selectionLabel;
+let selectionHyphen;
+let selectionLabelOnDashboard;
+let selectionHyphenOnDashboard;
+let videoURLButton;
+let videoURLInput;
+let insertLineWrapper;
+let t1timeObject = {};
+let t2timeObject = {};
 
 let timeEditPopup;
-let timeEditPopupO;
 let timeEditPopupV;
+let timeEditPopupO;
 let timeEditPopupThumb;
 let audioFileLoaded = false;
 let displayVideoControls = false;
@@ -74,8 +137,8 @@ const loadFontFileOptionText = 'Load Font List from a File';
 let callUpdateTimeTimeoutId;
 const checkTimeInterval = 200;
 const updateTimeInterval = 1000;
-let timeEditSynchronizeWithTrack1 = true;
-let rectifySubtitleStartEnabled = true;
+let timeEditSynchronizeWithTrack1 = false;
+let rectifySubtitleStartEnabled = false;
 let timeEditPopupRow = 0;
 let t1timeEditPopupOldTime;
 let t1timeEditPopupOldSeconds;
@@ -85,6 +148,8 @@ let t1timeEditPopupOldTimeOnTrack2;
 let t1timeEditPopupOldSecondsOnTrack2;
 let t2timeEditPopupOldTimeOnTrack2;
 let t2timeEditPopupOldSecondsOnTrack2;
+let timeEditPopupPuckPosition;
+let errorMsg;
 let CaretUtil = { };
 let showTimePopup = false;
 let customColorsEnabled = false;
@@ -92,6 +157,8 @@ let selectedCustomStyle;
 let dropDownArrow = "▾";
 let selectedThemeNumber;
 let themeAttributes;
+let copyt1;
+let copyt2;
 
 let themeAttributesArray = [
 {
@@ -204,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function statusMsg(caller, msg) {
-	document.getElementById("spanSubtitle1").innerHTML = msg;
+	spanSubtitle1.innerHTML = msg;
 	logTimeStamp("statusMsg ", (caller + " " + msg));
 	// console.log(caller, " ", msg);
 }
@@ -213,6 +280,13 @@ function logTimeStamp(caller, msg) {
 	let	timeStamp = new Date();
 	console.log("timeStamp ", caller, " ", msg, timeStamp);
 }
+
+function throwError(errorMsg) {
+	console.log(errorMsg);
+	alert(errorMsg);
+	throw new Error(errorMsg);
+}
+
 
 function unFocus(){
 	// Remove focus from any focused element
@@ -236,62 +310,62 @@ function computeSubtitleTableHeight() {
 	let divNames = [];
 
 	if (toggleVideoSwitch === "on") {
-		divNames = ['wrapper'];
+		divNames = [wrapper];
 	}
 
 	if (showSeekBarContainer) {
-		divNames = divNames.concat(['seekBarContainer']);
+		divNames = divNames.concat([seekBarContainer]);
 	} else {
-		document.getElementById("seekBarContainer").style.display = "none";
+		seekBarContainer.style.display = "none";
 	}
 
 	if (showMarginLine1) {
-		divNames = divNames.concat(['marginLine1']);
+		divNames = divNames.concat([marginLine1]);
 	} else {
-		document.getElementById("marginLine1").style.display = "none";
+		marginLine1.style.display = "none";
 	}
 
 	if (showSubtitleTrack1) {
-		divNames = divNames.concat(['divSubtitle1']);
+		divNames = divNames.concat([divSubtitle1]);
 	} else {
-		document.getElementById("divSubtitle1").style.display = "none";
+		divSubtitle1.style.display = "none";
 	}
 	
 	if (showMarginLine2) {
-		divNames = divNames.concat(['marginLine2']);
+		divNames = divNames.concat([marginLine2]);
 	} else {
-		document.getElementById("marginLine2").style.display = "none";
+		marginLine2.style.display = "none";
 	}
 	
 	if (showSubtitleTrack2) {
-		divNames = divNames.concat(['divSubtitle2']);
+		divNames = divNames.concat([divSubtitle2]);
 	} else {
-		document.getElementById("divSubtitle2").style.display = "none";
+		divSubtitle2.style.display = "none";
 	}
 	
 	if (showCounter) {
-		divNames = divNames.concat(['videoCounterDiv']);
+		divNames = divNames.concat([videoCounterDiv]);
 	} else {
-		document.getElementById("videoCounterDiv").style.display = "none";
+		videoCounterDiv.style.display = "none";
 	}
 
 	if (showSelectionInfo) {
-		divNames = divNames.concat(['selectionInfoDiv']);
+		divNames = divNames.concat([selectionInfoDiv]);
 	} else {
-		document.getElementById("selectionInfoDiv").style.display = "none";
+		selectionInfoDiv.style.display = "none";
 	}
 
 	if (showControlButtons) {
-		divNames = divNames.concat(['buttonSection', 'marginLine3']);
+		divNames = divNames.concat([buttonSection, marginLine3]);
 	} else {
-		document.getElementById("buttonSection").style.display = "none";
+		buttonSection.style.display = "none";
 	} 
 		
-	divNames = divNames.concat(['EOT']);	
+	divNames = divNames.concat([EOT]);	
 	
 	divNames.forEach(function(divName) {
 
-		let divElem = document.getElementById(divName);
+		let divElem = divName;
 
 /*		if (divElem.style.display != "none") {
 			divElemWidth = divElem.offsetWidth;
@@ -312,7 +386,7 @@ function computeSubtitleTableHeight() {
 
 /*		if ((divName === 'divSubtitle1') || (divName === 'divSubtitle2')) {
 			if (divName === 'divSubtitle1') {
-				document.getElementById("divSubtitle2").style.display = "none";
+				divSubtitle2.style.display = "none";
 			}
 			divElem.style.flexShrink = '0';
             divElem.style.display = 'block';
@@ -322,19 +396,19 @@ function computeSubtitleTableHeight() {
             divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
 			console.log("computeSubtitleTableHeight ", divName, " w" + divElemWidth + " h" + divElemHeight);
 		} else {
-*/			if (divName === 'divSubtitle1') {
-				document.getElementById("divSubtitle2").style.display = "none";
+*/			if (divName === divSubtitle1) {
+				divSubtitle2.style.display = "none";
 			}
 			divElem.style.flexShrink = '0';
             divElem.style.display = 'block';
             divElem.style.height = 'auto';
-		//if (divName !== 'buttonSection') {
+		//if (divName !== buttonSection) {
             divElem.style.overflowY = 'hidden';
 		//}
             divElemHeight = Math.ceil(divElem.getBoundingClientRect().height);
             divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
 			console.log("computeSubtitleTableHeight ", divName, " w" + divElemWidth + " h" + divElemHeight);
-			if ((divName != 'divSubtitle1') || (divName != 'divSubtitle2')) {
+			if ((divName != divSubtitle1) || (divName != divSubtitle2)) {
 				divElem.style.flexShrink = '1';
 			}
 //		}
@@ -342,17 +416,17 @@ function computeSubtitleTableHeight() {
 		let availableHeight = viewportHeight - totalHeight;
 		totalHeight += divElemHeight;
 		residualHeight = viewportHeight - totalHeight;
-		console.log("computeSubtitleTableHeight ", divName, " w" + divElemWidth + " h" + divElemHeight,
+		console.log("computeSubtitleTableHeight ", divName.id, " w" + divElemWidth + " h" + divElemHeight,
 			" totalHeight ", totalHeight, 
 			" availableHeight ", availableHeight,
 			" residualHeight ", residualHeight);
 		
 		switch(divName) {
-		case 'wrapper':
+		case wrapper:
 			divElem.style.display = "block";
 			break;
-		case 'divSubtitle1':
-		case 'divSubtitle2':
+		case divSubtitle1:
+		case divSubtitle2:
 			if (availableHeight <= 0) {
 				divElem.style.display = "none";  
 			} else {
@@ -366,7 +440,7 @@ function computeSubtitleTableHeight() {
 				}
 			}
 			break;
-		case 'buttonSection':
+		case buttonSection:
 			if (residualHeight < 0) {
 				divElem.style.display = "none";
 			} else {
@@ -390,22 +464,19 @@ function computeSubtitleTableHeight() {
 		showTimeEditPopup(selectedSubtitleNumber);
 	}
 
-	divElem = document.getElementById("subtitleTableDiv");
-	divElemEOT = document.getElementById("EOT");
-
 	if (residualHeight < 0){
-		divElem.style.display = "none";
-		divElemEOT.style.display = "none";
+		subtitleTableDiv.style.display = "none";
+		EOT.style.display = "none";
 		return;
 	}
 
 	if (((toggleVideoSwitch == "on") && (showSubtitleTable)) || 
 		(toggleVideoSwitch != "on")) {
-		divElem.style.display = "block";
-		divElem.style.height = residualHeight + "px";
+		subtitleTableDiv.style.display = "block";
+		subtitleTableDiv.style.height = residualHeight + "px";
 	} else {
-		divElem.style.display = "none";
-		divElemEOT.style.display = "none";
+		subtitleTableDiv.style.display = "none";
+		EOT.style.display = "none";
 	}
 	return;
 
@@ -510,13 +581,13 @@ function convertToSeconds(time){
 function findThemeAttributeObject(themeNumber) {
 
 	if (!Number.isInteger(themeNumber)) {
-		let errorMsg = 'findThemeAttributeObject themeNumber not an integer: ' + themeNumber;
+		errorMsg = 'findThemeAttributeObject themeNumber not an integer: ' + themeNumber;
 		alert(errorMsg);
 		throw new Error(errorMsg);
 	}
 
 	if ((themeNumber < 0) || ((themeNumber + 1) > themeAttributesArray.length)) {
-		let errorMsg = 'findThemeAttributeObject themeNumber invalid: ' + themeNumber;
+		errorMsg = 'findThemeAttributeObject themeNumber invalid: ' + themeNumber;
 		alert(errorMsg);
 		throw new Error(errorMsg);
 	}
@@ -528,24 +599,22 @@ function findThemeAttributeObject(themeNumber) {
 }
 
 
-function highlightThemeOption(themeNumber, action) {
+function highlightThemeOption(themeNumber, themeElement, action) {
 
 	let themeAttributeObject = findThemeAttributeObject(themeNumber);
 
 	switch (action) {
 	case 'off':
-		document.getElementById("theme" + themeNumber).style.backgroundColor = 
+		themeElement.style.backgroundColor = 
 			themeAttributeObject.backgroundColor;
 		break;
 	case 'on':
-		document.getElementById("theme" + themeNumber).style.backgroundColor = 
+		themeElement.style.backgroundColor = 
 			themeAttributeObject.highlightBackgroundColor;
 		break;
 	default:
-		let errorMsg = "highlightThemeOption Invalid action: " + action;
-		console.log(errorMsg);
-		alert(errorMsg);
-		throw new Error(errorMsg);
+		errorMsg = "highlightThemeOption Invalid action: " + action;
+		throwError(errorMsg);
 	}
 
 }
@@ -555,28 +624,28 @@ function sanityCheck() {
 	if (lastSubtitleNumber === 0) {return;}
 
 	if (lastSubtitleNumber != (subtitleTable.rows.length - 1)) {
-		let errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleTable.rows.length - 1) ' 
+		errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleTable.rows.length - 1) ' 
 			+ lastSubtitleNumber + ' != ' + (subtitleTable.rows.length - 1);
 		alert(errorMsg);
 		throw new Error(errorMsg);
 	}
 
 	if (lastSubtitleNumber != (subtitleStartSeconds.length - 1)) {
-		let errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleStartSeconds.length - 1) ' 
+		errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleStartSeconds.length - 1) ' 
 			+ lastSubtitleNumber + ' != ' + (subtitleStartSeconds.length - 1);
 		alert(errorMsg);
 		throw new Error(errorMsg);
 	}
 
 	if (lastSubtitleNumber != (subtitleEndSeconds.length - 1)) {
-		let errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleEndSeconds.length - 1) ' 
+		errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleEndSeconds.length - 1) ' 
 			+ lastSubtitleNumber + ' != ' + (subtitleEndSeconds.length - 1);
 		alert(errorMsg);
 		throw new Error(errorMsg);
 	}
 
 	if (lastSubtitleNumber != (subtitleTrack.length - 1)) {
-		let errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleTrack.length - 1) ' 
+		errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleTrack.length - 1) ' 
 			+ lastSubtitleNumber + ' != ' + (subtitleTrack.length - 1);
 		alert(errorMsg);
 		throw new Error(errorMsg);
@@ -619,11 +688,16 @@ function videoStateBusy() {
 function selectRow(rowNumber, directive) {
     console.log("selectRow entered");
 
-	console.log('selectRow current selection ',selectedSubtitleNumber);
-	console.log('selectRow current subtitleStartSeconds ',subtitleStartSeconds[selectedSubtitleNumber]);
-	console.log('selectRow current subtitleEndSeconds ',subtitleEndSeconds[selectedSubtitleNumber]);
-	console.log('selectRow current subtitleTrack ',subtitleTrack[selectedSubtitleNumber]);
-	console.log('selectRow new selection ',rowNumber);
+	console.log('selectRow current selection ', selectedSubtitleNumber);
+	console.log('selectRow current subtitleStartSeconds ', subtitleStartSeconds[selectedSubtitleNumber]);
+	console.log('selectRow current subtitleEndSeconds ', subtitleEndSeconds[selectedSubtitleNumber]);
+	console.log('selectRow current subtitleTrack ', subtitleTrack[selectedSubtitleNumber]);
+	console.log('selectRow new selection ', rowNumber);
+
+	if (rowNumber < 1) {
+		errorMsg = 'selectRow Invalid selection ' + rowNumber;
+		throwError(errorMsg);
+	}
 
 	if (!playingContinuously){
 		console.log("selectRow !playingContinuously");
@@ -633,15 +707,15 @@ function selectRow(rowNumber, directive) {
 		}
 	}
 
-	document.getElementById("spanStartTime").textContent = "";
-	document.getElementById("spanEndTime").textContent = "";
-	document.getElementById("spanTrack").textContent = "";
-	document.getElementById("spanStartTimeOnDashboard").textContent = "";
-	document.getElementById("spanEndTimeOnDashboard").textContent = "";
-	document.getElementById("spanTrackOnDashboard").textContent = "";
+	spanStartTime.textContent = "";
+	spanEndTime.textContent = "";
+	spanTrack.textContent = "";
+	spanStartTimeOnDashboard.textContent = "";
+	spanEndTimeOnDashboard.textContent = "";
+	spanTrackOnDashboard.textContent = "";
 
-	document.getElementById("spanSubtitle1").innerHTML = "";
-	document.getElementById("spanSubtitle2").innerHTML = "";
+	spanSubtitle1.innerHTML = "";
+	spanSubtitle2.innerHTML = "";
 	spanSubtitle1Selected = false;
 	console.log("spanSubtitle1Selected = f 1");
 	spanSubtitle2Selected = false;
@@ -668,13 +742,10 @@ function selectRow(rowNumber, directive) {
 		else {
 			videoElem.currentTime = subtitleStartSeconds[selectedSubtitleNumber];
 		}
-		document.getElementById("currentTime").textContent = 
-			formatTime(subtitleStartSeconds[selectedSubtitleNumber]);
-		document.getElementById("currentTimeOnDashboard").textContent = 
-			document.getElementById("currentTime").textContent;
-		document.getElementById("seekBar").value =
-			(subtitleStartSeconds[selectedSubtitleNumber] / videoDuration) * 100;
-		updateSliderFill(document.getElementById("seekBar"));
+		currentTime.textContent = formatTime(subtitleStartSeconds[selectedSubtitleNumber]);
+		currentTimeOnDashboard.textContent = currentTime.textContent;
+		seekBar.value = (subtitleStartSeconds[selectedSubtitleNumber] / videoDuration) * 100;
+		updateSliderFill(seekBar);
 
 	} else {
 		if (scrollOption == "alwaysVisible"){
@@ -683,6 +754,7 @@ function selectRow(rowNumber, directive) {
 		}
 	}
 
+	// if directive is "scroll"
 	if (directive != "undefined"){
 		if (scrollOption == "alwaysVisible"){
 			subtitleTable.rows[rowNumber].scrollIntoView({ 
@@ -694,27 +766,21 @@ function selectRow(rowNumber, directive) {
 		rectifySubtitleStart(rowNumber);
 	}
 	
-	document.getElementById("spanStartTime").textContent = 
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
-	document.getElementById("spanEndTime").textContent =
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
+	spanStartTime.textContent = subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
+	spanEndTime.textContent = subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
 	if (subtitleTrack[rowNumber] > 0) {
-		document.getElementById("spanTrack").textContent =
-			subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
+		spanTrack.textContent = subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
 	}
 
-	document.getElementById("spanStartTimeOnDashboard").textContent =
-		document.getElementById("spanStartTime").textContent;
-	document.getElementById("spanEndTimeOnDashboard").textContent =
-		document.getElementById("spanEndTime").textContent;
-	document.getElementById("spanTrackOnDashboard").textContent =
-		document.getElementById("spanTrack").textContent;
+	spanStartTimeOnDashboard.textContent = spanStartTime.textContent;
+	spanEndTimeOnDashboard.textContent = spanEndTime.textContent;
+	spanTrackOnDashboard.textContent = spanTrack.textContent;
 
 	spanSubtitle1Row = rowNumber;
-	document.getElementById("spanSubtitle1").innerHTML =
+	spanSubtitle1.innerHTML =
 		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
-	if (document.getElementById("spanSubtitle1").innerHTML === "") {
-		document.getElementById("spanSubtitle1").innerHTML = "_";
+	if (spanSubtitle1.innerHTML === "") {
+		spanSubtitle1.innerHTML = "_";
 	}
 		
 	let spanSubtitle2Track = 0;
@@ -732,15 +798,15 @@ function selectRow(rowNumber, directive) {
 
 	if (spanSubtitle2Row) {
 	    console.log("selectRow spanSubtitle2Row = ", spanSubtitle2Row);
-		document.getElementById("spanSubtitle2").innerHTML =
-			subtitleTable.rows[spanSubtitle2Row].querySelector(".classSubtitleText").innerHTML;
-		if (document.getElementById("spanSubtitle2").innerHTML === "") {
-			document.getElementById("spanSubtitle2").innerHTML = "_";
+		spanSubtitle2.innerHTML = subtitleTable.rows[spanSubtitle2Row].querySelector(".classSubtitleText").innerHTML;
+		if (spanSubtitle2.innerHTML === "") {
+			spanSubtitle2.innerHTML = "_";
 		}
 	}
 
     console.log("selectRow exiting");
 	computeSubtitleTableHeight();
+	return;
 
 } // selectRow
 
@@ -760,9 +826,9 @@ function setColor (type) {
 		case 'highlightedRow':
 			break;
 		case 'copyThemeColors':
-			document.getElementById("color1Input").value = themeAttributes.foregroundColor;
-			document.getElementById("color2Input").value = themeAttributes.backgroundColor;
-			document.getElementById("color3Input").value = themeAttributes.highlightBackgroundColor;
+			color1Input.value = themeAttributes.foregroundColor;
+			color2Input.value = themeAttributes.backgroundColor;
+			color3Input.value = themeAttributes.highlightBackgroundColor;
 			break;
 		case 'toggle':
 			if (customColorsEnabled) {
@@ -782,10 +848,10 @@ function setColor (type) {
 	}
 
 	if (enforceCustomColors) {
-		document.body.style.backgroundColor = document.getElementById("color2Input").value;
-		document.body.style.color = document.getElementById("color1Input").value;
+		document.body.style.backgroundColor = color2Input.value;
+		document.body.style.color = color1Input.value;
 		selectedCustomStyle.textContent = 
-			".selectedCustom {background-color: " + `${document.getElementById("color3Input").value}` + " }";
+			".selectedCustom {background-color: " + `${color3Input.value}` + " }";
 		if (selectedSubtitleNumber > 0){
 			highlightSelectedRow(selectedSubtitleNumber);
 		}
@@ -793,12 +859,12 @@ function setColor (type) {
 
 
 		/*		case 'foreground':
-			document.body.setAttribute('style', `background-color: ${document.getElementById("color2Input").value}`);
-			document.body.setAttribute('style', `color: ${document.getElementById("color1Input").value}`);
+			document.body.setAttribute('style', `background-color: ${color2Input.value}`);
+			document.body.setAttribute('style', `color: ${color1Input.value}`);
 			break;
 		case 'background':
-			document.body.setAttribute('style', `background-color: ${document.getElementById("color2Input").value}`);
-			document.body.setAttribute('style', `color: ${document.getElementById("color1Input").value}`);
+			document.body.setAttribute('style', `background-color: ${color2Input.value}`);
+			document.body.setAttribute('style', `color: ${color1Input.value}`);
 			break;
 		default:
 			console.log("setColor Invalid option: ", type);
@@ -835,13 +901,11 @@ function changeVideoSize(){
 		return;
 	}
 
-	const wrapperElement = document.getElementById("wrapper");
-	const selectVideoSize = document.getElementById("videoSizeMenu");
-	const selectedValue = selectVideoSize.value;
+	const selectedValue = videoSizeMenu.value;
 
 	let oldMaxVideoWidth = maxVideoWidth;
 
-	maxVideoWidth = getAdjustedWidthPixels(wrapperElement);
+	maxVideoWidth = getAdjustedWidthPixels(wrapper);
 	console.log("changeVideoSize maxVideoWidth = ",maxVideoWidth);
 
 	if (oldMaxVideoWidth != maxVideoWidth) {
@@ -850,20 +914,20 @@ function changeVideoSize(){
 
 	unFocus();
 
-	let fraction = selectVideoSize.value;
+	let fraction = videoSizeMenu.value;
 	let newWidth;
 	if (youTubeVideoId) {
 		newWidth = Math.round((maxVideoWidth)*fraction);
 		let newHeight = Math.round((newWidth * 9) / 16);
 		player.setSize(width=newWidth, height=newHeight);
-		wrapperElement.style.width = newWidth + "px";
-		document.getElementById("seekBarContainer").style.width = wrapperElement.style.width;
+		wrapper.style.width = newWidth + "px";
+		seekBarContainer.style.width = wrapper.style.width;
 	} else {
 		newWidth = Math.round((maxVideoWidth)*fraction);
 		let newHeight = Math.ceil((videoElem.videoHeight / videoElem.videoWidth) * newWidth);
-		wrapperElement.style.width = newWidth + "px";
-		wrapperElement.style.height = newHeight + "px";
-		document.getElementById("seekBarContainer").style.width = wrapperElement.style.width; // videoElem.style.width;
+		wrapper.style.width = newWidth + "px";
+		wrapper.style.height = newHeight + "px";
+		seekBarContainer.style.width = wrapper.style.width; // videoElem.style.width;
 		console.log("changeVideoSize newHeight= ", newHeight, " newWidth = ", newWidth,
 			" videoElem.style.width = ", videoElem.style.width);
 	}
@@ -873,12 +937,12 @@ function changeVideoSize(){
 		updateTime();
 	}
 
-	//document.getElementById("seekBar").value = (current / videoDuration) * 100;
-	//updateSliderFill(document.getElementById("seekBar"));
+	//seekBar.value = (current / videoDuration) * 100;
+	//updateSliderFill(seekBar);
 
 
 
-	console.log("changeVideoSize selectVideoSize.value = ", selectVideoSize.value, 
+	console.log("changeVideoSize videoSizeMenu.value = ", videoSizeMenu.value, 
 		" newWidth = ", newWidth);
 
 	computeSubtitleTableHeight();
@@ -888,15 +952,12 @@ function changeVideoSize(){
 
 function changeSubtitleWidth() {
 
-	const s1 = document.getElementById("divSubtitle1");
-	const s2 = document.getElementById("divSubtitle2");
-	const selectSubtitleWidth = document.getElementById("subtitleWidthMenu");
-	const selectedValue = Number(selectSubtitleWidth.value);
+	const selectedValue = Number(subtitleWidthMenu.value);
 
-	console.log("changeSubtitleWidth subtitleWidth changed from ", s1.style.width, 
+	console.log("changeSubtitleWidth subtitleWidth changed from ", divSubtitle1.style.width, 
 		" to ", selectedValue, "%");
-	s1.style.width = selectedValue + '%';
-	s2.style.width = selectedValue + '%';
+	divSubtitle1.style.width = selectedValue + '%';
+	divSubtitle2.style.width = selectedValue + '%';
 
 	unFocus();
 
@@ -905,17 +966,16 @@ function changeSubtitleWidth() {
 } // changeSubtitleWidth
 
 function changeFont(){
-	var selectSubtitleFont = document.getElementById("subtitleFontMenu");
-	var selectedValue = selectSubtitleFont.value;
+
+	var selectedValue = subtitleFontMenu.value;
 	//?? If user presses ESC instead of selecting a file, the value displayed in the setting is blank.
 	//?? If user presses END and there are 2 tracks, the last subtitle of the second track is selected
 	//?? If user presses DEL, the selected row might be out of view (maybe ok if 1st row shown = 1st row when video displayed)
 	if (selectedValue == loadFontFileOptionText){
-		selectSubtitleFont.value = document.getElementById("spanSubtitle1").style.fontFamily
-		const fontListFileElem = document.getElementById("fontListFileInput");
-		if (fontListFileElem) {
-			fontListFileElem.value = ""; //Clear .value to make this file element reusable
-			fontListFileElem.click();
+		subtitleFontMenu.value = spanSubtitle1.style.fontFamily
+		if (fontListFileInput) {
+			fontListFifontListFileInputleElem.value = ""; //Clear .value to make this file element reusable
+			fontListFileInput.click();
 		}
 		unFocus();
 		return;
@@ -923,112 +983,100 @@ function changeFont(){
 	
 	// selectSubtitleFont.value = selectedFont;
 
-	var updateElement = document.getElementById("spanSubtitle1");
-	console.log("changeFont Font changed from " + updateElement.style.fontFamily + " to " + selectedValue);
-	updateElement.style.fontFamily = selectedValue;
-	updateElement = document.getElementById("spanSubtitle2");
-	updateElement.style.fontFamily = selectedValue;
+	console.log("changeFont Font changed from " + spanSubtitle1.style.fontFamily + " to " + selectedValue);
+	spanSubtitle1.style.fontFamily = selectedValue;
+	spanSubtitle2.style.fontFamily = selectedValue;
 	computeSubtitleTableHeight();
 	unFocus();
 }
 
 function changeFontSize(){
-	var selectSubtitleFontSize = document.getElementById("subtitleFontSizeMenu");
-	var selectedValue = selectSubtitleFontSize.value;
-	var updateElement = document.getElementById("spanSubtitle1");
-	console.log("Font size changed from " + updateElement.style.fontSize + " to " + selectedValue);
-	updateElement.style.fontSize = selectedValue;
-	updateElement = document.getElementById("spanSubtitle2");
-	updateElement.style.fontSize = selectedValue;
+	var selectedValue = subtitleFontSizeMenu.value;
+	console.log("Font size changed from " + spanSubtitle1.style.fontSize + " to " + selectedValue);
+	spanSubtitle1.style.fontSize = selectedValue;
+	spanSubtitle2.style.fontSize = selectedValue;
 	computeSubtitleTableHeight();
 	unFocus();
 }
 
 function changeAlignment(){
 	//?? Clean up this function
-	var updateElement = document.getElementById("divSubtitle1");
-    var selectSubtitleAlignment = document.getElementById("subtitleAlignmentMenu");
-	var selectedValue = selectSubtitleAlignment.value;
-	console.log("Alignment changed from " + updateElement.style.textAlign + " to " + selectedValue);
-	updateElement.style.textAlign = selectedValue;
+	var selectedValue = subtitleAlignmentMenu.value;
+	console.log("Alignment changed from " + divSubtitle1.style.textAlign + " to " + selectedValue);
+	divSubtitle1.style.textAlign = selectedValue;
 
-	updateElement = document.getElementById("divSubtitle2");
-    selectSubtitleAlignment = document.getElementById("subtitleAlignmentMenu");
-	selectedValue = selectSubtitleAlignment.value;
-	console.log("Alignment changed from " + updateElement.style.textAlign + " to " + selectedValue);
-	updateElement.style.textAlign = selectedValue;
+	console.log("Alignment changed from " + divSubtitle2.style.textAlign + " to " + selectedValue);
+	divSubtitle2.style.textAlign = selectedValue;
 	computeSubtitleTableHeight();
 	unFocus();
 }
 
 function changeSpacebar(){
-    const selectSpacebar = document.getElementById("spacebarMenu");
-	const selectedValue = selectSpacebar.value;
+	const selectedValue = spacebarMenu.value;
 	console.log("Spacebar option changed from " + spacebarOption + " to " + selectedValue);
 	spacebarOption = selectedValue;
 	unFocus();
 }
 
 function changeScroll(){
-	const selectScroll = document.getElementById("scrollMenu");
-	const selectedValue = selectScroll.value;
+	const selectedValue = scrollMenu.value;
 	console.log("Scroll option changed from " + scrollOption + " to " + selectedValue);
 	scrollOption = selectedValue;
 	unFocus();
 }
 
 function selectMarginLineMinHeight(e) {
-	const selectMargin = e.currentTarget;
+	const selectedMargin = e.currentTarget;
 	const selectedValue = Number(selectMargin.value);
 	let varName;
 	let oldValue;
-	let marginElemId;
-	switch (selectMargin.id) {
+	let marginElement;
+	switch (selectedMargin.id) {
 	case 'marginLine1Menu':
 		varName = "marginLine1MinHeight";
 		oldValue = marginLine1MinHeight;
 		marginLine1MinHeight = selectedValue;
-		marginElemId = "marginLine1";
+		marginElement = marginLine1;
 		break;
 	case 'marginLine2Menu':
 		varName = "marginLine2MinHeight";
 		oldValue = marginLine2MinHeight;
 		marginLine2MinHeight = selectedValue;
-		marginElemId = "marginLine2";
+		marginElement = marginLine2;
 		break;
 	default:
-		let errorMsg = 'selectMarginLineMinHeight invalid selectMargin.id: ' + selectMargin.id;
+		errorMsg = 'selectMarginLineMinHeight invalid selectedMargin.id: ' + selectedMargin.id;
 		alert(errorMsg);
 		throw new Error(errorMsg);
 	}
+
 	console.log("selectMarginLineMinHeight ", varName, " changed from " + oldValue + 
 		" to " + selectedValue);
 	
-	changeMarginLineMinHeight(marginElemId);
+	changeMarginLineMinHeight(marginElement);
 
 	unFocus();
 }
 
-function changeMarginLineMinHeight(marginId) {
+function changeMarginLineMinHeight(marginElement) {
 
-	let marginElement = document.getElementById(marginId);
 	let newMinHeight = 0;
-	switch (marginId) {
-	case 'marginLine1':
+	switch (marginElement) {
+	case marginLine1:
 		newMinHeight = marginLine1MinHeight;
 		showMarginLine1 = (newMinHeight > 0);
 		break;
-	case 'marginLine2':
+	case marginLine2:
 		newMinHeight = marginLine2MinHeight;
 		showMarginLine2 = (newMinHeight > 0);
 		break;
 	default:
-		let errorMsg = 'changeMarginLineMinHeight invalid marginId: ' + marginId;
-		alert(errorMsg);
-		throw new Error(errorMsg);
+		errorMsg = 'changeMarginLineMinHeight invalid marginElement: ' + marginElement;
+		throwError(errorMsg);
 	}
-	console.log("changeMarginLineMinHeight ", marginId, " minHeight changed from ", 
+	console.log("changeMarginLineMinHeight ", marginElement.id, " minHeight changed from ", 
 		marginElement.style.minHeight, " to ", newMinHeight + "rem");
+	
 	marginElement.style.minHeight = newMinHeight + "rem";
 	
 	computeSubtitleTableHeight();
@@ -1036,17 +1084,14 @@ function changeMarginLineMinHeight(marginId) {
 }
 
 function changeScrollStep(){
-	const selectScrollStep = document.getElementById("scrollStepMenu");
-	const selectedValue = Number(selectScrollStep.value);
+	
+	const selectedValue = Number(scrollStepMenu.value);
 	console.log("Scroll Step changed from " + scrollStepOption + " to " + selectedValue);
 	scrollStepOption = selectedValue;
 	unFocus();
 
-	let span1 = document.getElementById("spanSubtitle1");
-	let span2 = document.getElementById("spanSubtitle2");
-
-	var checkBox1 = document.getElementById("myCheck01");
-	var checkBox2 = document.getElementById("myCheck02");
+	var checkBox1 = myCheck01;
+	var checkBox2 = myCheck02;
 
 	switch(selectedValue) {
 		case 1:
@@ -1064,7 +1109,7 @@ function changeScrollStep(){
 			checkBox2.checked = true;
 			break;
 		default:
-			console.log('keyup Invalid scroll step option: ', selectScrollStep.value);
+			console.log('keyup Invalid scroll step option: ', scrollStepMenu.value);
 			break;
 	}
 	
@@ -1078,8 +1123,8 @@ function changeScrollStep(){
 }
 
 function changeMargin(){
-	const selectMargin = document.getElementById("marginMenu");
-	const selectedValue = Number(selectMargin.value);
+
+	const selectedValue = Number(marginMenu.value);
 	console.log("Margin changed from " + marginOption + " to " + selectedValue);
 	marginOption = selectedValue;
 	unFocus();
@@ -1097,12 +1142,17 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 		fromRow = timeEditPopupRow + 1;
 		break;
 	default:
+		errorMsg = 'copyTime invalid rowOffset: ' + rowOffset;
+		throwError(errorMsg);
 	}
+
 	console.log("copyTime source row: ", fromRow);
 
 	if ((fromRow <= 0) || (fromRow > lastSubtitleNumber)){
-		console.log("copyTime source row out of bounds: ", fromRow);
-		alert("copyTime source row out of bounds: " + fromRow);
+		errorMsg = "copyTime source row out of bounds: " + fromRow;
+		console.log(errorMsg);
+		alert(errorMsg);
+		throw new Error(errorMsg);
 		return;
 	}
 
@@ -1154,21 +1204,27 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 			oldText, " to ", newText, 
 			" seconds changed from ", oldSeconds, " to ", newSeconds);
 
+	let wrapperElement;
+
 	if (elemIdTo === 't1') {
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = newText;
 		subtitleStartSeconds[timeEditPopupRow] = newSeconds;
 		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
 			synchronizeWithTrack1(timeEditPopupRow, "t1", newSeconds, newText);
 		}
+		wrapperElement = copyt1;
 	} else {
 		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = newText;
 		subtitleEndSeconds[timeEditPopupRow] = newSeconds;
 		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
 			synchronizeWithTrack1(timeEditPopupRow, "t2", newSeconds, newText);
 		}
+		wrapperElement = copyt2;
 	}
-	document.getElementById(`copy${elemIdTo}`).style.pointerEvents = 'none';
-	setTimeout(() => {document.getElementById(`copy${elemIdTo}`).style.pointerEvents = ''}, 500);
+
+	wrapperElement.style.pointerEvents = 'none';
+	setTimeout(() => {wrapperElement.style.pointerEvents = ''}, 500);
+
 	showTimeEditPopup(timeEditPopupRow);
 
 }
@@ -1203,23 +1259,23 @@ function changeRange (operation) {
 	}
 }
 
-function changeTime(operation, elemId) {
+function changeTime(operation, selector, element) {
 
 	switch(operation) {
+	case "increment":
+	case "decrement":
+		break;
 	case "close":
 		showTimeEditPopup(0);
 		return;
 	case "restore":
-		timeEditRestore(elemId); /* t1 or t2 */
+		timeEditRestore(selector); /* t1 or t2 */
 		showTimeEditPopup(timeEditPopupRow);
 		return;
 	case "current":
-		timeEditCurrent(elemId); /* t1 or t2 */
+		timeEditCurrent(selector); /* t1 or t2 */
 		showTimeEditPopup(timeEditPopupRow);
 		return;
-	case "increment":
-	case "decrement":
-		break;
 	default:
 		console.log('changeTime Invalid operation ', operation);
 		alert("changeTime Invalid operation " + operation);
@@ -1229,16 +1285,16 @@ function changeTime(operation, elemId) {
 	let min = 0;
 	let max = 9;
 
-	switch(elemId) {
+	switch(selector) {
 	case "t1minuteField1":
 	case "t2minuteField1":
 	case "t1secondField1":
 	case "t2secondField1":
 		max = 5;		
+		break;
 	}
 
-	let elem = document.getElementById(elemId);
-	let value = Number(elem.textContent);
+	let value = Number(element.textContent);
 
 	switch(operation) {
 	case "increment":
@@ -1255,35 +1311,51 @@ function changeTime(operation, elemId) {
 		break;
 	}
 
-	elem.textContent = value;
-	saveTime(elemId.substring(0,2));
+	element.textContent = value;
+	saveTime(selector.substring(0,2));
 
 	return;
 
-function saveTime (prefix) {
-	let fractionText = document.getElementById(prefix + "millisecondField1").textContent + 
-		document.getElementById(prefix + "millisecondField2").textContent + 
-		document.getElementById(prefix + "millisecondField3").textContent;
+function saveTime (selector) {
 
-	let totalSeconds = (Number(document.getElementById(prefix + "hourField1").textContent) * 3600) +
-		(Number(document.getElementById(prefix + "minuteField1").textContent) * 600) +
-		(Number(document.getElementById(prefix + "minuteField2").textContent) * 60) +
-		(Number(document.getElementById(prefix + "secondField1").textContent) * 10) +
-		(Number(document.getElementById(prefix + "secondField2").textContent)) +
+	let timeObject = {};
+
+	switch (selector) {
+		case "t1":
+			timeObject = t1timeObject;
+			break;
+		case "t2":
+			timeObject = t2timeObject;
+			break;
+		default:
+			errorMsg = 'saveTime invalid selector: ' + selector;
+			alert(errorMsg);
+			throw new Error(errorMsg);
+	}
+
+	let fractionText = timeObject.millisecondField1.textContent + 
+		timeObject.millisecondField2.textContent + 
+		timeObject.millisecondField3.textContent;
+
+	let totalSeconds = (Number(timeObject.hourField1.textContent) * 3600) +
+		(Number(timeObject.minuteField1.textContent) * 600) +
+		(Number(timeObject.minuteField2.textContent) * 60) +
+		(Number(timeObject.secondField1.textContent) * 10) +
+		(Number(timeObject.secondField2.textContent)) +
 		(Number(fractionText) / 1000);
 			
-	let timeText = document.getElementById(prefix + "hourField1").textContent + ":" +
-		document.getElementById(prefix + "minuteField1").textContent +
-		document.getElementById(prefix + "minuteField2").textContent + ":" +
-		document.getElementById(prefix + "secondField1").textContent +
-		document.getElementById(prefix + "secondField2").textContent + "." +
-		document.getElementById(prefix + "millisecondField1").textContent + 
-		document.getElementById(prefix + "millisecondField2").textContent;
+	let timeText = timeObject.hourField1.textContent + ":" +
+		timeObject.minuteField1.textContent +
+		timeObject.minuteField2.textContent + ":" +
+		timeObject.secondField1.textContent +
+		timeObject.secondField2.textContent + "." +
+		timeObject.millisecondField1.textContent + 
+		timeObject.millisecondField2.textContent;
 
 	console.log("saveTime fractionText ", fractionText, " timeText ", timeText, 
 		" totalSeconds ", totalSeconds);
 
-	switch (prefix) {
+	switch (selector) {
 	case "t1":
 		console.log("saveTime Row ", timeEditPopupRow, " start ", 
 			" old ", 
@@ -1309,8 +1381,6 @@ function saveTime (prefix) {
 		}
 		break;
 	default:
-		console.log('saveTime Invalid prefix ', prefix);
-		return;
 	}
 	
 }  // saveTime
@@ -1362,9 +1432,8 @@ function timeEditCurrent(prefix) {
 
 	let timeText = helper.toTimeString(current * 1000);	
 
-	document.getElementById("currentTime").textContent = formatTime(current);
-	document.getElementById("currentTimeOnDashboard").textContent = 
-		document.getElementById("currentTime").textContent;
+	currentTime.textContent = formatTime(current);
+	currentTimeOnDashboard.textContent = currentTime.textContent;
 
 
 	switch (prefix) {
@@ -1409,7 +1478,7 @@ function findTrackRow(option, trackNumber, rowNumber) {
 		case 2:
 			break;
 		default:
-			let errorMsg = 'findTrackRow invalid trackNumber: ' + trackNumber;
+			errorMsg = 'findTrackRow invalid trackNumber: ' + trackNumber;
 			alert(errorMsg);
 			throw new Error(errorMsg);
 	}
@@ -1438,7 +1507,7 @@ function findTrackRow(option, trackNumber, rowNumber) {
 			}
 			break;
 		default:
-			let errorMsg = 'findTrackRow invalid option: ' + option;
+			errorMsg = 'findTrackRow invalid option: ' + option;
 			alert(errorMsg);
 			throw new Error(errorMsg);
 	}
@@ -1451,7 +1520,7 @@ function findTrackRow(option, trackNumber, rowNumber) {
 function synchronizeWithTrack1(rowNumber, prefix, time, timeText) {
 	let sourceTrack = subtitleTrack[rowNumber];
 	if (sourceTrack != 1) {
-		let errorMsg = 'synchronizeWithTrack1 invalid sourceTrack: ' + sourceTrack + " rowNumber= " + rowNumber;
+		errorMsg = 'synchronizeWithTrack1 invalid sourceTrack: ' + sourceTrack + " rowNumber= " + rowNumber;
 		alert(errorMsg);
 		throw new Error(errorMsg);
 	}
@@ -1469,7 +1538,7 @@ function synchronizeWithTrack1(rowNumber, prefix, time, timeText) {
 			subtitleTable.rows[targetRow].querySelector(".classSubtitleEnd").textContent = timeText;
 			break;
 		default:
-			let errorMsg = 'synchronizeWithTrack1 invalid prefix: ' + prefix;
+			errorMsg = 'synchronizeWithTrack1 invalid prefix: ' + prefix;
 			alert(errorMsg);
 			throw new Error(errorMsg);
 	}
@@ -1641,70 +1710,74 @@ function redo() {
 
 }
 
-function enableFields(checkBoxId){
+function enableFields(checkBox){
 
-	console.log("enableFields checkBoxId = ", checkBoxId);
-	var checkBox = document.getElementById(checkBoxId);
+	console.log("enableFields checkBox Id = ", checkBox.id);
 
-	const selectScrollStep = document.getElementById("scrollStepMenu");
-
-	switch (checkBoxId) {
-	case 'myCheck01':
-		if (checkBox.checked == true) {
+	switch (checkBox) {
+	case myCheck01:
+		if (myCheck01.checked == true) {
 			showSubtitleTrack1 = true;
 		} else {
 			showSubtitleTrack1 = false;
 		}
 		break;
-	case 'myCheck02':
-		if (checkBox.checked == true) {
+	case myCheck02:
+		if (myCheck02.checked == true) {
 			showSubtitleTrack2 = true;
-			selectScrollStep.value = '2';
+			scrollStepMenu.value = '2';
 		} else {
 			showSubtitleTrack2 = false;
-			selectScrollStep.value = '1';
+			scrollStepMenu.value = '1';
 		}
 		changeScrollStep();
 		break;
-	case 'myCheck03':
-		if (checkBox.checked == true) {
+	case myCheck03:
+		if (myCheck03.checked == true) {
 			showCounter = true;
 		} else {
 			showCounter = false;
 		}
 		break;
-	case 'myCheck04':
-		if (checkBox.checked == true) {
+	case myCheck04:
+		if (myCheck04.checked == true) {
 			showSelectionInfo = true;
 		} else {
 			showSelectionInfo = false;
 		}
 		break;
-	case 'myCheck05':
-		if (checkBox.checked == true) {
+	case myCheck05:
+		if (myCheck05.checked == true) {
 			showControlButtons = true;
 		} else {
 			showControlButtons = false;
 		}
 		break;
-	case 'myCheck06':
+	case myCheck06:
 		toggleSubtitleSection();
 		break;
-	case 'myCheck07':
+	case myCheck07:
 		toggleEditing();
 		break;
-	case 'myCheck08':
-		if (checkBox.checked == true) {
-			showTimePopup = true;
+	case myCheck08:
+		if (myCheck08.checked == true) {
+			rectifySubtitleStartEnabled = true;
 		} else {
-			showTimePopup = false;
+			rectifySubtitleStartEnabled = false;
 		}
 		break;
-	case 'myCheck09':
+	case myCheck09:
+		if (myCheck09.checked == true) {
+			timeEditSynchronizeWithTrack1 = true;
+		} else {
+			timeEditSynchronizeWithTrack1 = false;
+		}
+		break;
+	case myCheck10:
 		toggleDashboard();
 		break;
-	case 'displayVideoControls':
-		if (checkBox.checked == true) {
+	case myCheck20:
+		if (myCheck20.checked == true) {
 			displayVideoControls = true;
 		} else {
 			displayVideoControls = false;
@@ -1720,60 +1793,56 @@ function enableFields(checkBoxId){
 }
 
 function toggleDashboard() {
-	let x = document.getElementById("dashboard");
 
-	if (x.style.display == "inline-block") {
-		x.style.display = "none";
-		document.getElementById("myCheck09").checked = false;
+	if (dashboard.style.display == "inline-block") {
+		dashboard.style.display = "none";
+		myCheck10.checked = false;
 		showCounter = true;
-		document.getElementById("myCheck03").checked = true;
+		myCheck03.checked = true;
 		showSelectionInfo = true;
-		document.getElementById("myCheck04").checked = true;
+		myCheck04.checked = true;
 		showControlButtons = true;
-		document.getElementById("myCheck05").checked = true;
+		myCheck05.checked = true;
 	} else {
-		x.style.display = "inline-block";
-		document.getElementById("myCheck09").checked = true;
+		dashboard.style.display = "inline-block";
+		myCheck10.checked = true;
 		showCounter = false;
-		document.getElementById("myCheck03").checked = false;
+		myCheck03.checked = false;
 		showSelectionInfo = false;
-		document.getElementById("myCheck04").checked = false;
+		myCheck04.checked = false;
 		showControlButtons = false;
-		document.getElementById("myCheck05").checked = false;
+		myCheck05.checked = false;
 	}
 }
 
 function toggleEditing() {
-	var checkBox = document.getElementById("myCheck07");
 
-	if (document.getElementById("spanSubtitle1").contentEditable == "false") {
-		console.log("enableFields editing changing to true");
-		document.getElementById("spanSubtitle1").contentEditable = "true";
-		document.getElementById("spanSubtitle2").contentEditable = "true";
-		checkBox.checked = true;
+	if (spanSubtitle1.contentEditable == "false") {
+		console.log("toggleEditing editing changing to true");
+		spanSubtitle1.contentEditable = "true";
+		spanSubtitle2.contentEditable = "true";
+		myCheck07.checked = true;
 	} else {
-		console.log("enableFields editing changing to false");
-		document.getElementById("spanSubtitle1").contentEditable = "false";
-		document.getElementById("spanSubtitle2").contentEditable = "false";
-		checkBox.checked = false;
+		console.log("toggleEditing editing changing to false");
+		spanSubtitle1.contentEditable = "false";
+		spanSubtitle2.contentEditable = "false";
+		myCheck07.checked = false;
 	}
 
-	console.log("toggleEditing editing ", 
-			document.getElementById("spanSubtitle1").contentEditable);
+	console.log("toggleEditing editing ", spanSubtitle1.contentEditable);
 
 }
 
 
 function toggleSubtitleSection() {
-	var checkBox = document.getElementById("myCheck06");
 
 	if (showSubtitleTable) {
 		showSubtitleTable = false;
-		checkBox.checked = false;
+		myCheck06.checked = false;
 	} 
 	else {
 		showSubtitleTable = true;
-		checkBox.checked = true;
+		myCheck06.checked = true;
 	}
 
 	computeSubtitleTableHeight();
@@ -1781,18 +1850,19 @@ function toggleSubtitleSection() {
 
 
 function toggleVideoSection() {
-	let x = document.getElementById("wrapper");
 
 	if (toggleVideoSwitch == "on") {
 		toggleVideoSwitch = "off";
-		x.style.display = "none";
+		wrapper.style.display = "none";
 	} 
 	else {
 		toggleVideoSwitch = "on";
-		x.style.display = "block";
+		wrapper.style.display = "block";
 	}
 
 	computeSubtitleTableHeight();
+	selectRow(selectedSubtitleNumber);
+
 }
 
 function changeTheme(newThemeNumber) {
@@ -1808,11 +1878,11 @@ function changeTheme(newThemeNumber) {
 	selectedCustomStyle.textContent = 
 		".selectedCustom {background-color: " + themeAttributes.highlightBackgroundColor + "}";
 
-	document.getElementById("selectedTheme").style.backgroundColor = themeAttributes.backgroundColor;
-	document.getElementById("selectedTheme").style.color = themeAttributes.foregroundColor;
-	document.getElementById("selectedTheme").textContent = themeAttributes.themeName + dropDownArrow;
+	selectedTheme.style.backgroundColor = themeAttributes.backgroundColor;
+	selectedTheme.style.color = themeAttributes.foregroundColor;
+	selectedTheme.textContent = themeAttributes.themeName + dropDownArrow;
 
-	document.getElementById("myCheck10").checked = false;
+	customColorsCheckbox.checked = false;
 
 	if (selectedSubtitleNumber > 0){
 		highlightSelectedRow(selectedSubtitleNumber);
@@ -1938,7 +2008,7 @@ function skipForward() {
 	let increment = 1;
 	let stop = false;
 	while ((!stop) && ((selectedSubtitleNumber + increment) >= 1)) {
-		if ((document.getElementById("spanTrack").textContent) ==
+		if (spanTrack.textContent) ==
 			(subtitleTable.rows[selectedSubtitleNumber + increment].querySelector(".classSubtitleTrack").textContent)) {
 			if (newTime < subtitleStartSeconds[selectedSubtitleNumber + increment]) {
 				stop = true;
@@ -2041,6 +2111,7 @@ function checkTime2() {
 	// Playing continuously more than one subtitle in the selected track
 	// until the end time of the subtitle subset is exceeded
 
+
 	if (!checkTimeEnabled) {
 		console.log('checkTime2 entered while NOT Enabled');
 		if (!youTubeVideoId) {
@@ -2071,6 +2142,7 @@ function checkTime2() {
 			selectRow(subsetFirstRow);
 			return;
 		}
+
 		// Playing the current selection in a loop.
 		if (youTubeVideoId) {
 			if (player.getPlayerState() != YT.PlayerState.PAUSED) {
@@ -2332,8 +2404,7 @@ async function loadVideoFile(file) {
 		if (videoElem.videoWidth === 0 && videoElem.videoHeight === 0) {
 			audioFileLoaded = true;
 			displayVideoControls = true;
-			const selectVideoSize = document.getElementById("videoSizeMenu");
-			selectVideoSize.value = '0.10';
+			videoSizeMenu.value = '0.10';
 		}
 
 		if (displayVideoControls) {
@@ -2346,18 +2417,17 @@ async function loadVideoFile(file) {
 
 		videoDuration = videoElem.duration;
 		console.log('loadVideoFile Video duration = ',videoDuration);
-		document.getElementById("duration").textContent = formatTime(videoDuration);
-		document.getElementById("durationOnDashboard").textContent = 
-				document.getElementById("duration").textContent;
+		duration.textContent = formatTime(videoDuration);
+		durationOnDashboard.textContent = duration.textContent;
 		//setInterval(updateTime, updateTimeInterval);
 
 
 		console.log('loadVideoFile intrinsic height = ',videoElem.videoHeight);
 		console.log('loadVideoFile intrinsic width = ',videoElem.videoWidth);
 
-		document.getElementById('wrapper').style.backgroundColor = "transparent";
-		document.getElementById('wrapper').style.border = "none";
-		document.getElementById('pageTitle').style.display = "none";
+		wrapper.style.backgroundColor = "transparent";
+		wrapper.style.border = "none";
+		pageTitle.style.display = "none";
 
 		//let newWidth = Math.round((videoElem.videoWidth)*0.50);
 		//console.log('loadVideoFile newWidth = ',newWidth);
@@ -2399,7 +2469,7 @@ function handleVideoFileLoaded() {
 	addKeyListener();
 
 	removeVideoPrompts();
-	updateSliderFill(document.getElementById("seekBar"));
+	updateSliderFill(seekBar);
 
 }
 
@@ -2422,9 +2492,8 @@ function addKeyListenerForVideo() {
 				break;
 			}
 		case "{":
-			var x = document.getElementById("videoSizeMenu");
-			if (x.selectedIndex > 0) {
-				x.selectedIndex -= 1;
+			if (videoSizeMenu.selectedIndex > 0) {
+				videoSizeMenu.selectedIndex -= 1;
 			}
 			changeVideoSize();
 			break;
@@ -2433,9 +2502,8 @@ function addKeyListenerForVideo() {
 				break;
 			}
 		case "}":
-			var x = document.getElementById("videoSizeMenu");
-			if (x.selectedIndex < (x.length - 1)) {
-				x.selectedIndex += 1;
+			if (videoSizeMenu.selectedIndex < (videoSizeMenu.length - 1)) {
+				videoSizeMenu.selectedIndex += 1;
 			}
 			changeVideoSize();
 			break;
@@ -2448,7 +2516,7 @@ function addKeyListenerForVideo() {
 function handleSeek(e) {
 
 	console.log("handleSeek entered");
-	//	updateSliderFill(document.getElementById("seekBar"));
+	//	updateSliderFill(seekBar);
 
 	let subtitleIndex = 1;
 	let stop = false;
@@ -2485,7 +2553,7 @@ function handleSeek(e) {
 //		videoElem.currentTime = ((e.target.value / 100) * duration);
 //	}
 //
-//	updateSliderFill(document.getElementById("seekBar"));
+//	updateSliderFill(seekBar);
 //
 //}
 
@@ -2532,9 +2600,9 @@ function onYouTubeIframeAPIReady() {
 	// myWrapper.style.backgroundColor = "transparent";
 	// document.getElementById('pageTitle').style.display = "none";
 
-	document.getElementById('wrapper').style.backgroundColor = "transparent";
-	document.getElementById('wrapper').style.border = "none";
-	document.getElementById('pageTitle').style.display = "none";
+	wrapper.style.backgroundColor = "transparent";
+	wrapper.style.border = "none";
+	pageTitle.style.display = "none";
 
 
 	// This function creates an <iframe> (and YouTube player)
@@ -2613,10 +2681,9 @@ function onYouTubePlayerReady(event) {
 	console.log('onYouTubePlayerReady entered');
 	iframeElement = document.getElementById("player");
 	videoDuration = player.getDuration();
-	document.getElementById("duration").textContent = formatTime(videoDuration);
-	document.getElementById("durationOnDashboard").textContent = 
-		document.getElementById("duration").textContent;
-	console.log('onYouTubePlayerReady Video duration = ',videoDuration);
+	duration.textContent = formatTime(videoDuration);
+	durationOnDashboard.textContent = duration.textContent;
+	console.log('onYouTubePlayerReady Video duration = ', videoDuration);
 	//setInterval(updateTime, updateTimeInterval);
 
 	videoFileLoaded = true;
@@ -2646,13 +2713,11 @@ function updateTime() {
 	}
 	console.log("updateTime current ", current);
 
-	document.getElementById("currentTime").textContent = formatTime(current);
-	document.getElementById("currentTimeOnDashboard").textContent = 
-		document.getElementById("currentTime").textContent;
-
+	currentTime.textContent = formatTime(current);
+	currentTimeOnDashboard.textContent = currentTime.textContent;
 	
-	document.getElementById("seekBar").value = (current / videoDuration) * 100;
-	updateSliderFill(document.getElementById("seekBar"));
+	seekBar.value = (current / videoDuration) * 100;
+	updateSliderFill(seekBar);
 
 }
 
@@ -2718,9 +2783,8 @@ async function loadFontListFile(file) {
 	const textContent = await file.text();
 	const lineArray = textContent.split(/\n/);
 
-	let fileElem = document.getElementById("fontListFileInput");
-	console.log("loadFontListFile Clearing fileElem.value");
-	console.log(fileElem.value);
+	console.log("loadFontListFile Clearing fontListFileInput.value");
+	console.log(fontListFileInput.value);
 
 	let fontArray = [];
 	let fontArrayIndex = 0;
@@ -2736,9 +2800,8 @@ async function loadFontListFile(file) {
 		return;
 	}
 
-	var subtitleFontOptions = document.getElementById("subtitleFontMenu");
-  	while (subtitleFontOptions.firstChild) {
-		subtitleFontOptions.removeChild(subtitleFontOptions.lastChild);
+  	while (subtitleFontMenu.firstChild) {
+		subtitleFontMenu.removeChild(subtitleFontMenu.lastChild);
 	}
 	selectedFont = fontArray[0];
 	createSubtitleFontOptions(fontArray);
@@ -2787,9 +2850,9 @@ async function loadSubtitleFile(trackNumber, file) {
 	await extractSubtitleFile(file, subtitleFileDataArray[trackNumber]);
 //?? What if totalNumberOfSubtitlesRead = 0?
 	if (trackNumber === 0) {
-		document.getElementById("save1File").style.display = "inline-block";
-		document.getElementById("save2Files").style.display = "none";
-		document.getElementById("subtitleTrack").classList.add('notDisplayed');
+		save1File.style.display = "inline-block";
+		save2Files.style.display = "none";
+		subtitleTrackField.classList.add('notDisplayed');
 		if (oldSelectedSubtitleNumber <= totalNumberOfSubtitlesRead) {
 			selectedSubtitleNumber = oldSelectedSubtitleNumber;
 		}
@@ -2797,16 +2860,16 @@ async function loadSubtitleFile(trackNumber, file) {
 			selectedSubtitleNumber = 1;		// by default, select the first subtitle
 		}
 		displaySubtitles();
-		document.getElementById("scrollStepMenu").value = '1';
+		scrollStepMenu.value = '1';
 		changeScrollStep();
 		console.log("loadSubtitleFile subtitleFileDataArray[0].loaded = ", 
 			subtitleFileDataArray[0].loaded);
 		return;
 	}
 	
-	document.getElementById("save1File").style.display = "none";
-	document.getElementById("save2Files").style.display = "inline-block";
-	document.getElementById("subtitleTrack").classList.remove('notDisplayed');
+	save1File.style.display = "none";
+	save2Files.style.display = "inline-block";
+	subtitleTrackField.classList.remove('notDisplayed');
 
 	console.log("loadSubtitleFile subtitleFileDataArray[1].loaded = ", subtitleFileDataArray[1].loaded);
 	console.log("loadSubtitleFile subtitleFileDataArray[2].loaded = ", subtitleFileDataArray[2].loaded);
@@ -2826,7 +2889,7 @@ async function loadSubtitleFile(trackNumber, file) {
 		statusMsg("loadSubtitleFile", "Displaying subtitles");
 		displaySubtitles();
 		if (trackNumber === 2) {
-			document.getElementById("scrollStepMenu").value = '2';
+			scrollStepMenu.value = '2';
 			changeScrollStep();
 		}
 	}
@@ -2838,10 +2901,10 @@ function displaySubtitles()	 {
 
 	if (totalNumberOfSubtitlesRead == 0) { return; }
 	
-	document.getElementById("selectionLabel").style.display = "inline";
-	document.getElementById("selectionHyphen").style.display = "inline";
-	document.getElementById("selectionLabelOnDashboard").style.display = "inline";
-	document.getElementById("selectionHyphenOnDashboard").style.display = "inline";
+	selectionLabel.style.display = "inline";
+	selectionHyphen.style.display = "inline";
+	selectionLabelOnDashboard.style.display = "inline";
+	selectionHyphenOnDashboard.style.display = "inline";
 	
 	console.log("displaySubtitles lastSubtitleNumber old " + lastSubtitleNumber
 		+ " new " + totalNumberOfSubtitlesRead);
@@ -2863,8 +2926,7 @@ function displaySubtitles()	 {
 	selectRow(selectedSubtitleNumber);
 
 	if (showSubtitleTable) {
-		let elem = document.getElementById("subtitleTableDiv");
-		elem.style.display = "block";
+		subtitleTableDiv.style.display = "block";
 	}
 
 	addKeyListenerForSubtitles();
@@ -2878,11 +2940,13 @@ function displaySubtitles()	 {
 function updateRow() {
 
 	let selectedSpan = "";
+	let spanElement;
 	let rowNumber = 0;
 	let doNothing = true;
 
 	if (spanSubtitle1Selected) {
 		selectedSpan = "spanSubtitle1";
+		spanElement = spanSubtitle1;
 		rowNumber = spanSubtitle1Row;
 		spanSubtitle1Selected = false;
 		console.log("updateRow spanSubtitle1Selected = f 2");
@@ -2892,6 +2956,7 @@ function updateRow() {
 		}
 	} else if (spanSubtitle2Selected) {
 		selectedSpan = "spanSubtitle2";
+		spanElement = spanSubtitle2;
 		rowNumber = spanSubtitle2Row;
 		spanSubtitle2Selected = false;
 		if (spanSubtitle2Modified) {
@@ -2900,22 +2965,20 @@ function updateRow() {
 		}
 	}
 
-	//if (selectedSpan === "") {
-	//	let errorMsg = "updateRow No subtitle span selected";
-	//	console.log(errorMsg);
-	//	alert(errorMsg);
-	//	throw new Error(errorMsg);
-	//}
+	// if (selectedSpan === "") {
+	//	errorMsg = "updateRow No subtitle span selected";
+	//	throwError(errorMsg);
+	// }
 
 	console.log("updateRow ", selectedSpan, " rowNumber ", rowNumber, " modified = ", !doNothing);
 
 	if (doNothing) { return; }
 
 	let oldValue = subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
-	let newValue = document.getElementById(selectedSpan).innerHTML;
+	let newValue = spanElement.innerHTML;
 	console.log("updateRow ", selectedSpan, " oldValue = ", oldValue);
 	console.log("updateRow ", selectedSpan, " newValue = ", newValue);
-	if (document.getElementById(selectedSpan).innerHTML === "_") {
+	if (spanElement.innerHTML === "_") {
 		newValue = oldValue;
 	} 
 	if (oldValue != newValue) {
@@ -2978,19 +3041,6 @@ function addKeyListenerForSubtitles() {
 			console.log("d delete row ", selectedSubtitleNumber);
 			deleteSubtitle(selectedSubtitleNumber);
 			break;
-		case "c":
-			subsetFirstRow = 0;
-			subsetLastRow = 0;
-			console.log("c subsetFirstRow & subsetLastRow = 0");
-			break;
-		case "m":
-			subsetFirstRow = selectedSubtitleNumber;
-			console.log("m subsetFirstRow = ", subsetFirstRow);
-			break;
-		case "M":
-			subsetLastRow = selectedSubtitleNumber;
-			console.log("M subsetLastRow = ", subsetLastRow);
-			break;
 		case "n":
 			console.log("n newLine after ", selectedSubtitleNumber);
 			insertSubtitle(selectedSubtitleNumber, "", subtitleTrack[selectedSubtitleNumber], 
@@ -3033,9 +3083,8 @@ function addKeyListenerForSubtitles() {
 				break;
 			}
 		case "[":
-			var x = document.getElementById("subtitleFontSizeMenu");
-			if (x.selectedIndex > 0) {
-				x.selectedIndex -= 1;
+			if (subtitleFontSizeMenu.selectedIndex > 0) {
+				subtitleFontSizeMenu.selectedIndex -= 1;
 			}
 			changeFontSize();
 			break;
@@ -3044,9 +3093,8 @@ function addKeyListenerForSubtitles() {
 				break;
 			}
 		case "]":
-			var x = document.getElementById("subtitleFontSizeMenu");
-			if (x.selectedIndex < (x.length - 1)) {
-				x.selectedIndex += 1;
+			if (subtitleFontSizeMenu.selectedIndex < (subtitleFontSizeMenu.length - 1)) {
+				subtitleFontSizeMenu.selectedIndex += 1;
 			}
 			changeFontSize();
 			break;
@@ -3056,8 +3104,8 @@ function addKeyListenerForSubtitles() {
 		}	
 	});
 
-	document.getElementById("spanSubtitle1").addEventListener('click', (e) => {
-		if (!(document.getElementById("myCheck07").checked)) { return;}
+	spanSubtitle1.addEventListener('click', (e) => {
+		if (!(myCheck07.checked)) { return;}
 		spanSubtitle1Selected = true;
 		//console.log("click spanSubtitle1Selected = true");
 		spanSubtitle2Selected = false;
@@ -3065,37 +3113,37 @@ function addKeyListenerForSubtitles() {
 		return;
 	});
 
-	document.getElementById("spanSubtitle1").addEventListener('input', () => {
+	spanSubtitle1.addEventListener('input', () => {
 		spanSubtitle1Modified = true;
 		spanSubtitle1Selected = true;
 		spanSubtitle2Selected = false;
 	});
 
-	document.getElementById("spanSubtitle1").addEventListener('paste', handlePaste, false);
+	spanSubtitle1.addEventListener('paste', handlePaste, false);
 		
-	document.getElementById("spanSubtitle1").addEventListener('blur', () => {
+	spanSubtitle1.addEventListener('blur', () => {
 		console.log("onblur spanSubtitle1 spanSubtitle1Modified = ", spanSubtitle1Modified);
 		spanSubtitle1Selected = true;
 		spanSubtitle2Selected = false;
 		updateRow();
 	});
 
-	document.getElementById("spanSubtitle2").addEventListener('click', (e) => {
-		if (!(document.getElementById("myCheck07").checked)) { return;}
+	spanSubtitle2.addEventListener('click', (e) => {
+		if (!(myCheck07.checked)) { return;}
 		spanSubtitle2Selected = true;
 		spanSubtitle1Selected = false;
 		e.preventDefault();
 		return;
 	});
-	document.getElementById("spanSubtitle2").addEventListener('input', () => {
+	spanSubtitle2.addEventListener('input', () => {
 		spanSubtitle2Modified = true;
 		spanSubtitle1Selected = false;
 		spanSubtitle2Selected = true;
 	});
 
-	document.getElementById("spanSubtitle2").addEventListener('paste', handlePaste, false);
+	spanSubtitle2.addEventListener('paste', handlePaste, false);
 
-	document.getElementById("spanSubtitle2").addEventListener('blur', () => {
+	spanSubtitle2.addEventListener('blur', () => {
 		console.log("onBlur spanSubtitle2 spanSubtitle2Modified = ", spanSubtitle2Modified);
 		spanSubtitle1Selected = false;
 		spanSubtitle2Selected = true;
@@ -3172,37 +3220,6 @@ function handlePaste(e) {
 
 	return;
 }
-
-function setCursor(elementId, pos) {
-
-	// https://www.geeksforgeeks.org/javascript/how-to-set-cursor-position-in-content-editable-element-using-javascript/
-
-	let element = document.getElementById(elementId);
-
-	// Creates range object
-	let setpos = document.createRange();
-
-	// Creates object for selection
-	let set = window.getSelection();
-
-	// Set start position of range
-	setpos.setStart(element.childNodes[0], pos);
-
-	// Collapse range within its boundary points
-	// Returns boolean
-	setpos.collapse(true);
-
-	// Remove all ranges set
-	set.removeAllRanges();
-
-	// Add range with respect to range object.
-	set.addRange(setpos);
-
-	// Set cursor on focus
-	element.focus();
-
-}
-
 
 function deleteSubtitleTable() {
 	console.log("deleteSubtitleTable Deleting subtitle table");
@@ -3322,8 +3339,8 @@ function textEditPopupAction(operand) {
 		case 'insertAbove':
 		case 'insertBelow':
 			updateRow();
-			document.getElementById("insertLineWrapper").style.pointerEvents = 'none';
-			setTimeout(() => {document.getElementById("insertLineWrapper").style.pointerEvents = ''}, 500);
+			insertLineWrapper.style.pointerEvents = 'none';
+			setTimeout(() => {insertLineWrapper.style.pointerEvents = ''}, 500);
 			if (operand === 'insertAbove') {
 				insertSubtitle((selectedSubtitleNumber - 1), "", subtitleTrack[selectedSubtitleNumber], 
 					"selectNew");
@@ -3344,10 +3361,12 @@ function textEditPopupAction(operand) {
 	// Handle splitToNext, splitToNextNewline, splitToPrev
 
 	let selectedSpan = "";
+	let spanElement;
 	let rowNumber = 0;
 
 	if (spanSubtitle1SelectedOnEntry) {
 		selectedSpan = "spanSubtitle1";
+		spanElement = spanSubtitle1;
 		rowNumber = spanSubtitle1Row;
 		if (!spanSubtitle1Selected) {
 			let msg = "textEditPopupAction spanSubtitle1Selected already set to false";
@@ -3358,6 +3377,7 @@ function textEditPopupAction(operand) {
 		console.log("spanSubtitle1Selected = f 4");
 	} else if (spanSubtitle2SelectedOnEntry) {
 		selectedSpan = "spanSubtitle2";
+		spanElement = spanSubtitle2;
 		rowNumber = spanSubtitle2Row;
 		spanSubtitle2Selected = false;
 	}
@@ -3372,8 +3392,6 @@ function textEditPopupAction(operand) {
 		return;
 	}
 
-	let textElement = document.getElementById(selectedSpan);
-	
     // Get the current cursor position (selection)
     const selection = window.getSelection();
 
@@ -3389,32 +3407,32 @@ function textEditPopupAction(operand) {
 	const activeRange = selection.getRangeAt(0);
 
 	// Check if the cursor is actually inside the span
-	if (textElement.contains(activeRange.startContainer)) { 
+	if (spanElement.contains(activeRange.startContainer)) { 
  	} else {
 		console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
 		' selectedSpan = ""', selectedSpan);
 		alert("textEditPopupAction The cursor is not in the expected edit area: ", selectedSpan );
-		textElement.removeAllRanges();
+		spanElement.removeAllRanges();
 		return;
 	}
 
 	if (operand === "splitToPrev") {
-		// Extend the START of the range back to the very beginning of textElement.
+		// Extend the START of the range back to the very beginning of spanElement.
 		// The end of the range stays exactly where the cursor is currently located.
 		// The '0' indicates the very first position inside span2.
-        activeRange.setStart(textElement, 0);
+        activeRange.setStart(spanElement, 0);
 
 	} else {
-		// Extend the range from the cursor to the very end of textElement.
-		// textElement.childNodes.length represents the absolute end of the span
-		activeRange.setEnd(textElement, textElement.childNodes.length);
+		// Extend the range from the cursor to the very end of spanElement.
+		// spanElement.childNodes.length represents the absolute end of the span
+		activeRange.setEnd(spanElement, spanElement.childNodes.length);
 	}
 
 	// Extract the contents.
-	// This safely removes the text and <br> tags from textElement
+	// This safely removes the text and <br> tags from spanElement
 	// and packages them into a DocumentFragment.
 	const extractedContent = activeRange.extractContents();
-	subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML = textElement.innerHTML;
+	subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML = spanElement.innerHTML;
 
 	if ((operand === "splitToNext") || (operand === "splitToNextNewline")) {
 		// Insert the extracted content at the beginning of the next subtitle
@@ -3583,8 +3601,8 @@ function deleteSubtitle(rowNumber) {
 			selectRow(lastSubtitleNumber);
 		} else {
 			selectedSubtitleNumber = 0;
-			document.getElementById("spanSubtitle1").innerHTML = "";
-			document.getElementById("spanSubtitle2").innerHTML = "";
+			spanSubtitle1.innerHTML = "";
+			spanSubtitle2.innerHTML = "";
 		}
 	}
 	console.log("deleteSubtitle exiting rowNumber = ", rowNumber);
@@ -3629,8 +3647,7 @@ function createSubtitleRow(rowObject, rowIndex) {
 	newRow.innerHTML = rowColumns;
 
 //  Sample syntax:
-//	document.getElementById("spanStartTime").innerHTML =
-//		document.getElementById(`row${rowNumber}SubtitleStart`).innerHTML;
+//	spanStartTime.innerHTML = document.getElementById(`row${rowNumber}SubtitleStart`).innerHTML;
 
 }  // createSubtitleRow
 
@@ -3644,6 +3661,7 @@ function showTimeEditPopup(rowNumber) {
 	if (rowNumber < 1) {
 		timeEditPopup.style.display = "none";
 		timeEditPopupRow = 0;
+		toggleHideShow('timeEditPopupOToOff');
 		return;
 	}
 
@@ -3675,28 +3693,43 @@ function showTimeEditPopup(rowNumber) {
 
 	return;
 
-function fillTimeFields (ms, prefix) {
+function fillTimeFields (ms, selector) {
+
+	let timeObject = {};
+
+	switch (selector) {
+		case "t1":
+			timeObject = t1timeObject;
+			break;
+		case "t2":
+			timeObject = t2timeObject;
+			break;
+		default:
+			errorMsg = 'saveTime invalid selector: ' + selector;
+			alert(errorMsg);
+			throw new Error(errorMsg);
+	}
+
 	let hh = Math.floor(ms / 1000 / 3600);
 	let mm = Math.floor(ms / 1000 / 60 % 60);
 	let ss = Math.floor(ms / 1000 % 60);
 	let ff = Math.floor(ms % 1000);
 
 
-	document.getElementById(prefix + "hourField1").textContent = hh - (Math.floor(hh / 10) * 10);
+	timeObject.hourField1.textContent = hh - (Math.floor(hh / 10) * 10);
 
-	document.getElementById(prefix + "minuteField1").textContent = Math.floor(mm / 10);
-	document.getElementById(prefix + "minuteField2").textContent = mm - (Math.floor(mm / 10) * 10);
+	timeObject.minuteField1.textContent = Math.floor(mm / 10);
+	timeObject.minuteField2.textContent = mm - (Math.floor(mm / 10) * 10);
 
-	document.getElementById(prefix + "secondField1").textContent = Math.floor(ss / 10);
-	document.getElementById(prefix + "secondField2").textContent = ss - (Math.floor(ss / 10) * 10);
-
+	timeObject.secondField1.textContent = Math.floor(ss / 10);
+	timeObject.secondField2.textContent = ss - (Math.floor(ss / 10) * 10);
 
 	let millisecondHundreds = Math.floor(ff / 100);
 	let millisecondTens = Math.floor((ff - (millisecondHundreds * 100)) / 10);
 	let millisecondsOnes = ff - (Math.floor(ff / 10) * 10);
-	document.getElementById(prefix + "millisecondField1").textContent = millisecondHundreds;
-	document.getElementById(prefix + "millisecondField2").textContent = millisecondTens;
-	document.getElementById(prefix + "millisecondField3").textContent = millisecondsOnes;
+	timeObject.millisecondField1.textContent = millisecondHundreds;
+	timeObject.millisecondField2.textContent = millisecondTens;
+	timeObject.millisecondField3.textContent = millisecondsOnes;
 
 }  // fillTimeFields
 
@@ -3722,12 +3755,17 @@ function toggleHideShow(triggerId) {
 		return;
 	}
 
+	// timeEditPopupOToOff or timeEditPopupO
 	if (timeEditPopupThumb.style.display === 'none') {
+		if (triggerId === "timeEditPopupOToOff") {return;}
+
 		console.log("toggleHideShow 1 timeEditPopup.style.opacity ", timeEditPopup.style.opacity);
 		if (timeEditPopupV.classList.contains('selected')) {
 			timeEditPopupV.classList.remove("selected");
 		}
 		timeEditPopupO.classList.add("selected");
+		timeEditPopupThumb.style.top = (timeEditPopup.offsetTop + timeEditPopupPuckPosition.offsetTop - 24) + 'px';
+		timeEditPopupThumb.style.left = (timeEditPopup.offsetLeft + timeEditPopupPuckPosition.offsetLeft - 16) + 'px';
 		timeEditPopupThumb.style.display = 'block';
 		timeEditPopupThumb.addEventListener('mouseover', (e) => { 
 			timeEditPopup.style.visibility = "visible"; 
@@ -3745,19 +3783,19 @@ function toggleHideShow(triggerId) {
 		}
 	}
 
-}
+} // toggleHideShow
 
 function dragElement(elmnt) {
 	let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-	if (document.getElementById(elmnt.id + "Header")) {
-		/* if present, the header is where you move the DIV from:*/
-		console.log("dragElement 1");
-		document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
-	} else {
+	//if (document.getElementById(elmnt.id + "Header")) {
+	//	/* if present, the header is where you move the DIV from:*/
+	//	console.log("dragElement 1");
+	//	document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
+	//} else {
 		/* otherwise, move the DIV from anywhere inside the DIV:*/
 		console.log("dragElement 2");
 		elmnt.onmousedown = dragMouseDown;
-	}
+	//}
 
 function dragMouseDown(e) {
 	// e = e || window.event;
@@ -3843,11 +3881,7 @@ function interleave(array1, array2) {
 async function extractSubtitleFile(file, subtitleFile) {
 
 	console.log('extractSubtitleFile subtitleFile ', subtitleFile);
-	console.log('extractSubtitleFile document.getElementById(subtitleFile.inputId) ',
-		document.getElementById(subtitleFile.inputId)); 
 
-	console.log('extractSubtitleFile document.getElementById(subtitleFile.inputId).files[0] ' 
-		+ document.getElementById(subtitleFile.inputId).files[0]);
 	console.log("extractSubtitleFile file.name " + file.name);
 	let extension = file.name.substring((file.name.length - 4));
 	console.log("extractSubtitleFile extension " + extension);
@@ -3938,7 +3972,7 @@ function captureSingleSubtitle(content, inputId) {
 			rowData.track = 2;
 			break;
 		default:
-			let errorMsg = 'captureSingleSubtitle invalid inputId: ' + inputId;
+			errorMsg = 'captureSingleSubtitle invalid inputId: ' + inputId;
 			alert(errorMsg);
 			throw new Error(errorMsg);
 	}
@@ -4159,10 +4193,9 @@ function addKeyListener(){
 
 	if (!((lastSubtitleNumber > 0) && videoFileLoaded)) { return; }
 
-	document.getElementById("seekBarContainer").style.display = "inline";
+	seekBarContainer.style.display = "inline";
 
 	console.log("addKeyListener Adding event listener for seekBar");
-	let seekBar = document.getElementById("seekBar");
 	//seekBar.oninput = () => {
 	//	console.log(seekBar.value);
 	//}
@@ -4362,9 +4395,13 @@ function buttonAction(actionType) {
 
 function subsetting() {
 
-	if ((!(subsetFirstRow && subsetLastRow)) && (subsetRange === 1)){
+	if (subsetRange <= 1){
 		return false;
 	}
+
+	// if ((!(subsetFirstRow && subsetLastRow)) && (subsetRange === 1)) {
+	//	return false;
+	// }
 
 	if ((subsetFirstRow && subsetLastRow) && (subsetFirstRow > subsetLastRow)) {
 		let temp = subsetFirstRow;
@@ -4394,6 +4431,7 @@ function subsetting() {
 	}
 	
 	return true;
+
 }  // subsetting
 }  // buttonAction
 
@@ -4416,7 +4454,7 @@ function subtitleTimeCorrections(){
 };
 
 function createSubtitleFontOptions(fontArray) {
-	var subtitleFontOptions = document.getElementById("subtitleFontMenu");
+
 	let selectionFound = false;
 
 	appendOption(loadFontFileOptionText);
@@ -4424,7 +4462,7 @@ function createSubtitleFontOptions(fontArray) {
 	fontArray.forEach(function(fontName) {
 		appendOption(fontName);
 		if (fontName == selectedFont) {
-			subtitleFontOptions.value = selectedFont;
+			subtitleFontMenu.value = selectedFont;
 			selectionFound = true;
 		}
 	});
@@ -4437,40 +4475,28 @@ function createSubtitleFontOptions(fontArray) {
 		fontOption.text = fontName;
 		fontOption.classList.add('selectOption');
 		//fontOption.style.fontSize = "20px";
-		subtitleFontOptions.appendChild(fontOption);
+		subtitleFontMenu.appendChild(fontOption);
 	};
 }
 
 function clickSubtitleFileInput(numberOfFiles) {
 
-	console.log("clickSubtitleFileInput entered ", numberOfFiles);
-
 	if ((numberOfFiles < 1) || (numberOfFiles > 2)) {
-		console.log("clickSubtitleFileInput numberOfFiles = ", numberOfFiles);
-			let errorMsg = 'Invalid numberOfFiles: ' + numberOfFiles;
-			alert(errorMsg);
-			throw new Error(errorMsg);
+		errorMsg = 'clickSubtitleFileInput Invalid numberOfFiles: ' + numberOfFiles;
+		throwError(errorMsg);
 	}
 	
 	console.log("clickSubtitleFileInput numberOfFiles = ", numberOfFiles);
 	
-	const subtitleFileElem0 = document.getElementById("subtitleFileInput0");
-	console.log("clickSubtitleFileInput subtitleFileElem0", subtitleFileElem0);
-	if (!subtitleFileElem0) {return;}
+	console.log("clickSubtitleFileInput subtitleFileInput0", subtitleFileInput0);
 	
-	const subtitleFileElem1 = document.getElementById("subtitleFileInput1");
-	console.log("clickSubtitleFileInput subtitleFileElem1", subtitleFileElem1);
-	if (!subtitleFileElem1) {return;}
+	console.log("clickSubtitleFileInput subtitleFileInput1", subtitleFileInput1);
 	
-	const subtitleFileElem2 = document.getElementById("subtitleFileInput2");
-	console.log("clickSubtitleFileInput subtitleFileElem2", subtitleFileElem2);
-	if (!subtitleFileElem2) {return;}
-
-	console.log("clickSubtitleFileInput proceeding");
+	console.log("clickSubtitleFileInput subtitleFileInput2", subtitleFileInput2);
 
 	if (numberOfFiles == 1) {
-		subtitleFileElem0.value = ""; //Clear .value to make this file element reusable
-		subtitleFileElem0.click();
+		subtitleFileInput0.value = ""; //Clear .value to make this file element reusable
+		subtitleFileInput0.click();
 		return;
 	}
 
@@ -4479,43 +4505,128 @@ function clickSubtitleFileInput(numberOfFiles) {
 	subtitleFileDataArray[1].loaded = false;
 	subtitleFileDataArray[2].loaded = false;
 
-	subtitleFileElem1.value = ""; //Clear .value to make this file element reusable
-	subtitleFileElem1.click();
+	subtitleFileInput1.value = ""; //Clear .value to make this file element reusable
+	subtitleFileInput1.click();
 	
-	subtitleFileElem2.value = ""; //Clear .value to make this file element reusable
-	subtitleFileElem2.click();
+	subtitleFileInput2.value = ""; //Clear .value to make this file element reusable
+	subtitleFileInput2.click();
 
 }
 
 function DOMInitializations() {
 
+videoURLButton = document.getElementById("videoURLButton");
+videoURLInput = document.getElementById("videoURLInput");
+
+subtitleFileInput0 = document.getElementById("subtitleFileInput0");
+subtitleFileInput1 = document.getElementById("subtitleFileInput1");
+subtitleFileInput2 = document.getElementById("subtitleFileInput2");
+
 selectedCustomStyle = document.createElement('style');
 document.head.appendChild(selectedCustomStyle);
-document.getElementById("subtitleTrack").classList.add('notDisplayed');
+
+subtitleTrackField = document.getElementById("subtitleTrackField");
+subtitleTrackField.classList.add('notDisplayed');
+save1File = document.getElementById("save1File");
+save2Files = document.getElementById("save2Files");
 
 let viewportWidth = getViewportWidth();
 let viewportHeight = getViewportHeight();
 console.log("DOMInitializations Viewport Width " + viewportWidth + " Height " + viewportHeight);
 
 videoElem = document.getElementById("videoArea");
+wrapper = document.getElementById("wrapper");
+videoSizeMenu = document.getElementById("videoSizeMenu");
+marginMenu = document.getElementById("marginMenu");
+duration = document.getElementById("duration");
+durationOnDashboard = document.getElementById("durationOnDashboard");
+
 timeEditPopup = document.getElementById("timeEditPopup");
 timeEditPopupO = document.getElementById("timeEditPopupO");
 timeEditPopupThumb = document.getElementById("timeEditPopupThumb");
+timeEditPopupThumb = document.getElementById("timeEditPopupThumb");
 timeEditPopupV = document.getElementById("timeEditPopupV");
+timeEditPopupPuckPosition = document.getElementById("timeEditPopupPuckPosition");
+
+t1timeObject = createTimeObject ("t1");
+t2timeObject = createTimeObject ("t2");
+copyt1 = document.getElementById("copyt1");
+copyt2 = document.getElementById("copyt2");
+
 rangeCount = document.getElementById("rangeCount");
 rangeCount.textContent = subsetRange;
 rangeButtonRangeCount = document.getElementById("rangeButtonRangeCount");
+insertLineWrapper = document.getElementById("insertLineWrapper");
 
 currentLineButton = document.getElementById("currentLine");
 playVideoButton = document.getElementById("playVideo");
 loopButton = document.getElementById("loop");
+dashboard = document.getElementById("dashboard");
 currentLineOnDashboardButton = document.getElementById("currentLineOnDashboard");
 playVideoOnDashboardButton = document.getElementById("playVideoOnDashboard");
 loopOnDashboardButton = document.getElementById("loopOnDashboard");
 textEditPopupPlaySingleButton = document.getElementById("textEditPopupPlaySingle");
 
+spanStartTime = document.getElementById("spanStartTime");
+spanEndTime = document.getElementById("spanEndTime");
+spanTrack = document.getElementById("spanTrack");
+spanStartTimeOnDashboard = document.getElementById("spanStartTimeOnDashboard");
+spanEndTimeOnDashboard = document.getElementById("spanEndTimeOnDashboard");
+spanTrackOnDashboard = document.getElementById("spanTrackOnDashboard");
 
+spanSubtitle1 = document.getElementById("spanSubtitle1");
+spanSubtitle2 = document.getElementById("spanSubtitle2");
+subtitleAlignmentMenu = document.getElementById("subtitleAlignmentMenu");
+
+selectionLabel = document.getElementById("selectionLabel");
+selectionHyphen = document.getElementById("selectionHyphen");
+selectionLabelOnDashboard = document.getElementById("selectionLabelOnDashboard");
+selectionHyphenOnDashboard = document.getElementById("selectionHyphenOnDashboard");
+
+currentTime = document.getElementById("currentTime");
+currentTimeOnDashboard = document.getElementById("currentTimeOnDashboard");
+seekBar = document.getElementById("seekBar");
+
+color1Input = document.getElementById("color1Input");
+color2Input = document.getElementById("color2Input");
+color3Input	= document.getElementById("color3Input");
+
+selectedTheme =	document.getElementById("selectedTheme");
+customColorsCheckbox = document.getElementById("customColorsCheckbox");
+
+selectSpacebar = document.getElementById("spacebarMenu");
+selectScroll = document.getElementById("scrollMenu");
+selectScrollStep = document.getElementById("scrollStepMenu");
+
+myCheck01 = document.getElementById("myCheck01");
+myCheck02 = document.getElementById("myCheck02");
+myCheck03 = document.getElementById("myCheck03");
+myCheck04 = document.getElementById("myCheck04");
+myCheck05 = document.getElementById("myCheck05");
+myCheck06 = document.getElementById("myCheck06");
+myCheck07 = document.getElementById("myCheck07");
+myCheck08 = document.getElementById("myCheck08");
+myCheck09 = document.getElementById("myCheck00");
+myCheck10 = document.getElementById("myCheck10");
+myCheck20 = document.getElementById("myCheck20");
+
+
+seekBarContainer = document.getElementById("seekBarContainer");
+marginLine1 = document.getElementById("marginLine1");
+divSubtitle1 = document.getElementById("divSubtitle1");
+marginLine2 = document.getElementById("marginLine2");
+divSubtitle2 = document.getElementById("divSubtitle2");
+videoCounterDiv = document.getElementById("videoCounterDiv");
+selectionInfoDiv = document.getElementById("selectionInfoDiv");
+buttonSection = document.getElementById("buttonSection");
+subtitleWidthMenu = document.getElementById("subtitleWidthMenu");
+subtitleFontMenu = document.getElementById("subtitleFontMenu");
+fontListFileInput = document.getElementById("fontListFileInput");
+subtitleFontSizeMenu = document.getElementById("subtitleFontSizeMenu");
+
+subtitleTableDiv = document.getElementById("subtitleTableDiv");
 subtitleTable = document.getElementById("subtitleTable");
+EOT = document.getElementById("EOT");
 
 subtitleTable.addEventListener('mousedown', (e) => {
 	const cell = e.target.closest('td');
@@ -4552,12 +4663,11 @@ if (allUrlParamsObject.yturl == undefined) {
 	}
 }
 
-const wrapperElement = document.getElementById("wrapper");
-maxVideoWidth = getAdjustedWidthPixels(wrapperElement);
+maxVideoWidth = getAdjustedWidthPixels(wrapper);
 console.log("DOMInitializations maxVideoWidth = ",maxVideoWidth);
 
-console.log("DOMInitializations wrapper.style.width = ", wrapperElement.style.width, 
-		" wrapper.style.height = ", wrapperElement.style.height);
+console.log("DOMInitializations wrapper.style.width = ", wrapper.style.width, 
+		" wrapper.style.height = ", wrapper.style.height);
 
 enableFileSelection();
 
@@ -4573,26 +4683,26 @@ changeAlignment();		// Initialize alignment option
 changeScroll();			// Initialize scroll option
 changeScrollStep();		// Initialize scroll step option
 changeMargin();			// Initialize margin option
-changeMarginLineMinHeight('marginLine1');
-changeMarginLineMinHeight('marginLine2');
+changeMarginLineMinHeight(marginLine1);
+changeMarginLineMinHeight(marginLine2);
 changeSubtitleWidth();
 
 const controls = [
-	{id: "subtitleFontMenu", changeFunction: changeFont},
-	{id: "subtitleFontSizeMenu", changeFunction: changeFontSize},
-	{id: "subtitleAlignmentMenu", changeFunction: changeAlignment},
-	{id: "videoSizeMenu", changeFunction: changeVideoSize},
-	{id: "subtitleWidthMenu", changeFunction: changeSubtitleWidth},
-	{id: "spacebarMenu", changeFunction: changeSpacebar},
-	{id: "scrollMenu", changeFunction: changeScroll},
-	{id: "scrollStepMenu", changeFunction: changeScrollStep},
-	{id: "marginMenu", changeFunction: changeMargin},
-	{id: "marginLine1Menu", changeFunction: selectMarginLineMinHeight},
-	{id: "marginLine2Menu", changeFunction: selectMarginLineMinHeight},
+	{element: subtitleFontMenu, changeFunction: changeFont},
+	{element: subtitleFontSizeMenu, changeFunction: changeFontSize},
+	{element: subtitleAlignmentMenu, changeFunction: changeAlignment},
+	{element: videoSizeMenu, changeFunction: changeVideoSize},
+	{element: subtitleWidthMenu, changeFunction: changeSubtitleWidth},
+	{element: spacebarMenu, changeFunction: changeSpacebar},
+	{element: scrollMenu, changeFunction: changeScroll},
+	{element: scrollStepMenu, changeFunction: changeScrollStep},
+	{element: marginMenu, changeFunction: changeMargin},
+	{element: marginLine1Menu, changeFunction: selectMarginLineMinHeight},
+	{element: marginLine2Menu, changeFunction: selectMarginLineMinHeight},
 ]; 
 
 controls.forEach(function(item) {
-	const selectedControl = document.getElementById(item.id);
+	const selectedControl = item.element;
 	selectedControl.addEventListener("change", item.changeFunction);
 	selectedControl.addEventListener("mouseout", unFocus);
 });
@@ -4615,11 +4725,11 @@ if (urlParams.has('yturl')) {
 		}
 	yturl = yturl.substring(1, (yturl.length - 1));	
 	console.log("DOMInitializations  edited yturl = ", yturl);
-	document.getElementById("videoURLInput").value = yturl;
-	document.getElementById("videoURLButton").click();
+	videoURLInput.value = yturl;
+	videoURLButton.click();
 }
 
-dragElement(document.getElementById("dashboard"));
+dragElement(dashboard);
 dragElement(timeEditPopup);
 dragElement(timeEditPopupThumb);
 timeEditPopupThumb.style.display = 'none';
@@ -4649,7 +4759,7 @@ const rangeButton = document.getElementById('rangeButton');
 const rangePopup = document.getElementById('rangePopup');
 
 rangeButton.addEventListener('mouseenter', () => {
-    // Get the exact coordinates of Button 3 on the screen
+    // Get the exact coordinates of button on the screen
     const rect = rangeButton.getBoundingClientRect();
     
     // Position the popup
@@ -4672,8 +4782,27 @@ rangePopup.addEventListener('mouseleave', () => {
     rangePopup.style.display = 'none';
 });
 
+document.getElementById('splashScreen').style.display = "none";
 
 return;
+
+function createTimeObject(prefix) {
+
+	let timeObject = {};
+
+	timeObject.hourField1 = document.getElementById(prefix + "hourField1");
+	timeObject.minuteField1 = document.getElementById(prefix + "minuteField1");
+	timeObject.minuteField2 = document.getElementById(prefix + "minuteField2");
+	timeObject.secondField1 = document.getElementById(prefix + "secondField1");
+	timeObject.secondField2 = document.getElementById(prefix + "secondField2");
+	timeObject.millisecondField1 = document.getElementById(prefix + "millisecondField1");
+	timeObject.millisecondField2 = document.getElementById(prefix + "millisecondField2");
+	timeObject.millisecondField3 = document.getElementById(prefix + "millisecondField3");
+
+	return timeObject;
+	
+}  // createTimeObject
+
 
 function enableFileSelection() {
 
@@ -4692,15 +4821,13 @@ videoFileSelect.addEventListener(
   false,
 );
 
-const videoURLSelect = document.getElementById("videoURLButton");
-const videoURLElem = document.getElementById("videoURLInput");
 // https://www.youtube.com/watch?v=b4-AZT60GFw
 
-videoURLSelect.addEventListener(
+videoURLButton.addEventListener(
   "click",
   (e) => {
-		if (videoURLElem) {
-			getYouTubeVideoId(videoURLElem.value);
+		if (videoURLInput) {
+			getYouTubeVideoId(videoURLInput.value);
 			if (!youTubeVideoId){
 				return;
 			}
@@ -4744,7 +4871,7 @@ function configInitializations() {
 	} while ((!found) && (index < themeAttributesArray.length));
 
 	if (!found) {
-		let errorMsg = "configInitializations Invalid theme: " + theme;
+		errorMsg = "configInitializations Invalid theme: " + theme;
 		console.log(errorMsg);
 		alert(errorMsg);
 		throw new Error(errorMsg);
@@ -4752,14 +4879,14 @@ function configInitializations() {
 
 	let themeAttributeObject = findThemeAttributeObject(selectedThemeNumber);
 
-	document.getElementById("color1Input").value = themeAttributeObject.foregroundColor;
-	document.getElementById("color2Input").value = themeAttributeObject.backgroundColor;
-	document.getElementById("color3Input").value = themeAttributeObject.highlightBackgroundColor;
+	color1Input.value = themeAttributeObject.foregroundColor;
+	color2Input.value = themeAttributeObject.backgroundColor;
+	color3Input.value = themeAttributeObject.highlightBackgroundColor;
 
 	themeAttributesArray.forEach(function(content, index) {
 		let themeElement = document.getElementById("theme" + index);
 		if (!themeElement) {
-			let errorMsg = "configInitializations HTML element not found: theme" + index;
+			errorMsg = "configInitializations HTML element not found: theme" + index;
 			console.log(errorMsg);
 			alert(errorMsg);
 			throw new Error(errorMsg);
@@ -4768,8 +4895,8 @@ function configInitializations() {
 		themeElement.style.color = themeAttributesArray[index].foregroundColor;
 		themeElement.style.backgroundColor = themeAttributesArray[index].backgroundColor;
 		themeElement.addEventListener('click', (e) => { changeTheme(index); } );
-		themeElement.addEventListener('mouseover', (e) => { highlightThemeOption(index, "on"); } );
-		themeElement.addEventListener('mouseleave', (e) => { highlightThemeOption(index, "off"); } );
+		themeElement.addEventListener('mouseover', (e) => { highlightThemeOption(index, e.currentTarget, "on"); } );
+		themeElement.addEventListener('mouseleave', (e) => { highlightThemeOption(index, e.currentTarget, "off"); } );
 	});
 
 	if (typeof spacebarOption == 'undefined') {
@@ -4781,9 +4908,8 @@ function configInitializations() {
 		case 'playPause':
 		case 'currentLine':
 		case 'loop':
-		    const selectSpacebar = document.getElementById("spacebarMenu");
-			selectSpacebar.value = spacebarOption;
-			console.log("Configuration: spacebarOption = " + selectSpacebar.value);
+			spacebarMenu.value = spacebarOption;
+			console.log("Configuration: spacebarOption = " + spacebarMenu.value);
 			break;
 		default:
 			errorReason = 'spacebarOption = ' + spacebarOption + ' invalid';
@@ -4813,48 +4939,45 @@ function configInitializations() {
 		initError(errorReason);
 	}
 
-	const selectVideoSize = document.getElementById("videoSizeMenu");
-	selectVideoSize.value = videoWidthScale;
+	videoSizeMenu.value = videoWidthScale;
 
-	if (selectVideoSize.value != videoWidthScale){
+	if (videoSizeMenu.value != videoWidthScale){
 		errorReason = 'videoWidthScale = ' + videoWidthScale + ' not in list of allowed values';
 		initError(errorReason);
 	}
 
-	console.log("Configuration: videoWidthScale = " + selectVideoSize.value);
+	console.log("Configuration: videoWidthScale = " + videoSizeMenu.value);
 
 	if (typeof subtitleWidthScale == 'undefined') {
 		errorReason = 'subtitleWidthScale missing';
 		initError(errorReason);
 	}
 
-	const selectSubtitleWidth = document.getElementById("subtitleWidthMenu");
-	selectSubtitleWidth.value = subtitleWidthScale;
+	subtitleWidthMenu.value = subtitleWidthScale;
 
-	if (selectSubtitleWidth.value != subtitleWidthScale){
+	if (subtitleWidthMenu.value != subtitleWidthScale){
 		errorReason = 'subtitleWidthScale = ' + subtitleWidthScale + ' not in list of allowed values';
 		initError(errorReason);
 	}
 
-	console.log("Configuration: subtitleWidthScale = " + selectSubtitleWidth.value);
+	console.log("Configuration: subtitleWidthScale = " + subtitleWidthMenu.value);
 
 	if (typeof fontSize == 'undefined') {
 		errorReason = 'fontSize missing';
 		initError(errorReason);
 	}
 
-	const selectFontSize = document.getElementById("subtitleFontSizeMenu");
-	selectFontSize.value = fontSize;
+	subtitleFontSizeMenu.value = fontSize;
 
-	if (selectFontSize.value != fontSize){
+	if (subtitleFontSizeMenu.value != fontSize){
 		errorReason = 'fontSize = ' + fontSize + ' not in list of allowed values';
 		initError(errorReason);
 	}
 
-	console.log("Configuration: fontSize = " + selectFontSize.value);
+	console.log("Configuration: fontSize = " + subtitleFontSizeMenu.value);
 
 function initError(errorType){
-	let errorMsg = 'Configuration error. ' + errorType + '\nCheck config.js';
+	errorMsg = 'Configuration error. ' + errorType + '\nCheck config.js';
 	alert(errorMsg);
 	throw new Error(errorMsg);
 }
