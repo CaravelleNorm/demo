@@ -163,6 +163,7 @@ table tr td:first-child::before {
 	position: relative;
 	flex-direction: column;
 	height: auto;
+	overflow: hidden;
 	aspect-ratio: 16 / 9;
 	width: min(40%, 100% - 3rem);
 	/* width: min(40%, 100% - 3rem); */
@@ -171,7 +172,10 @@ table tr td:first-child::before {
 	margin-left: auto;
 	margin-right: auto;
 	/* margin: 0 auto; */
-	padding: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
 	border-radius: 12px;
 	background-color: #3498DB;
 	border: 3px solid hsla(350, 27%, 96%, 0.75);
