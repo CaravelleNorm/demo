@@ -7,7 +7,7 @@ document.addEventListener('keydown', PSDPD_KeyCheck);
 
 let videoFileLoaded = false;
 
-let videoElem;
+let videoArea;
 let playVideoButton;
 let currentLineButton;
 let loopButton;
@@ -91,7 +91,7 @@ let maxVideoWidth;
 let player;
 let iframeElement;
 let showButtonSection = true;
-let toggleVideoSwitch = "on";
+let showVideo = true;
 let keyListenerForSubtitlesAdded = false;
 let keyListenerAdded = false;
 let playing = false;				// Flag: If false, the video is not currently playing
@@ -307,123 +307,88 @@ function computeSubtitleTableHeight() {
 	let divElemWidth = 0;
 	let divElemHeight = 0;
 
-	let divNames = [];
+	let divElements = [];
 
-	if (toggleVideoSwitch === "on") {
-		divNames = [wrapper];
+	if (showVideo) {
+		divElements = [wrapper];
 	}
 
 	if (showSeekBarContainer) {
-		divNames = divNames.concat([seekBarContainer]);
+		divElements = divElements.concat([seekBarContainer]);
 	} else {
 		seekBarContainer.style.display = "none";
 	}
 
 	if (showMarginLine1) {
-		divNames = divNames.concat([marginLine1]);
+		divElements = divElements.concat([marginLine1]);
 	} else {
 		marginLine1.style.display = "none";
 	}
 
 	if (showSubtitleTrack1) {
-		divNames = divNames.concat([divSubtitle1]);
+		divElements = divElements.concat([divSubtitle1]);
 	} else {
 		divSubtitle1.style.display = "none";
 	}
 	
 	if (showMarginLine2) {
-		divNames = divNames.concat([marginLine2]);
+		divElements = divElements.concat([marginLine2]);
 	} else {
 		marginLine2.style.display = "none";
 	}
 	
 	if (showSubtitleTrack2) {
-		divNames = divNames.concat([divSubtitle2]);
+		divElements = divElements.concat([divSubtitle2]);
 	} else {
 		divSubtitle2.style.display = "none";
 	}
 	
 	if (showCounter) {
-		divNames = divNames.concat([videoCounterDiv]);
+		divElements = divElements.concat([videoCounterDiv]);
 	} else {
 		videoCounterDiv.style.display = "none";
 	}
 
 	if (showSelectionInfo) {
-		divNames = divNames.concat([selectionInfoDiv]);
+		divElements = divElements.concat([selectionInfoDiv]);
 	} else {
 		selectionInfoDiv.style.display = "none";
 	}
 
 	if (showControlButtons) {
-		divNames = divNames.concat([buttonSection, marginLine3]);
+		divElements = divElements.concat([buttonSection, marginLine3]);
 	} else {
 		buttonSection.style.display = "none";
 	} 
 		
-	divNames = divNames.concat([EOT]);	
+	divElements = divElements.concat([EOT]);	
 	
-	divNames.forEach(function(divName) {
+	divElements.forEach(function(divElem) {
 
-		let divElem = divName;
-
-/*		if (divElem.style.display != "none") {
-			divElemWidth = divElem.offsetWidth;
-			divElemHeight = divElem.offsetHeight;
-			console.log("computeSubtitleTableHeight display != 'none' ", divName, " w" + divElemWidth + " h" + divElemHeight);
-		} else {
-			const clone = divElem.cloneNode(true);
-			clone.style.visibility = 'hidden';	
-			clone.style.position = 'absolute';
-			clone.style.display = 'block';
-			document.body.appendChild(clone);
-			divElemWidth = clone.offsetWidth;
-			divElemHeight = clone.offsetHeight;
-			document.body.removeChild(clone);
-			console.log("computeSubtitleTableHeight display 'none' ", divName, " w" + divElemWidth + " h" + divElemHeight);
+		if (divElem === divSubtitle1) {
+			divSubtitle2.style.display = "none";
 		}
-*/
-
-/*		if ((divName === 'divSubtitle1') || (divName === 'divSubtitle2')) {
-			if (divName === 'divSubtitle1') {
-				divSubtitle2.style.display = "none";
-			}
-			divElem.style.flexShrink = '0';
-            divElem.style.display = 'block';
-            divElem.style.height = 'auto';
-            divElem.style.overflowY = 'hidden';
-            divElemHeight = Math.ceil(divElem.getBoundingClientRect().height);
-            divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
-			console.log("computeSubtitleTableHeight ", divName, " w" + divElemWidth + " h" + divElemHeight);
-		} else {
-*/			if (divName === divSubtitle1) {
-				divSubtitle2.style.display = "none";
-			}
-			divElem.style.flexShrink = '0';
-            divElem.style.display = 'block';
-            divElem.style.height = 'auto';
-		//if (divName !== buttonSection) {
-            divElem.style.overflowY = 'hidden';
-		//}
-            divElemHeight = Math.ceil(divElem.getBoundingClientRect().height);
-            divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
-			console.log("computeSubtitleTableHeight ", divName, " w" + divElemWidth + " h" + divElemHeight);
-			if ((divName != divSubtitle1) || (divName != divSubtitle2)) {
-				divElem.style.flexShrink = '1';
-			}
-//		}
+		divElem.style.flexShrink = '0';
+		divElem.style.display = 'block';
+		divElem.style.height = 'auto';
+		divElem.style.overflowY = 'hidden';
+		divElemHeight = Math.ceil(divElem.getBoundingClientRect().height);
+		divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
+		console.log("computeSubtitleTableHeight ", divElem.id, " w" + divElemWidth + " h" + divElemHeight);
+		if ((divElem != divSubtitle1) || (divElem != divSubtitle2)) {
+			divElem.style.flexShrink = '1';
+		}
  
 		let availableHeight = viewportHeight - totalHeight;
 		totalHeight += divElemHeight;
 		residualHeight = viewportHeight - totalHeight;
-		console.log("computeSubtitleTableHeight ", divName.id, " w" + divElemWidth + " h" + divElemHeight,
+		console.log("computeSubtitleTableHeight ", divElem.id, " w" + divElemWidth + " h" + divElemHeight,
 			" totalHeight ", totalHeight, 
 			" availableHeight ", availableHeight,
 			" residualHeight ", residualHeight);
 		
-		switch(divName) {
+		switch(divElem) {
 		case wrapper:
-			divElem.style.display = "block";
 			break;
 		case divSubtitle1:
 		case divSubtitle2:
@@ -470,8 +435,9 @@ function computeSubtitleTableHeight() {
 		return;
 	}
 
-	if (((toggleVideoSwitch == "on") && (showSubtitleTable)) || 
-		(toggleVideoSwitch != "on")) {
+	// If the ST table is not shown on the video display, do show the ST table on the audio-only display.
+	if (((showVideo) && (showSubtitleTable)) || 
+		(!showVideo)) {
 		subtitleTableDiv.style.display = "block";
 		subtitleTableDiv.style.height = residualHeight + "px";
 	} else {
@@ -678,7 +644,7 @@ function videoStateBusy() {
 		}
 	}
 	else {
-		if (!videoElem.paused) {
+		if (!videoArea.paused) {
 			return true;
 		}
 	}
@@ -740,7 +706,7 @@ function selectRow(rowNumber, directive) {
 			}
 		}
 		else {
-			videoElem.currentTime = subtitleStartSeconds[selectedSubtitleNumber];
+			videoArea.currentTime = subtitleStartSeconds[selectedSubtitleNumber];
 		}
 		currentTime.textContent = formatTime(subtitleStartSeconds[selectedSubtitleNumber]);
 		currentTimeOnDashboard.textContent = currentTime.textContent;
@@ -924,12 +890,12 @@ function changeVideoSize(){
 		seekBarContainer.style.width = wrapper.style.width;
 	} else {
 		newWidth = Math.round((maxVideoWidth)*fraction);
-		let newHeight = Math.ceil((videoElem.videoHeight / videoElem.videoWidth) * newWidth);
+		let newHeight = Math.ceil((videoArea.videoHeight / videoArea.videoWidth) * newWidth);
 		wrapper.style.width = newWidth + "px";
 		wrapper.style.height = newHeight + "px";
-		seekBarContainer.style.width = wrapper.style.width; // videoElem.style.width;
+		seekBarContainer.style.width = wrapper.style.width; // videoArea.style.width;
 		console.log("changeVideoSize newHeight= ", newHeight, " newWidth = ", newWidth,
-			" videoElem.style.width = ", videoElem.style.width);
+			" videoArea.style.width = ", videoArea.style.width);
 	}
 
 	if ((lastSubtitleNumber > 0) && videoFileLoaded) { 
@@ -1426,7 +1392,7 @@ function timeEditCurrent(prefix) {
 		current = player.getCurrentTime();
 	}
 	else {
-		current = videoElem.currentTime;
+		current = videoArea.currentTime;
 	}
 	console.log("timeEditCurrent current ", current);
 
@@ -1851,15 +1817,21 @@ function toggleSubtitleSection() {
 
 function toggleVideoSection() {
 
-	if (toggleVideoSwitch == "on") {
-		toggleVideoSwitch = "off";
-		wrapper.style.display = "none";
+	if (showVideo) {
+		showVideo = false;
+		wrapper.style.height = 0;
+		wrapper.style.marginTop = 0;
+		wrapper.style.marginBottom = 0;
+		wrapper.style.paddingTop = 0;
+		wrapper.style.paddingBottom = 0;
 	} 
 	else {
-		toggleVideoSwitch = "on";
-		wrapper.style.display = "block";
+		showVideo = true;
+		wrapper.style.height = 'auto';
+		wrapper.style.paddingTop = '5px';
+		wrapper.style.paddingBottom = '5px';
 	}
-
+	console.log("toggleVideoSection showVideo = ", showVideo);
 	computeSubtitleTableHeight();
 	selectRow(selectedSubtitleNumber);
 
@@ -1897,7 +1869,7 @@ function skipBackward() {
 	if (youTubeVideoId) {
 		videoCurrentTime = player.getCurrentTime();
 	} else {
-		videoCurrentTime = videoElem.currentTime;
+		videoCurrentTime = videoArea.currentTime;
 	}
 
 	let newTime = videoCurrentTime - skipBackwardSeconds;
@@ -1952,7 +1924,7 @@ function skipTo(time) {
 			}
 		}
 	} else {
-			videoElem.currentTime = time;
+			videoArea.currentTime = time;
 	}
 	console.log("skipTo updateTime");
 	updateTime();
@@ -1965,7 +1937,7 @@ function skipForward() {
 	if (youTubeVideoId) {
 		videoCurrentTime = player.getCurrentTime();
 	} else {
-		videoCurrentTime = videoElem.currentTime;
+		videoCurrentTime = videoArea.currentTime;
 	}
 
 	let newTime = videoCurrentTime + skipForwardSeconds;
@@ -2033,7 +2005,7 @@ function checkTime() {
 	if (!checkTimeEnabled) {
 		console.log('checkTime entered while NOT Enabled');
 		if (!youTubeVideoId) {
-			videoElem.removeEventListener("timeupdate",checkTime,true);
+			videoArea.removeEventListener("timeupdate",checkTime,true);
 		}
 		return;
 	}
@@ -2046,7 +2018,7 @@ function checkTime() {
 			videoCurrentTime = player.getCurrentTime();
 		}
 		else {
-			videoCurrentTime = videoElem.currentTime;
+			videoCurrentTime = videoArea.currentTime;
 		}
 		if ((rowIndex) && (videoCurrentTime >= subtitleStartSeconds[rowIndex])) {
 			selectRow(rowIndex);
@@ -2063,7 +2035,7 @@ function checkTime() {
 		videoCurrentTime = player.getCurrentTime();
 	}
 	else {
-		videoCurrentTime = videoElem.currentTime;
+		videoCurrentTime = videoArea.currentTime;
 	}
    	console.log('checkTime videoCurrentTime', videoCurrentTime, 
 		' subtitleEndSeconds[selectedSubtitleNumber] ', subtitleEndSeconds[selectedSubtitleNumber]);
@@ -2096,7 +2068,7 @@ function checkTime() {
 		setTimeout(checkTime, checkTimeInterval);
 	}
 	else {
-		videoElem.removeEventListener("timeupdate",checkTime,true);
+		videoArea.removeEventListener("timeupdate",checkTime,true);
 		clearTimeout(timeoutId);
 		playVideo(selectionStartSeconds, selectionEndSeconds);
 	}
@@ -2115,7 +2087,7 @@ function checkTime2() {
 	if (!checkTimeEnabled) {
 		console.log('checkTime2 entered while NOT Enabled');
 		if (!youTubeVideoId) {
-			videoElem.removeEventListener("timeupdate",checkTime2,true);
+			videoArea.removeEventListener("timeupdate",checkTime2,true);
 		}
 		return;
 	}
@@ -2125,7 +2097,7 @@ function checkTime2() {
 		videoCurrentTime = player.getCurrentTime();
 	}
 	else {
-		videoCurrentTime = videoElem.currentTime;
+		videoCurrentTime = videoArea.currentTime;
 	}
 
 	console.log('checkTime2 videoCurrentTime', videoCurrentTime, 
@@ -2154,7 +2126,7 @@ function checkTime2() {
 			setTimeout(checkTime2, checkTimeInterval);
 		}
 		else {
-			videoElem.removeEventListener("timeupdate", checkTime2, true);
+			videoArea.removeEventListener("timeupdate", checkTime2, true);
 			clearTimeout(timeoutId);
 			selectRow(subsetFirstRow);
 			playVideo(selectionStartSeconds, selectionEndSeconds);
@@ -2167,7 +2139,7 @@ function checkTime2() {
 		videoCurrentTime = player.getCurrentTime();
 	}
 	else {
-		videoCurrentTime = videoElem.currentTime;
+		videoCurrentTime = videoArea.currentTime;
 	}
 	if ((rowIndex) && (videoCurrentTime >= subtitleStartSeconds[rowIndex])) {
 		selectRow(rowIndex);
@@ -2190,7 +2162,7 @@ function pauseVideo() {
 	}
 	else {
 		clearTimeout(timeoutId);
-		videoElem.pause();
+		videoArea.pause();
 	}
 }
 
@@ -2220,7 +2192,7 @@ function playVideo(time1, time2) {
 		console.log('playVideo seekTo time1 (3)', time1, 
 			'playVideo player.playerInfo.currentTime ', player.playerInfo.currentTime);
 	} else {
-		videoElem.currentTime = time1;
+		videoArea.currentTime = time1;
 	}
 
 	console.log("playVideo updateTime");
@@ -2237,9 +2209,9 @@ function playVideo(time1, time2) {
 	else {
     	console.log('playVideo: Adding timeupdate listener to run checkTime.');
 		if (playingContinuously && (selectionEndSeconds != 0)) {
-			videoElem.addEventListener("timeupdate", checkTime2, true);
+			videoArea.addEventListener("timeupdate", checkTime2, true);
 		} else {
-			videoElem.addEventListener("timeupdate", checkTime, true);
+			videoArea.addEventListener("timeupdate", checkTime, true);
 		}
 
 	}	
@@ -2280,7 +2252,7 @@ function issuePlayVideo() {
 async function issuePlayVideo2() {
 	console.log('issuePlayVideo2 entered');
 	try {
-    	await videoElem.play();
+    	await videoArea.play();
 		if (!playingContinuously) {
 			let delay = (selectionEndSeconds - selectionStartSeconds) * 1000;
 			console.log("issuePlayVideo2 delay = ", delay);
@@ -2300,10 +2272,10 @@ async function issuePlayVideo2() {
 
 function handleSelectionTimeOut() {
 	if (!playing) {return;}
-   	console.log("handleSelectionTimeOut video currentTime = ", videoElem.currentTime);
+   	console.log("handleSelectionTimeOut video currentTime = ", videoArea.currentTime);
    	console.log("handleSelectionTimeOut ms elapsed = ",  
-		(videoElem.currentTime - subtitleStartSeconds[selectedSubtitleNumber]) * 1000);
-	videoElem.currentTime = selectionEndSeconds;
+		(videoArea.currentTime - subtitleStartSeconds[selectedSubtitleNumber]) * 1000);
+	videoArea.currentTime = selectionEndSeconds;
 }
 
 function handleVideoOnPause() {
@@ -2347,7 +2319,7 @@ function handleVideoOnEnded() {
 			}
 		}
 		else {
-			videoElem.currentTime = subtitleStartSeconds[selectedSubtitleNumber];
+			videoArea.currentTime = subtitleStartSeconds[selectedSubtitleNumber];
 		}
 		console.log("handleVideoOnEnded updateTime");
 		updateTime();
@@ -2381,55 +2353,55 @@ async function loadVideoFile(file) {
 
 //	const file = videoFile.files[0];
     const fileURL = URL.createObjectURL(file);
-    videoElem.setAttribute("src", fileURL);
+    videoArea.setAttribute("src", fileURL);
 	console.log("loadVideoFile fileURL = ", fileURL);
-	// console.log("loadVideoFile videoElem.getAttribute('src') = ", videoElem.getAttribute("src"));
-	// console.log("loadVideoFile videoElem.src = ", videoElem.src);
+	// console.log("loadVideoFile videoArea.getAttribute('src') = ", videoArea.getAttribute("src"));
+	// console.log("loadVideoFile videoArea.src = ", videoArea.src);
 	console.log("loadVideoFile file.name = ", file.name);
 
-	videoElem.onpause = function() {
+	videoArea.onpause = function() {
 		handleVideoOnPause();
 	}
 
-	videoElem.onended = function() {
+	videoArea.onended = function() {
 		handleVideoOnEnded();
 	}
 
-	videoElem.onloadedmetadata = function() {
+	videoArea.onloadedmetadata = function() {
 
 		if (videoFileLoaded) {
 			return;
 		}
 
-		if (videoElem.videoWidth === 0 && videoElem.videoHeight === 0) {
+		if (videoArea.videoWidth === 0 && videoArea.videoHeight === 0) {
 			audioFileLoaded = true;
 			displayVideoControls = true;
 			videoSizeMenu.value = '0.10';
 		}
 
 		if (displayVideoControls) {
-			videoElem.controls = true;
+			videoArea.controls = true;
 		} else {
-			videoElem.controls = false;
+			videoArea.controls = false;
 		}
 
-		videoElem.style.display = 'inline-block';
+		videoArea.style.display = 'inline-block';
 
-		videoDuration = videoElem.duration;
+		videoDuration = videoArea.duration;
 		console.log('loadVideoFile Video duration = ',videoDuration);
 		duration.textContent = formatTime(videoDuration);
 		durationOnDashboard.textContent = duration.textContent;
 		//setInterval(updateTime, updateTimeInterval);
 
 
-		console.log('loadVideoFile intrinsic height = ',videoElem.videoHeight);
-		console.log('loadVideoFile intrinsic width = ',videoElem.videoWidth);
+		console.log('loadVideoFile intrinsic height = ',videoArea.videoHeight);
+		console.log('loadVideoFile intrinsic width = ',videoArea.videoWidth);
 
 		wrapper.style.backgroundColor = "transparent";
 		wrapper.style.border = "none";
 		pageTitle.style.display = "none";
 
-		//let newWidth = Math.round((videoElem.videoWidth)*0.50);
+		//let newWidth = Math.round((videoArea.videoWidth)*0.50);
 		//console.log('loadVideoFile newWidth = ',newWidth);
 
 		//var myWrapper = document.getElementById('wrapper');
@@ -2438,15 +2410,15 @@ async function loadVideoFile(file) {
 		//const pageTitle = document.getElementById('pageTitle');
 		//pageTitle.style.display = "none";
 
-		console.log(videoElem);
-		console.log({videoElem});
+		console.log(videoArea);
+		console.log({videoArea});
 
 		videoFileLoaded = true;
 		showSeekBarContainer = true;
 
 		handleVideoFileLoaded();
 		
-		console.log("videoElem.onloadedmetadata Exiting");
+		console.log("videoArea.onloadedmetadata Exiting");
 
 	}
 
@@ -2550,7 +2522,7 @@ function handleSeek(e) {
 //			" player.getCurrentTime ", player.getCurrentTime());
 //
 //	} else {
-//		videoElem.currentTime = ((e.target.value / 100) * duration);
+//		videoArea.currentTime = ((e.target.value / 100) * duration);
 //	}
 //
 //	updateSliderFill(seekBar);
@@ -2583,7 +2555,7 @@ function getYouTubeVideoId(url) {
 
 	removeVideoPrompts();
 	// Remove the file video player.
-	videoElem.style.display = 'none';
+	videoArea.style.display = 'none';
 
 	var tag = document.createElement('script');
 
@@ -2709,7 +2681,7 @@ function updateTime() {
 		current = player.getCurrentTime();
 	}
 	else {
-		current = videoElem.currentTime;
+		current = videoArea.currentTime;
 	}
 	console.log("updateTime current ", current);
 
@@ -4354,7 +4326,7 @@ function buttonAction(actionType) {
 			selectionStartSeconds = player.getCurrentTime();
 		}
 		else {
-			selectionStartSeconds = videoElem.currentTime;
+			selectionStartSeconds = videoArea.currentTime;
 		}
 		selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
 		break;
@@ -4365,7 +4337,7 @@ function buttonAction(actionType) {
 				selectionStartSeconds = player.getCurrentTime();
 			}
 			else {
-				selectionStartSeconds = videoElem.currentTime;
+				selectionStartSeconds = videoArea.currentTime;
 			}
 			selectionEndSeconds = 0;
 		}
@@ -4534,7 +4506,7 @@ let viewportWidth = getViewportWidth();
 let viewportHeight = getViewportHeight();
 console.log("DOMInitializations Viewport Width " + viewportWidth + " Height " + viewportHeight);
 
-videoElem = document.getElementById("videoArea");
+videoArea = document.getElementById("videoArea");
 wrapper = document.getElementById("wrapper");
 videoSizeMenu = document.getElementById("videoSizeMenu");
 marginMenu = document.getElementById("marginMenu");
