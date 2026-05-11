@@ -41,19 +41,19 @@
 </div>
 <!-- Media File section -->
 <div id="wrapper" class="wrapper">
-<div class="pageTitleWrapper">
+<div id="pageTitleWrapper" class="pageTitleWrapper">
 <div id="pageTitle" class="pageTitle"><b>Subtitle Player & Editor for Browsers</b></div>
-</div>  <!-- id="wrapperWrapper" class="wrapperWrapper" -->
+</div>
 <div id="player"></div>
-<div>
+<div id="videoFileInputDiv">
 	<input id="videoFileInput" type="file" accept=".mp4,.mp3" class="videoFileInput" 
 		onchange="loadVideoFile(this.files[0])" >
 </div>
 <div id="inputWrapper" class="inputWrapper">
-<div class="videoFileContainer" id="videoFileContainer"><br><br>
+<div class="videoFileContainer"><br><br>
 		<div id="videoFileButton" class="vidButton">Select a Video or Audio File</div><br>
 </div>
-<div id="videoURLContainer" class="videoURLContainer">
+<div class="videoURLContainer">
 	<div>Or paste a YouTube link:<br></div>
 	<input type="url" id="videoURLInput" name="videoURLInput" 
 		placeholder="Insert YouTube url" class="videoURLInput">
