@@ -2401,14 +2401,13 @@ async function loadVideoFile(file) {
 		wrapper.style.border = "none";
 		pageTitle.style.display = "none";
 
+
 		//let newWidth = Math.round((videoArea.videoWidth)*0.50);
 		//console.log('loadVideoFile newWidth = ',newWidth);
 
 		//var myWrapper = document.getElementById('wrapper');
 		//myWrapper.style.width = newWidth + "px";
 		//myWrapper.style.backgroundColor = "transparent";
-		//const pageTitle = document.getElementById('pageTitle');
-		//pageTitle.style.display = "none";
 
 		console.log(videoArea);
 		console.log({videoArea});
@@ -2530,14 +2529,17 @@ function handleSeek(e) {
 //}
 
 function removeVideoPrompts() {
-	// Remove the file selection button.
-	let elem = document.getElementById('inputWrapper');
-	elem.style.display = 'none';
-		
-	// Remove the URL entry section.
-	//elem = document.getElementById('videoURLContainer');
-	//elem.style.display = 'none';
-	// elem.parentNode.removeChild(elem);
+	document.getElementById('inputWrapper').remove();
+	videoURLInput = null;
+	videoURLButton = null;
+	myCheck20 = null;
+	document.getElementById('pageTitleWrapper').remove();	
+	if (youTubeVideoId) {
+		document.getElementById('videoFileInputDiv').remove();
+		document.getElementById('videoArea').remove();
+	} else {
+		document.getElementById('player').remove();
+	}
 }
 
 function getYouTubeVideoId(url) {
@@ -2553,10 +2555,6 @@ function getYouTubeVideoId(url) {
 	youTubeVideoId = result;
 	console.log("getYouTubeVideoId youTubeVideoId ", youTubeVideoId);
 
-	removeVideoPrompts();
-	// Remove the file video player.
-	videoArea.style.display = 'none';
-
 	var tag = document.createElement('script');
 
 	tag.src = "https://www.youtube.com/iframe_api";
@@ -2568,10 +2566,6 @@ function getYouTubeVideoId(url) {
 
 function onYouTubeIframeAPIReady() {
 	
-	// const myWrapper = document.getElementById('wrapper');
-	// myWrapper.style.backgroundColor = "transparent";
-	// document.getElementById('pageTitle').style.display = "none";
-
 	wrapper.style.backgroundColor = "transparent";
 	wrapper.style.border = "none";
 	pageTitle.style.display = "none";
@@ -3199,6 +3193,8 @@ function deleteSubtitleTable() {
 	let old_tbody = document.getElementById("subtitleTbody");
 	old_tbody.parentNode.replaceChild(new_tbody, old_tbody);
 	new_tbody.id = "subtitleTbody";
+	old_tbody.remove();
+	old_tbody = null;
 	subtitleStartSeconds = [];
 	subtitleEndSeconds = [];
 	subtitleTrack = [];
@@ -4754,7 +4750,7 @@ rangePopup.addEventListener('mouseleave', () => {
     rangePopup.style.display = 'none';
 });
 
-document.getElementById('splashScreen').style.display = "none";
+document.getElementById('splashScreen').remove();
 
 return;
 
@@ -4778,12 +4774,11 @@ function createTimeObject(prefix) {
 
 function enableFileSelection() {
 
-const videoFileSelect = document.getElementById("videoFileButton");
-const videoFileElem = document.getElementById("videoFileInput");
 
-videoFileSelect.addEventListener(
+document.getElementById("videoFileButton").addEventListener(
   "click",
   (e) => {
+		const videoFileElem = document.getElementById("videoFileInput");
 		logTimeStamp("videoFileButton", "clicking on videoFileInput");
 		if (videoFileElem) {
 			videoFileElem.value = ""; 
