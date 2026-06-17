@@ -1,4 +1,4 @@
-//			<option value="currentLine" selected>Current Line</option>
+﻿//			<option value="currentLine" selected>Current Line</option>
 //			<option value="playPause">Play/Pause</option>
 //			<option value="loop">Loop</option>
 
@@ -9,7 +9,9 @@ fontList = ['Arial',
 			'Courier New',
 			'Georgia',
 			'Verdana',
+			'dingliesongtypeface',
 			'GenRyuMin JP SemiBold',
+			'Huiwen-mincho',
 			'Kaiti',
 			'MingLiU',
 			'SimHei',
@@ -19,12 +21,15 @@ fontList = ['Arial',
 			'Microsoft YaHei UI',
 			'Microsoft YaHei UI Light',
 			'Microsoft JhengHei',
+			'MJT-5982',
 			'Source Han Serif CN',
 			'Source Han Serif CN ExtraLight',
 			'Source Han Serif CN Heavy',
 			'Source Han Serif CN Light',
 			'Source Han Serif CN Medium',
 			'Source Han Serif CN SemiBold',
+			'Sun Yat-sen Hsingshu',
+			'WenYue GuDianMingChaoTi (Non-Commercial Use)',
 			'Yu Gothic',
 			'Yu Gothic Light',
 			'Yu Gothic Medium',
@@ -34,10 +39,12 @@ fontList = ['Arial',
 			'Yu Gothic Semilight',
 			'Yu Mincho',
 			'Yu Mincho Demibold',
-			'Yu Mincho Light'
+			'Yu Mincho Light',
+			'寒蝉锦书明朝JPText Medium'
 			];
 
 selectedFont = 'Kaiti';
+selectedFont2 = selectedFont;
 
 videoWidthScale = '0.55'; // videoWidthScale rescales the video size by a fraction of its width.
 

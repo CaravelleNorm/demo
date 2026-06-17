@@ -1,12 +1,56 @@
+"use strict"
+let verbose = true;  // Enable/disable verbose tracing
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+    // Log the error details
+    console.log('Error message:', msg);
+    console.log('URL:', url);
+    console.log('Line:', lineNo);
+    console.log('Column:', columnNo);
+    console.log('Error object:', error);
 
-console.log("localStorage dump ",localStorage);
-// localStorage.setItem("lastname", "Smith");
-// https://www.w3schools.com/html/html5_webstorage.asp
-// localStorage.clear(); //Clear old values left behind;
+    // Trigger a notification (custom implementation)
+    alert('An error occurred: ' + msg);
+
+    return; // true; // Prevents the default browser error handling
+};
+
+let notification = document.getElementById("notification");
+let notificationX = document.getElementById("notificationX");
+let notificationDiv1 = document.getElementById("notificationDiv1");
+let notificationDiv2 = document.getElementById("notificationDiv2");
+let notificationDiv3 = document.getElementById("notificationDiv3");
+notificationX.addEventListener('click', (e) => {
+	notification.style.display = 'none';
+});
+dragElement(notification);
+
+let fileNotification = document.getElementById("fileNotification");
+let fileNotificationDiv1 = document.getElementById("fileNotificationDiv1");
+let fileNotificationDiv2 = document.getElementById("fileNotificationDiv2");
+let fileNotificationDiv3 = document.getElementById("fileNotificationDiv3");
+dragElement(fileNotification);
+
+
 document.addEventListener('keydown', PSDPD_KeyCheck);
+
+let userAgentString;
+let chromeAgent;
+let IExplorerAgent;
+let firefoxAgent;
+let safariAgent;
+let operaAgent;
+let fileAPIPickersSupported = false;
+let OPFSAvailable = false;
+
+ 
 
 let videoFileLoaded = false;
 
+let subtitleFileInput0;
+let subtitleFileInput1;
+let subtitleFileInput2;
+let rangeCount;
+let rangeButtonRangeCount;
 let videoArea;
 let playVideoButton;
 let currentLineButton;
@@ -17,14 +61,16 @@ let loopOnDashboardButton;
 let duration;
 let durationOnDashboard;
 let textEditPopupPlaySingleButton;
+let splitLineWrapper;
+let timeEditPopupTrackInfo;
 let spanStartTime;
 let spanEndTime;
 let spanTrack;
 let spanStartTimeOnDashboard;
 let spanEndTimeOnDashboard;
 let spanTrackOnDashboard;
-let spanSubtitle1;
-let spanSubtitle2;
+let STSpan1;
+let STSpan2;
 let currentTime;
 let currentTimeOnDashboard;
 let seekBar;
@@ -39,19 +85,22 @@ let divSubtitle2;
 let videoCounterDiv; 
 let selectionInfoDiv; 
 let buttonSection; 
-let subtitleTableDiv;
+let subtitleTableDiv0;
 let EOT;
 let subtitleWidthMenu;
 let wrapper;
 let videoSizeMenu;
+let fontListFileInput ;
 let subtitleFontMenu;
 let subtitleFontSizeMenu;
+let subtitleFontMenu2;
+let subtitleFontSizeMenu2;
 let subtitleAlignmentMenu;
 let selectSpacebar;
 let selectScroll;
 let selectScrollStep;
 let marginMenu;
-let mycheck01;
+let myCheck01;
 let myCheck02;
 let myCheck03;
 let myCheck04;
@@ -67,7 +116,7 @@ let selectedTheme;
 let customColorsCheckbox;
 let save1File;
 let save2Files;
-let subtitleTrackField;
+let saveBothTracks;
 let selectionLabel;
 let selectionHyphen;
 let selectionLabelOnDashboard;
@@ -85,11 +134,13 @@ let timeEditPopupThumb;
 let audioFileLoaded = false;
 let displayVideoControls = false;
 let subtitleTable;
+let subtitleTableSection;
 let videoDuration;
 let youTubeVideoId;
 let maxVideoWidth;
 let player;
 let iframeElement;
+	
 let showButtonSection = true;
 let showVideo = true;
 let keyListenerForSubtitlesAdded = false;
@@ -102,14 +153,23 @@ let subsetLastRow = 0;
 let subsetRange = 1;
 let checkTimeEnabled = false;		// Flag: Enable/Disable checking the endtime of a subtitle while it is playing
 let callUpdateTimeEnabled = false;
-let	lastSubtitleNumber = 0;			// Total number of subtitles
+let fileNotificationMsg1 = "";
+let fileNotificationMsg2 = "";
+let fileNotificationMsg3 = "";
+let notificationMsg1 = "";
+let notificationMsg2 = "";
+let notificationMsg3 = "";
+
+let	numberOfSubtitleTables = 1;
 let totalNumberOfSubtitlesRead = 0;
+let oldTotalNumberOfSubtitlesRead = 0;
 let selectedSubtitleNumber = 0;		// No subtitle is selected until the subtitle file has been loaded.
-let subtitleStartSeconds = [];		// Array: Start time in seconds for each subtitle
-let subtitleEndSeconds = [];		// Array: Stop time in seconds for each subtitle
-let subtitleTrack = [];				// Array: Track number for each subtitle
+let selectedSubtitleTableIndex = null;
 let selectionStartSeconds = 0;
 let selectionEndSeconds = 0;
+let subtitleTable1;
+let subtitleTable2;
+
 let timeoutId;
 let	scrollOption = "uninitialized";
 let	scrollStepOption = 0;
@@ -122,12 +182,14 @@ let marginLine1MinHeight = 1;
 let marginLine2MinHeight = 1;
 let showSubtitleTrack1 = true;
 let showSubtitleTrack2 = false;
-let spanSubtitle1Modified = false;
-let spanSubtitle2Modified = false;
-let spanSubtitle1Selected = false;
-let spanSubtitle2Selected = false;
-let spanSubtitle1Row = 0;
-let spanSubtitle2Row = 0;
+let STSpan1Modified = false;
+let STSpan2Modified = false;
+let STSpan1Selected = false;
+let STSpan2Selected = false;
+let STSpan1RowNumber = 0;
+let STSpan1STTableIndex;
+let STSpan2RowNumber = 0;
+let STSpan2STTableIndex;
 let showSeekBarContainer = false;
 let showCounter = true;
 let showSelectionInfo = true;
@@ -137,17 +199,18 @@ const loadFontFileOptionText = 'Load Font List from a File';
 let callUpdateTimeTimeoutId;
 const checkTimeInterval = 200;
 const updateTimeInterval = 1000;
-let timeEditSynchronizeWithTrack1 = false;
 let rectifySubtitleStartEnabled = false;
 let timeEditPopupRow = 0;
+let timeEditPopupSubtitleTrack = null;
+let timeEditPopupTableIndex = null;
 let t1timeEditPopupOldTime;
 let t1timeEditPopupOldSeconds;
 let t2timeEditPopupOldTime;
 let t2timeEditPopupOldSeconds;
-let t1timeEditPopupOldTimeOnTrack2;
-let t1timeEditPopupOldSecondsOnTrack2;
-let t2timeEditPopupOldTimeOnTrack2;
-let t2timeEditPopupOldSecondsOnTrack2;
+//let t1timeEditPopupOldTimeOnTwinnedTrack;
+//let t1timeEditPopupOldSecondsOnTwinnedTrack;
+//let t2timeEditPopupOldTimeOnTwinnedTrack;
+//let t2timeEditPopupOldSecondsOnTwinnedTrack;
 let timeEditPopupPuckPosition;
 let errorMsg;
 let CaretUtil = { };
@@ -159,6 +222,9 @@ let selectedThemeNumber;
 let themeAttributes;
 let copyt1;
 let copyt2;
+let videoCrop = 1;
+let configuration = "1Track1Table";
+
 
 let themeAttributesArray = [
 {
@@ -208,6 +274,12 @@ let themeAttributesArray = [
 	foregroundColor: "#0a0a0a", /* ? */
 	backgroundColor: "#d29e0f", /* ? */
 	highlightBackgroundColor: "#5e95b0" /* ? */
+},
+{
+	themeName: "preset 6",
+	foregroundColor: "#00050f", /* ? */
+	backgroundColor: "#05cdf5", /* ? */
+	highlightBackgroundColor: "#a5d0e3" /* ? */
 }
 ];
 
@@ -225,19 +297,28 @@ var helper = {
  		}
 };
 
+let STTableMetadata = [];
+STTableMetadata[0] = {STTableId: "subtitleTable0", STTable: null, trackHeader: null, selectedSubtitleNumber: 0, 
+	lastSubtitleNumber: 0, subtitleStartSeconds: [], subtitleEndSeconds: [], subtitleTrack: []
+};
+STTableMetadata[1] = {STTableId: "subtitleTable1", STTable: null, trackHeader: null, selectedSubtitleNumber: 0, 
+	lastSubtitleNumber: 0, subtitleStartSeconds: [], subtitleEndSeconds: [], subtitleTrack: []
+};
 
-let pointerArray = [];
-
-// sample subtitleFileDataArray[x].array[y] member: 
+// sample TrkFileMetadata[x].array[y] member: 
 // 	{track: 0; startSeconds: 120, endSeconds: 123, startTime: "0:02.00", endTime: "0:02.03", 
 //		subtitleStyle: "File1", subtitle: "Caption text" }
-let subtitleFileDataArray = [];
-subtitleFileDataArray[0] = {inputId: "subtitleFileInput0", defaultSubtitleStyle: "", loaded: false, array: []};	
-subtitleFileDataArray[1] = {inputId: "subtitleFileInput1", defaultSubtitleStyle: "File1", loaded: false, array: []};
-subtitleFileDataArray[2] = {inputId: "subtitleFileInput2", defaultSubtitleStyle: "File2", loaded: false, array: []};
+const maxTrackNumber = 2;
+let TrkFileMetadata = [];
+TrkFileMetadata[0] = {inputId: "subtitleFileInput0", STTableIndex: 0, 
+	defaultSubtitleStyle: "", twinnedTrack: 0, loaded: false, array: []};	
+TrkFileMetadata[1] = {inputId: "subtitleFileInput1", STTableIndex: 0, 
+	defaultSubtitleStyle: "File1", twinnedTrack: 2, loaded: false, array: []};
+TrkFileMetadata[2] = {inputId: "subtitleFileInput2", STTableIndex: 0, 
+	defaultSubtitleStyle: "File2", twinnedTrack: 1, loaded: false, array: []};
 
 // sample mergeDataArray[x] member: 
-// 	{dataIndex: "1", arrayIndex: 0} means subtitleFileDataArray[1].array[0]
+// 	{trackIndex: "1", arrayIndex: 0} means TrkFileMetadata[1].array[0]
 let mergeDataArray = [];
 
 const undoArraySize = 10;
@@ -248,6 +329,7 @@ const [undoArray, redoArray] = Array.from({ length: 2 }, () =>
 		inUse: false,
 		changeNumber: 0,
 		action: "",
+		STTableIndex: null,
 		rowNumber: 0,
 		selectedRowNumber: 0,
 		startTime: "",
@@ -257,7 +339,8 @@ const [undoArray, redoArray] = Array.from({ length: 2 }, () =>
 		newValue: "",
 		subtitleTrack: 0,
 		subtitleStartSeconds: 0,
-		subtitleEndSeconds: 0
+		subtitleEndSeconds: 0,
+		twinnedTrackObj: {}
 	}))
 );
 
@@ -270,21 +353,49 @@ document.addEventListener("DOMContentLoaded", () => {
 	initCaretUtil();
 });
 
-function statusMsg(caller, msg) {
-	spanSubtitle1.innerHTML = msg;
-	logTimeStamp("statusMsg ", (caller + " " + msg));
-	// console.log(caller, " ", msg);
+function fileNotify(caller, msg) {
+
+	fileNotificationDiv1.innerHTML = fileNotificationMsg1;
+	if (fileNotificationMsg2 != "") {
+		fileNotificationDiv2.innerHTML = fileNotificationMsg2;
+	}
+	if (fileNotificationMsg3 != "") {
+		fileNotificationDiv3.innerHTML = fileNotificationMsg3;
+	}
+	fileNotification.style.display = 'block';
+	logTimeStamp("fileNotify ", `${caller} ${msg}`);
+	fileNotificationMsg1 = "";
+	fileNotificationMsg2 = "";
+	fileNotificationMsg3 = "";
+}
+
+
+function notify(caller, msg) {
+
+	notificationDiv1.innerHTML = notificationMsg1;
+	if (notificationMsg2 != "") {
+		notificationDiv2.innerHTML = notificationMsg2;
+	}
+	if (notificationMsg3 != "") {
+		notificationDiv3.innerHTML = notificationMsg3;
+	}
+	notification.style.display = 'block';
+	logTimeStamp("notify ", `${caller} `);
+	notificationMsg1 = "";
+	notificationMsg2 = "";
+	notificationMsg3 = "";
 }
 
 function logTimeStamp(caller, msg) {
 	let	timeStamp = new Date();
-	console.log("timeStamp ", caller, " ", msg, timeStamp);
+	console.log(`timeStamp ${caller} ${timeStamp} ${msg} ` + 
+		`${notificationMsg1}\n${notificationMsg2}\n${notificationMsg3}`);
 }
 
-function throwError(errorMsg) {
-	console.log(errorMsg);
-	alert(errorMsg);
-	throw new Error(errorMsg);
+function throwError(msg) {
+	console.log(msg);
+	alert(msg);
+	throw new Error(msg);
 }
 
 
@@ -299,8 +410,9 @@ function computeSubtitleTableHeight() {
 
 	let viewportWidth = getViewportWidth();
 	let viewportHeight = getViewportHeight();
+	if (verbose) {
 	console.log("computeSubtitleTableHeight Viewport w" + viewportWidth + " h" + viewportHeight);
-
+	}
 
 	let totalHeight = 0;
 	let residualHeight = 0;
@@ -374,18 +486,27 @@ function computeSubtitleTableHeight() {
 		divElem.style.overflowY = 'hidden';
 		divElemHeight = Math.ceil(divElem.getBoundingClientRect().height);
 		divElemWidth = Math.ceil(divElem.getBoundingClientRect().width);
+	if (verbose) {
 		console.log("computeSubtitleTableHeight ", divElem.id, " w" + divElemWidth + " h" + divElemHeight);
+	}
 		if ((divElem != divSubtitle1) || (divElem != divSubtitle2)) {
 			divElem.style.flexShrink = '1';
+		}
+
+		if ((divElem === wrapper) && (videoCrop < 1) && (videoFileLoaded)) {
+			divElemHeight = Math.ceil(divElemHeight * videoCrop);
+			divElem.style.height = divElemHeight + "px";
 		}
  
 		let availableHeight = viewportHeight - totalHeight;
 		totalHeight += divElemHeight;
 		residualHeight = viewportHeight - totalHeight;
+	if (verbose) {
 		console.log("computeSubtitleTableHeight ", divElem.id, " w" + divElemWidth + " h" + divElemHeight,
 			" totalHeight ", totalHeight, 
 			" availableHeight ", availableHeight,
 			" residualHeight ", residualHeight);
+	}
 		
 		switch(divElem) {
 		case wrapper:
@@ -422,15 +543,17 @@ function computeSubtitleTableHeight() {
 		}
 	});
 
+	if (verbose) {
 	console.log("computeSubtitleTableHeight totalHeight ", totalHeight, 
 		" residualHeight", residualHeight);
+	}
 
 	if (timeEditPopup.style.display == "inline-block") {
-		showTimeEditPopup(selectedSubtitleNumber);
+		showTimeEditPopup(selectedSubtitleTableIndex, selectedSubtitleNumber);
 	}
 
 	if (residualHeight < 0){
-		subtitleTableDiv.style.display = "none";
+		subtitleTableDiv0.style.display = "none";
 		EOT.style.display = "none";
 		return;
 	}
@@ -438,10 +561,10 @@ function computeSubtitleTableHeight() {
 	// If the ST table is not shown on the video display, do show the ST table on the audio-only display.
 	if (((showVideo) && (showSubtitleTable)) || 
 		(!showVideo)) {
-		subtitleTableDiv.style.display = "block";
-		subtitleTableDiv.style.height = residualHeight + "px";
+		subtitleTableDiv0.style.display = "block";
+		subtitleTableDiv0.style.height = residualHeight + "px";
 	} else {
-		subtitleTableDiv.style.display = "none";
+		subtitleTableDiv0.style.display = "none";
 		EOT.style.display = "none";
 	}
 	return;
@@ -463,68 +586,85 @@ function computeSubtitleTableHeight() {
 
 function getViewportWidth(){
 
+	if (verbose) {
 	console.log("getViewportWidth window.innerWidth = ", window.innerWidth);
 	console.log("getViewportWidth document.documentElement.clientWidth = ", document.documentElement.clientWidth);
 	console.log("getViewportWidth document.body.clientWidth = ", document.body.clientWidth);
+	}
 
 	let returnWidth = 0;
 	let returnWidthSet = false;
 
 	if (window.innerWidth){
+	if (verbose) {
 		console.log("getViewportWidth selecting window.innerWidth = ", window.innerWidth);
+	}
 		returnWidth = window.innerWidth;
 		returnWidthSet = true;
 	}
 	
 	if (!returnWidthSet && document.documentElement && (document.documentElement.clientWidth != 0)){
+	if (verbose) {
 		console.log("getViewportWidth selecting document.documentElement.clientWidth = ", document.documentElement.clientWidth);
+	}
 		returnWidth = document.documentElement.clientWidth;
 		returnWidthSet = true;
 	}
 
 	if (!returnWidthSet && document.body){
+	if (verbose) {
 		console.log("getViewportWidth selecting document.body.clientWidth = ", document.body.clientWidth);
+	}
 		returnWidth = document.body.clientWidth;
 		returnWidthSet = true;
 	}
 
 	if (returnWidth <= 0) {
-		console.log("getViewportWidth returning ", returnWidth);
-		alert("getViewportWidth returning " + returnWidth);
+		notificationMsg1 = `Viewport width <=0: ${returnWidth}`;
+		notify("getViewportWidth");
 	}
 
 	return returnWidth;
 }
 
 function getViewportHeight () {
+
+	if (verbose) {
 	console.log("getViewportHeight window.innerHeight = ", window.innerHeight);
 	console.log("getViewportHeight document.documentElement.clientHeight = ", document.documentElement.clientHeight);
 	console.log("getViewportHeight document.body.clientHeight = ", document.body.clientHeight);
+	}
 
 	let returnHeight = 0;
 	let returnHeightSet = false;
 
 	if (window.innerHeight){
+	if (verbose) {
 		console.log("getViewportHeight selecting window.innerHeight = ", window.innerHeight);
+	}
 		returnHeight = window.innerHeight;
 		returnHeightSet = true;
 	}
 	
 	if (!returnHeightSet && document.documentElement && (document.documentElement.clientHeight != 0)){
+	if (verbose) {
 		console.log("getViewportHeight selecting document.documentElement.clientHeight = ", document.documentElement.clientHeight);
+	}
 		returnHeight = document.documentElement.clientHeight;
 		returnHeightSet = true;
 	}
 
 	if (!returnHeightSet && document.body){
+	if (verbose) {
 		console.log("getViewportHeight selecting document.body.clientHeight = ", document.body.clientHeight);
+	}
 		returnHeight = document.body.clientHeight;
 		returnHeightSet = true;
 	}
 
 	if (returnHeight <= 0) {
-		console.log("getViewportHeight returning ", returnHeight);
-		alert("getViewportHeight returning " + returnHeight);
+		notificationMsg1 = `Viewport height <= 0: ${returnHeight}`;
+		notify("getViewportHeight");
 	}
 
 	return returnHeight;
@@ -548,14 +688,12 @@ function findThemeAttributeObject(themeNumber) {
 
 	if (!Number.isInteger(themeNumber)) {
 		errorMsg = 'findThemeAttributeObject themeNumber not an integer: ' + themeNumber;
-		alert(errorMsg);
-		throw new Error(errorMsg);
+		throwError(errorMsg);
 	}
 
 	if ((themeNumber < 0) || ((themeNumber + 1) > themeAttributesArray.length)) {
 		errorMsg = 'findThemeAttributeObject themeNumber invalid: ' + themeNumber;
-		alert(errorMsg);
-		throw new Error(errorMsg);
+		throwError(errorMsg);
 	}
 
 	let themeAttributeObject = themeAttributesArray[themeNumber];
@@ -585,47 +723,56 @@ function highlightThemeOption(themeNumber, themeElement, action) {
 
 }
 
-function sanityCheck() {
+function sanityCheck(subtitleTableIndex) {
+
+	const tableData = STTableMetadata[subtitleTableIndex];
+
+	let lastSubtitleNumber = tableData.lastSubtitleNumber;
 
 	if (lastSubtitleNumber === 0) {return;}
 
-	if (lastSubtitleNumber != (subtitleTable.rows.length - 1)) {
-		errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleTable.rows.length - 1) ' 
-			+ lastSubtitleNumber + ' != ' + (subtitleTable.rows.length - 1);
-		alert(errorMsg);
-		throw new Error(errorMsg);
+	errorMsg = 'sanityCheck subtitleTableIndex = ' + subtitleTableIndex + ' ';
+
+	if (lastSubtitleNumber != (tableData.STTable.rows.length - 1)) {
+		errorMsg = errorMsg + 'lastSubtitleNumber != (tableData.STTable.rows.length - 1) ' 
+			+ lastSubtitleNumber + ' != ' + (tableData.STTable.rows.length - 1);
+		throwError(errorMsg);
 	}
 
-	if (lastSubtitleNumber != (subtitleStartSeconds.length - 1)) {
-		errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleStartSeconds.length - 1) ' 
-			+ lastSubtitleNumber + ' != ' + (subtitleStartSeconds.length - 1);
-		alert(errorMsg);
-		throw new Error(errorMsg);
+	if (lastSubtitleNumber != (tableData.subtitleStartSeconds.length - 1)) {
+		errorMsg = errorMsg + 'lastSubtitleNumber != (tableData.subtitleStartSeconds.length - 1) ' 
+			+ lastSubtitleNumber + ' != ' + (tableData.subtitleStartSeconds.length - 1);
+		throwError(errorMsg);
 	}
 
-	if (lastSubtitleNumber != (subtitleEndSeconds.length - 1)) {
-		errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleEndSeconds.length - 1) ' 
-			+ lastSubtitleNumber + ' != ' + (subtitleEndSeconds.length - 1);
-		alert(errorMsg);
-		throw new Error(errorMsg);
+	if (lastSubtitleNumber != (tableData.subtitleEndSeconds.length - 1)) {
+		errorMsg = errorMsg + 'lastSubtitleNumber != (tableData.subtitleEndSeconds.length - 1) ' 
+			+ lastSubtitleNumber + ' != ' + (tableData.subtitleEndSeconds.length - 1);
+		throwError(errorMsg);
 	}
 
-	if (lastSubtitleNumber != (subtitleTrack.length - 1)) {
-		errorMsg = 'sanityCheck lastSubtitleNumber != (subtitleTrack.length - 1) ' 
-			+ lastSubtitleNumber + ' != ' + (subtitleTrack.length - 1);
-		alert(errorMsg);
-		throw new Error(errorMsg);
+	if (lastSubtitleNumber != (tableData.subtitleTrack.length - 1)) {
+		errorMsg = errorMsg + 'lastSubtitleNumber != (tableData.subtitleTrack.length - 1) ' 
+			+ lastSubtitleNumber + ' != ' + (tableData.subtitleTrack.length - 1);
+		throwError(errorMsg);
 	}
 
 }
 
-function highlightSelectedRow(rowNumber) {
+function highlightSelectedRow(subtitleTableIndex, rowNumber) {
 
-	sanityCheck();
+	let subtitleTable = STTableMetadata[subtitleTableIndex].STTable;
+	if (verbose) {
+		console.log(`highlightSelectedRow ${subtitleTableIndex} ${rowNumber}`);
+		console.log(subtitleTable);
+	}
+	sanityCheck(subtitleTableIndex);
+
+	let oldSelectedRow = STTableMetadata[subtitleTableIndex].selectedSubtitleNumber;
 
 	// Remove 'selected' class from previously selected row
-	if ((selectedSubtitleNumber < subtitleTable.rows.length) && (selectedSubtitleNumber > 0)) {
-		subtitleTable.rows[selectedSubtitleNumber].classList.remove("selectedCustom");
+	if ((oldSelectedRow < subtitleTable.rows.length) && (oldSelectedRow > 0)) {
+		subtitleTable.rows[oldSelectedRow].classList.remove("selectedCustom");
 	}			
 	subtitleTable.rows[rowNumber].classList.add("selectedCustom");
 
@@ -651,14 +798,18 @@ function videoStateBusy() {
 	return false;
 }
 
-function selectRow(rowNumber, directive) {
-    console.log("selectRow entered");
+function selectRow(subtitleTableIndex, rowNumber, directive) {
 
+	if (verbose) {
+	console.log("selectRow new selection: subtitleTableIndex = ", subtitleTableIndex, 
+		" rowNumber = ", rowNumber, " directive = ", directive);
+
+	console.log('selectRow current subtitle table ', selectedSubtitleTableIndex);
 	console.log('selectRow current selection ', selectedSubtitleNumber);
-	console.log('selectRow current subtitleStartSeconds ', subtitleStartSeconds[selectedSubtitleNumber]);
-	console.log('selectRow current subtitleEndSeconds ', subtitleEndSeconds[selectedSubtitleNumber]);
-	console.log('selectRow current subtitleTrack ', subtitleTrack[selectedSubtitleNumber]);
-	console.log('selectRow new selection ', rowNumber);
+	console.log('selectRow current subtitleStartSeconds ', STTableMetadata[subtitleTableIndex].subtitleStartSeconds[selectedSubtitleNumber]);
+	console.log('selectRow current subtitleEndSeconds ', STTableMetadata[subtitleTableIndex].subtitleEndSeconds[selectedSubtitleNumber]);
+	console.log('selectRow current subtitleTrack ', STTableMetadata[subtitleTableIndex].subtitleTrack[selectedSubtitleNumber]);
+	}
 
 	if (rowNumber < 1) {
 		errorMsg = 'selectRow Invalid selection ' + rowNumber;
@@ -666,9 +817,13 @@ function selectRow(rowNumber, directive) {
 	}
 
 	if (!playingContinuously){
+	if (verbose) {
 		console.log("selectRow !playingContinuously");
+	}
 		if (videoStateBusy()) {
+	if (verbose) {
 			console.log("selectRow videoStateBusy");
+	}
 			playVideo(-1, 0);  // Pause the video
 		}
 	}
@@ -680,37 +835,49 @@ function selectRow(rowNumber, directive) {
 	spanEndTimeOnDashboard.textContent = "";
 	spanTrackOnDashboard.textContent = "";
 
-	spanSubtitle1.innerHTML = "";
-	spanSubtitle2.innerHTML = "";
-	spanSubtitle1Selected = false;
-	console.log("spanSubtitle1Selected = f 1");
-	spanSubtitle2Selected = false;
+	STSpan1.innerHTML = "";
+	STSpan2.innerHTML = "";
+	STSpan1Selected = false;
+	if (verbose) {
+	console.log("STSpan1Selected = f 1");
+	}
+	STSpan2Selected = false;
 
+	if (verbose) {
 	console.log("selectRow highlighting");
-	highlightSelectedRow(rowNumber);
+	}
+	highlightSelectedRow(subtitleTableIndex, rowNumber);
+	if (verbose) {
     console.log("selectRow highlighted");
+	}
 				
+	selectedSubtitleTableIndex = subtitleTableIndex;
 	selectedSubtitleNumber = rowNumber;
+	STTableMetadata[subtitleTableIndex].selectedSubtitleNumber = rowNumber;
+
+	let subtitleStartSeconds = STTableMetadata[subtitleTableIndex].subtitleStartSeconds[selectedSubtitleNumber];
+	let subtitleTable = STTableMetadata[subtitleTableIndex].STTable;
+	let subtitleTrack = STTableMetadata[subtitleTableIndex].subtitleTrack[selectedSubtitleNumber];
 				
 	unFocus();
 
 	if ((!playingContinuously) && videoFileLoaded) {
 		if (youTubeVideoId) {
-			player.seekTo(subtitleStartSeconds[selectedSubtitleNumber], true);
-			console.log("selectRow seekTo subtitleStartSeconds[selectedSubtitleNumber] ", 
-				subtitleStartSeconds[selectedSubtitleNumber], 
+			player.seekTo(subtitleStartSeconds, true);
+	if (verbose) {
+			console.log("selectRow seekTo subtitleStartSeconds ", subtitleStartSeconds,
 				" player.getCurrentTime ", player.getCurrentTime());
-
-			if (player.getPlayerState() != YT.PlayerState.PAUSED) {
+	}
+				if (player.getPlayerState() != YT.PlayerState.PAUSED) {
 				pauseYouTubeVideo();
 			}
 		}
 		else {
-			videoArea.currentTime = subtitleStartSeconds[selectedSubtitleNumber];
+			videoArea.currentTime = subtitleStartSeconds;
 		}
-		currentTime.textContent = formatTime(subtitleStartSeconds[selectedSubtitleNumber]);
+		currentTime.textContent = formatTime(subtitleStartSeconds);
 		currentTimeOnDashboard.textContent = currentTime.textContent;
-		seekBar.value = (subtitleStartSeconds[selectedSubtitleNumber] / videoDuration) * 100;
+		seekBar.value = (subtitleStartSeconds / videoDuration) * 100;
 		updateSliderFill(seekBar);
 
 	} else {
@@ -729,12 +896,13 @@ function selectRow(rowNumber, directive) {
 	}
 
 	if (rectifySubtitleStartEnabled) {
-		rectifySubtitleStart(rowNumber);
+		rectifySubtitleStart(subtitleTableIndex, rowNumber);
 	}
 	
 	spanStartTime.textContent = subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
 	spanEndTime.textContent = subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
-	if (subtitleTrack[rowNumber] > 0) {
+	if (subtitleTrack > 0) { 
+		// If more than 1 track, display track number
 		spanTrack.textContent = subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
 	}
 
@@ -742,35 +910,54 @@ function selectRow(rowNumber, directive) {
 	spanEndTimeOnDashboard.textContent = spanEndTime.textContent;
 	spanTrackOnDashboard.textContent = spanTrack.textContent;
 
-	spanSubtitle1Row = rowNumber;
-	spanSubtitle1.innerHTML =
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
-	if (spanSubtitle1.innerHTML === "") {
-		spanSubtitle1.innerHTML = "_";
+	STSpan1STTableIndex = subtitleTableIndex;
+	STSpan1RowNumber = rowNumber;
+	STSpan1.innerHTML = subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
+	if (STSpan1.innerHTML === "") {
+		STSpan1.innerHTML = "_";
 	}
-		
-	let spanSubtitle2Track = 0;
-	switch (subtitleTrack[rowNumber]) {
+
+	if (scrollStepOption === 1) {
+		computeSubtitleTableHeight();
+	if (verbose) {
+	  console.log("selectRow exiting scrollStepOption = 1");
+	}
+	  return;
+	}	
+	
+	let STSpan2TrackIndex = 0;
+	switch (subtitleTrack) {
 	case 1:
-		spanSubtitle2Track = 2;
+		STSpan2TrackIndex = 2;
 		break;
 	case 2:
-		spanSubtitle2Track = 1;
+		STSpan2TrackIndex = 1;
 		break;
 	default:
 	}
 
-	spanSubtitle2Row = findTrackRow('next', spanSubtitle2Track, rowNumber);
+	STSpan2STTableIndex = TrkFileMetadata[STSpan2TrackIndex].STTableIndex;
+	const STSpan2STTable = STTableMetadata[STSpan2STTableIndex].STTable;
 
-	if (spanSubtitle2Row) {
-	    console.log("selectRow spanSubtitle2Row = ", spanSubtitle2Row);
-		spanSubtitle2.innerHTML = subtitleTable.rows[spanSubtitle2Row].querySelector(".classSubtitleText").innerHTML;
-		if (spanSubtitle2.innerHTML === "") {
-			spanSubtitle2.innerHTML = "_";
+	if (TrkFileMetadata[STSpan2TrackIndex].STTableIndex != subtitleTableIndex) {
+		STSpan2RowNumber = rowNumber;
+		STTableMetadata[subtitleTableIndex].selectedSubtitleNumber = rowNumber;
+		STSpan2.innerHTML = STSpan2STTable.rows[STSpan2RowNumber].querySelector(".classSubtitleText").innerHTML;
+	} else {
+		let otherRow = findTrackRow('next', STSpan2TrackIndex, subtitleTableIndex, rowNumber);
+
+		if (otherRow) {
+			STSpan2RowNumber = otherRow;
+			STSpan2.innerHTML = STSpan2STTable.rows[STSpan2RowNumber].querySelector(".classSubtitleText").innerHTML;
+			if (STSpan2.innerHTML === "") {
+				STSpan2.innerHTML = "_";
+			}
 		}
 	}
 
+	if (verbose) {
     console.log("selectRow exiting");
+	}
 	computeSubtitleTableHeight();
 	return;
 
@@ -808,8 +995,8 @@ function setColor (type) {
 			}
 			break;
 		default:
-			console.log("setColor Invalid option: ", type);
-			alert("setColor Invalid option: " + type);
+			notificationMsg1 = `Invalid option: ${type}`;
+			notify("setColor");
 			return;
 	}
 
@@ -819,7 +1006,7 @@ function setColor (type) {
 		selectedCustomStyle.textContent = 
 			".selectedCustom {background-color: " + `${color3Input.value}` + " }";
 		if (selectedSubtitleNumber > 0){
-			highlightSelectedRow(selectedSubtitleNumber);
+			highlightSelectedRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
 		}
 	}
 
@@ -885,7 +1072,8 @@ function changeVideoSize(){
 	if (youTubeVideoId) {
 		newWidth = Math.round((maxVideoWidth)*fraction);
 		let newHeight = Math.round((newWidth * 9) / 16);
-		player.setSize(width=newWidth, height=newHeight);
+		console.log(`changeVideoSize fraction: ${fraction}, newWidth: ${newWidth}, newHeight: ${newHeight}, maxVideoWidth: ${maxVideoWidth}`);
+		player.setSize(newWidth, newHeight);
 		wrapper.style.width = newWidth + "px";
 		seekBarContainer.style.width = wrapper.style.width;
 	} else {
@@ -898,7 +1086,7 @@ function changeVideoSize(){
 			" videoArea.style.width = ", videoArea.style.width);
 	}
 
-	if ((lastSubtitleNumber > 0) && videoFileLoaded) { 
+	if ((totalNumberOfSubtitlesRead > 0) && videoFileLoaded) { 
 		console.log("changeVideoSize updateTime");
 		updateTime();
 	}
@@ -937,10 +1125,10 @@ function changeFont(){
 	//?? If user presses ESC instead of selecting a file, the value displayed in the setting is blank.
 	//?? If user presses END and there are 2 tracks, the last subtitle of the second track is selected
 	//?? If user presses DEL, the selected row might be out of view (maybe ok if 1st row shown = 1st row when video displayed)
-	if (selectedValue == loadFontFileOptionText){
-		subtitleFontMenu.value = spanSubtitle1.style.fontFamily
+	if (selectedValue === loadFontFileOptionText) {
+		subtitleFontMenu.value = STSpan1.style.fontFamily;
 		if (fontListFileInput) {
-			fontListFifontListFileInputleElem.value = ""; //Clear .value to make this file element reusable
+			fontListFileInput.value  = ""; //Clear .value to make this file element reusable
 			fontListFileInput.click();
 		}
 		unFocus();
@@ -949,18 +1137,44 @@ function changeFont(){
 	
 	// selectSubtitleFont.value = selectedFont;
 
-	console.log("changeFont Font changed from " + spanSubtitle1.style.fontFamily + " to " + selectedValue);
-	spanSubtitle1.style.fontFamily = selectedValue;
-	spanSubtitle2.style.fontFamily = selectedValue;
+	console.log("changeFont Font changed from " + STSpan1.style.fontFamily + " to " + selectedValue);
+	STSpan1.style.fontFamily = `"` + selectedValue + `"`;
 	computeSubtitleTableHeight();
 	unFocus();
 }
 
+function changeFont2() {
+
+	var selectedValue = subtitleFontMenu2.value;
+	//?? If user presses ESC instead of selecting a file, the value displayed in the setting is blank.
+	//?? If user presses END and there are 2 tracks, the last subtitle of the second track is selected
+	//?? If user presses DEL, the selected row might be out of view (maybe ok if 1st row shown = 1st row when video displayed)
+	if (selectedValue === loadFontFileOptionText) {
+		subtitleFontMenu2.value = STSpan2.style.fontFamily;
+		if (fontListFileInput) {
+			fontListFileInput.value  = ""; //Clear .value to make this file element reusable
+			fontListFileInput.click();
+		}
+		unFocus();
+		return;
+	}
+	
+	// selectSubtitleFont.value = selectedFont;
+
+	console.log("changeFont2 Font changed from " + STSpan2.style.fontFamily + " to " + selectedValue);
+	STSpan2.style.fontFamily = `"` + selectedValue + `"`;
+	computeSubtitleTableHeight();
+	unFocus();
+
+}
+
 function changeFontSize(){
 	var selectedValue = subtitleFontSizeMenu.value;
-	console.log("Font size changed from " + spanSubtitle1.style.fontSize + " to " + selectedValue);
-	spanSubtitle1.style.fontSize = selectedValue;
-	spanSubtitle2.style.fontSize = selectedValue;
+	var selectedValue2 = subtitleFontSizeMenu2.value;
+	console.log("Font size 1 changed from " + STSpan1.style.fontSize + " to " + selectedValue);
+	console.log("Font size 2 changed from " + STSpan2.style.fontSize + " to " + selectedValue2);
+	STSpan1.style.fontSize = selectedValue;
+	STSpan2.style.fontSize = selectedValue2;
 	computeSubtitleTableHeight();
 	unFocus();
 }
@@ -993,7 +1207,7 @@ function changeScroll(){
 
 function selectMarginLineMinHeight(e) {
 	const selectedMargin = e.currentTarget;
-	const selectedValue = Number(selectMargin.value);
+	const selectedValue = Number(selectedMargin.value);
 	let varName;
 	let oldValue;
 	let marginElement;
@@ -1012,8 +1226,7 @@ function selectMarginLineMinHeight(e) {
 		break;
 	default:
 		errorMsg = 'selectMarginLineMinHeight invalid selectedMargin.id: ' + selectedMargin.id;
-		alert(errorMsg);
-		throw new Error(errorMsg);
+		throwError(errorMsg);
 	}
 
 	console.log("selectMarginLineMinHeight ", varName, " changed from " + oldValue + 
@@ -1079,8 +1292,8 @@ function changeScrollStep(){
 			break;
 	}
 	
-	if (lastSubtitleNumber > 0) {
-		selectRow(selectedSubtitleNumber);
+	if (totalNumberOfSubtitlesRead > 0) {
+		selectRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
 	}
 	else {
 		computeSubtitleTableHeight();
@@ -1098,41 +1311,13 @@ function changeMargin(){
 
 function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 
-	let fromRow;
-
-	switch (rowOffset) {
-	case "-1":
-		fromRow = timeEditPopupRow - 1;
-		break;
-	case "+1":
-		fromRow = timeEditPopupRow + 1;
-		break;
-	default:
-		errorMsg = 'copyTime invalid rowOffset: ' + rowOffset;
-		throwError(errorMsg);
-	}
-
-	console.log("copyTime source row: ", fromRow);
-
-	if ((fromRow <= 0) || (fromRow > lastSubtitleNumber)){
-		errorMsg = "copyTime source row out of bounds: " + fromRow;
-		console.log(errorMsg);
-		alert(errorMsg);
-		throw new Error(errorMsg);
-		return;
-	}
-
-	let toType;
 	switch (elemIdTo) {
 	case "t1":
-		toType = "start";
-		break;
 	case "t2":
-		toType = "end";
 		break;
 	default:
-		console.log('copyTime Invalid target prefix ', elemIdTo);
-		alert('copyTime Invalid target prefix ' + elemIdTo);
+		errorMsg = `copyTime Invalid target: ${elemIdTo}`;
+		throwError(errorMsg);
 		return;
 	}
 
@@ -1141,8 +1326,38 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 	case "t2":
 		break;
 	default:
-		console.log('copyTime Invalid source prefix ', elemIdFrom);
-		alert('copyTime Invalid source prefix ' + elemIdFrom);
+		errorMsg = `copyTime Invalid source: ${elemIdFrom}`;
+		throwError(errorMsg);
+		return;
+	}
+
+	let fromRow;
+	switch (rowOffset) {
+	case "-1":
+		fromRow = timeEditPopupRow - 1;
+		if (configuration === "2TwinnedTracks1Table") { 
+			fromRow = findTrackRow('prev', timeEditPopupSubtitleTrack, timeEditPopupTableIndex, timeEditPopupRow);
+		}
+		break;
+	case "+1":
+		fromRow = timeEditPopupRow + 1;
+		if (configuration === "2TwinnedTracks1Table") {
+			fromRow = findTrackRow('next', timeEditPopupSubtitleTrack, timeEditPopupTableIndex, timeEditPopupRow);
+		}
+		break;
+	default:
+		errorMsg = `copyTime Invalid rowOffset: ${rowOffset}`;
+		throwError(errorMsg);
+	}
+
+	console.log(`copyTime table: ${timeEditPopupTableIndex} from row: ${fromRow} to row: ${timeEditPopupRow}`);
+
+	const tableData = STTableMetadata[timeEditPopupTableIndex];
+	const trackData = TrkFileMetadata[timeEditPopupSubtitleTrack];
+
+	if ((fromRow <= 0) || (fromRow > tableData.lastSubtitleNumber)){
+		notificationMsg1 = `Source out of bounds, table: ${timeEditPopupTableIndex} row: ${fromRow}`;
+		notify("copyTime");
 		return;
 	}
 
@@ -1152,38 +1367,38 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 	let newSeconds;
 
 	if (elemIdTo === 't1') {
-		oldText = subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent;
-		oldSeconds = subtitleStartSeconds[timeEditPopupRow];
+		oldText = tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent;
+		oldSeconds = tableData.subtitleStartSeconds[timeEditPopupRow];
 	} else {
-		oldText = subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent;
-		oldSeconds = subtitleEndSeconds[timeEditPopupRow];
+		oldText = tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent;
+		oldSeconds = tableData.subtitleEndSeconds[timeEditPopupRow];
 	}
 	if (elemIdFrom === 't1') {
-		newText = subtitleTable.rows[fromRow].querySelector(".classSubtitleStart").textContent;
-		newSeconds = subtitleStartSeconds[fromRow];
+		newText = tableData.STTable.rows[fromRow].querySelector(".classSubtitleStart").textContent;
+		newSeconds = tableData.subtitleStartSeconds[fromRow];
 	} else {
-		newText = subtitleTable.rows[fromRow].querySelector(".classSubtitleEnd").textContent;
-		newSeconds = subtitleEndSeconds[fromRow];
+		newText = tableData.STTable.rows[fromRow].querySelector(".classSubtitleEnd").textContent;
+		newSeconds = tableData.subtitleEndSeconds[fromRow];
 	}
 
-	console.log("copyTime Row ", elemIdTo, " ", toType, " changed from ",
-			oldText, " to ", newText, 
-			" seconds changed from ", oldSeconds, " to ", newSeconds);
+	console.log(`copyTime table: ${timeEditPopupTableIndex} row: ${timeEditPopupRow} ${elemIdTo} changed from ${oldText} to ${newText}`,
+		`seconds changed from ${oldSeconds} to ${newSeconds}`);
 
+	let twinnedTrack = trackData.twinnedTrack;
 	let wrapperElement;
 
 	if (elemIdTo === 't1') {
-		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = newText;
-		subtitleStartSeconds[timeEditPopupRow] = newSeconds;
-		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
-			synchronizeWithTrack1(timeEditPopupRow, "t1", newSeconds, newText);
+		tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = newText;
+		tableData.subtitleStartSeconds[timeEditPopupRow] = newSeconds;
+		if (twinnedTrack != 0) {
+			synchronizeTwinnedTrack(timeEditPopupTableIndex, timeEditPopupRow, "t1");
 		}
 		wrapperElement = copyt1;
 	} else {
-		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = newText;
-		subtitleEndSeconds[timeEditPopupRow] = newSeconds;
-		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
-			synchronizeWithTrack1(timeEditPopupRow, "t2", newSeconds, newText);
+		tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = newText;
+		tableData.subtitleEndSeconds[timeEditPopupRow] = newSeconds;
+		if (twinnedTrack != 0) {
+			synchronizeTwinnedTrack(timeEditPopupTableIndex, timeEditPopupRow, "t2");
 		}
 		wrapperElement = copyt2;
 	}
@@ -1191,7 +1406,7 @@ function copyTime(elemIdTo, rowOffset, elemIdFrom) {
 	wrapperElement.style.pointerEvents = 'none';
 	setTimeout(() => {wrapperElement.style.pointerEvents = ''}, 500);
 
-	showTimeEditPopup(timeEditPopupRow);
+	showTimeEditPopup(timeEditPopupTableIndex, timeEditPopupRow);
 
 }
 
@@ -1213,8 +1428,8 @@ function changeRange (operation) {
 		}
 		break;
 	default:
-		console.log('changeRange Invalid operation ', operation);
-		alert("changeRange Invalid operation " + operation);
+		notificationMsg1 = `Invalid operation: ${operation}`;
+		notify("changeRange");
 		return;
 	}
 	rangeCount.textContent = subsetRange;
@@ -1225,33 +1440,33 @@ function changeRange (operation) {
 	}
 }
 
-function changeTime(operation, selector, element) {
+function changeTime(operation, timeSelector, element) {
 
 	switch(operation) {
 	case "increment":
 	case "decrement":
 		break;
 	case "close":
-		showTimeEditPopup(0);
+		showTimeEditPopup(selectedSubtitleTableIndex, 0);
 		return;
 	case "restore":
-		timeEditRestore(selector); /* t1 or t2 */
-		showTimeEditPopup(timeEditPopupRow);
+		timeEditRestore(timeSelector); /* t1 or t2 */
+		showTimeEditPopup(selectedSubtitleTableIndex, timeEditPopupRow);
 		return;
 	case "current":
-		timeEditCurrent(selector); /* t1 or t2 */
-		showTimeEditPopup(timeEditPopupRow);
+		timeEditCurrent(timeSelector); /* t1 or t2 */
+		showTimeEditPopup(selectedSubtitleTableIndex, timeEditPopupRow);
 		return;
 	default:
-		console.log('changeTime Invalid operation ', operation);
-		alert("changeTime Invalid operation " + operation);
+		notificationMsg1 = `Invalid operation: ${operation}`;
+		notify("changeTime");
 		return;
 	}
 
 	let min = 0;
 	let max = 9;
 
-	switch(selector) {
+	switch(timeSelector) {
 	case "t1minuteField1":
 	case "t2minuteField1":
 	case "t1secondField1":
@@ -1278,15 +1493,15 @@ function changeTime(operation, selector, element) {
 	}
 
 	element.textContent = value;
-	saveTime(selector.substring(0,2));
+	saveTime(timeSelector.substring(0,2));
 
 	return;
 
-function saveTime (selector) {
+function saveTime (timeSelector) {
 
 	let timeObject = {};
 
-	switch (selector) {
+	switch (timeSelector) {
 		case "t1":
 			timeObject = t1timeObject;
 			break;
@@ -1294,9 +1509,8 @@ function saveTime (selector) {
 			timeObject = t2timeObject;
 			break;
 		default:
-			errorMsg = 'saveTime invalid selector: ' + selector;
-			alert(errorMsg);
-			throw new Error(errorMsg);
+			errorMsg = 'saveTime invalid timeSelector: ' + timeSelector;
+			throwError(errorMsg);
 	}
 
 	let fractionText = timeObject.millisecondField1.textContent + 
@@ -1321,29 +1535,33 @@ function saveTime (selector) {
 	console.log("saveTime fractionText ", fractionText, " timeText ", timeText, 
 		" totalSeconds ", totalSeconds);
 
-	switch (selector) {
+	const tableData = STTableMetadata[timeEditPopupTableIndex];
+	const trackData = TrkFileMetadata[timeEditPopupSubtitleTrack];
+	const twinnedTrack = trackData.twinnedTrack;
+
+	switch (timeSelector) {
 	case "t1":
-		console.log("saveTime Row ", timeEditPopupRow, " start ", 
+		console.log("saveTime table ", timeEditPopupTableIndex, " row ", timeEditPopupRow, " start ", 
 			" old ", 
-			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
+			tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
 			" new ", timeText, 
-			" seconds old ", subtitleStartSeconds[timeEditPopupRow], " new ", totalSeconds);
-		subtitleStartSeconds[timeEditPopupRow] = totalSeconds;
-		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = timeText;
-		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
-			synchronizeWithTrack1(timeEditPopupRow, "t1", totalSeconds, timeText);
+			" seconds old ", tableData.subtitleStartSeconds[timeEditPopupRow], " new ", totalSeconds);
+		tableData.subtitleStartSeconds[timeEditPopupRow] = totalSeconds;
+		tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = timeText;
+		if (twinnedTrack != 0) {
+			synchronizeTwinnedTrack(timeEditPopupTableIndex, timeEditPopupRow, "t1");
 		}
 		break;
 	case "t2":
-		console.log("saveTime Row ", timeEditPopupRow, " end ",
+		console.log("saveTime table ", timeEditPopupTableIndex, " row ", timeEditPopupRow, " end ",
 			" old ", 
-			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
+			tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
 			" new ", timeText, 
-			" seconds old ", subtitleEndSeconds[timeEditPopupRow], " new ", totalSeconds);
-		subtitleEndSeconds[timeEditPopupRow] = totalSeconds;
-		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = timeText;
-		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
-			synchronizeWithTrack1(timeEditPopupRow, "t2", totalSeconds, timeText);
+			" seconds old ", tableData.subtitleEndSeconds[timeEditPopupRow], " new ", totalSeconds);
+		tableData.subtitleEndSeconds[timeEditPopupRow] = totalSeconds;
+		tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = timeText;
+		if (twinnedTrack != 0) {
+			synchronizeTwinnedTrack(timeEditPopupTableIndex, timeEditPopupRow, "t2");
 		}
 		break;
 	default:
@@ -1351,35 +1569,39 @@ function saveTime (selector) {
 	
 }  // saveTime
 
-function timeEditRestore(prefix) {
+function timeEditRestore(timeSelector) {
 
-	switch (prefix) {
+	const tableData = STTableMetadata[timeEditPopupTableIndex];
+	const trackData = TrkFileMetadata[timeEditPopupSubtitleTrack];
+	const twinnedTrack = trackData.twinnedTrack;
+
+	switch (timeSelector) {
 	case "t1":
-		console.log("timeEditRestore Row ", timeEditPopupRow, " start restored from ",
-			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
+		console.log("timeEditRestore table ", timeEditPopupTableIndex, " row ", timeEditPopupRow, " start restored from ",
+			tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
 			" to ", t1timeEditPopupOldTime, 
-			" seconds restored from ", subtitleStartSeconds[timeEditPopupRow], 
+			" seconds restored from ", tableData.subtitleStartSeconds[timeEditPopupRow], 
 			" to ", t1timeEditPopupOldSeconds);
-		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = t1timeEditPopupOldTime;
-		subtitleStartSeconds[timeEditPopupRow] = t1timeEditPopupOldSeconds;
-		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
-			synchronizeWithTrack1(timeEditPopupRow, "t1", t1timeEditPopupOldSecondsOnTrack2, t1timeEditPopupOldTimeOnTrack2);
+		tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = t1timeEditPopupOldTime;
+		tableData.subtitleStartSeconds[timeEditPopupRow] = t1timeEditPopupOldSeconds;
+		if (twinnedTrack != 0) {
+				synchronizeTwinnedTrack(timeEditPopupTableIndex, timeEditPopupRow, "t1");
 		}
 		break;
 	case "t2":
-		console.log("timeEditRestore Row ", timeEditPopupRow, " end restored from ",
-			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
+		console.log("timeEditRestore table ", timeEditPopupTableIndex, " row ", timeEditPopupRow, " end restored from ",
+			tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
 			" to ", t2timeEditPopupOldTime, 
-			" seconds restored from ", subtitleEndSeconds[timeEditPopupRow], 
+			" seconds restored from ", tableData.subtitleEndSeconds[timeEditPopupRow], 
 			" to ", t2timeEditPopupOldSeconds);
-			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = t2timeEditPopupOldTime;
-			subtitleEndSeconds[timeEditPopupRow] = t2timeEditPopupOldSeconds;
-			if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
-				synchronizeWithTrack1(timeEditPopupRow, "t2", t2timeEditPopupOldSecondsOnTrack2, t2timeEditPopupOldTimeOnTrack2);
-			}
+		tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = t2timeEditPopupOldTime;
+		tableData.subtitleEndSeconds[timeEditPopupRow] = t2timeEditPopupOldSeconds;
+		if (twinnedTrack != 0) {
+			synchronizeTwinnedTrack(timeEditPopupTableIndex, timeEditPopupRow, "t2");
+		}
 		break;
 	default:
-		console.log('timeEditRestore Invalid prefix ', prefix);
+		console.log('timeEditRestore Invalid timeSelector ', timeSelector);
 		return;
 	}
 
@@ -1401,30 +1623,35 @@ function timeEditCurrent(prefix) {
 	currentTime.textContent = formatTime(current);
 	currentTimeOnDashboard.textContent = currentTime.textContent;
 
-
+	const tableData = STTableMetadata[timeEditPopupTableIndex];
+	const trackData = TrkFileMetadata[timeEditPopupSubtitleTrack];
+	const twinnedTrack = trackData.twinnedTrack;
+	
 	switch (prefix) {
 	case "t1":
-		console.log("timeEditCurrent Row ", timeEditPopupRow, " start changed from ",
-			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
+		console.log("timeEditCurrent table ", timeEditPopupTableIndex, " row ", timeEditPopupRow, 
+			" start changed from ", 
+			tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent,
 			" to ", timeText, 
-			" seconds changed from ", subtitleStartSeconds[timeEditPopupRow], 
+			" seconds changed from ", tableData.subtitleStartSeconds[timeEditPopupRow], 
 			" to ", current);
-		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = timeText;
-		subtitleStartSeconds[timeEditPopupRow] = current;
-		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
-			synchronizeWithTrack1(timeEditPopupRow, "t1", current, timeText);
+		tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleStart").textContent = timeText;
+		tableData.subtitleStartSeconds[timeEditPopupRow] = current;
+		if (twinnedTrack != 0) {
+			synchronizeTwinnedTrack(timeEditPopupTableIndex, timeEditPopupRow, "t1");
 		}
 		break;
 	case "t2":
-		console.log("timeEditCurrent Row ", timeEditPopupRow, " end changed from ",
-			subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
+		console.log("timeEditCurrent table ", timeEditPopupTableIndex, " row ", timeEditPopupRow, 
+			" end changed from ",
+			tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent,
 			" to ", timeText, 
-			" seconds changed from ", subtitleEndSeconds[timeEditPopupRow], 
+			" seconds changed from ", tableData.subtitleEndSeconds[timeEditPopupRow], 
 			" to ", current);
-		subtitleTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = timeText;
-		subtitleEndSeconds[timeEditPopupRow] = current;
-		if ((subtitleTrack[timeEditPopupRow] === 1) && (timeEditSynchronizeWithTrack1)) {
-			synchronizeWithTrack1(timeEditPopupRow, "t2", current, timeText);
+		tableData.STTable.rows[timeEditPopupRow].querySelector(".classSubtitleEnd").textContent = timeText;
+		tableData.subtitleEndSeconds[timeEditPopupRow] = current;
+		if (twinnedTrack != 0) {
+			synchronizeTwinnedTrack(timeEditPopupTableIndex, timeEditPopupRow, "t2");
 		}
 		break;
 	default:
@@ -1436,8 +1663,9 @@ function timeEditCurrent(prefix) {
 
 }  // changeTime
 
-function findTrackRow(option, trackNumber, rowNumber) {
+function findTrackRow(option, trackNumber, subtitleTableIndex, rowNumber) {
 
+	console.log("findTrackRow ", option, " ", trackNumber, " ", subtitleTableIndex, " ", rowNumber);
 	switch (trackNumber) {
 		case 0:
 		case 1:
@@ -1445,17 +1673,18 @@ function findTrackRow(option, trackNumber, rowNumber) {
 			break;
 		default:
 			errorMsg = 'findTrackRow invalid trackNumber: ' + trackNumber;
-			alert(errorMsg);
-			throw new Error(errorMsg);
+			throwError(errorMsg);
 	}
 	 
 	let resultRow = 0;
-
+ 
 	switch (option) {
 		case "next":
 			let nextRow = rowNumber + 1;
-			while ((!resultRow) && (nextRow <= lastSubtitleNumber)) {
-				if (subtitleTrack[nextRow] === trackNumber) {
+	console.log("findTrackRow ", nextRow);
+	console.log("findTrackRow ", STTableMetadata[subtitleTableIndex].lastSubtitleNumber);
+			while ((!resultRow) && (nextRow <= STTableMetadata[subtitleTableIndex].lastSubtitleNumber)) {
+				if (STTableMetadata[subtitleTableIndex].subtitleTrack[nextRow] === trackNumber) {
 					resultRow = nextRow;
 				} else {
 					nextRow++;
@@ -1465,7 +1694,7 @@ function findTrackRow(option, trackNumber, rowNumber) {
 		case "prev":
 			let prevRow = rowNumber - 1;
 			while ((!resultRow) && (prevRow > 0)) {
-				if (subtitleTrack[prevRow] === trackNumber) {
+				if (STTableMetadata[subtitleTableIndex].subtitleTrack[prevRow] === trackNumber) {
 					resultRow = prevRow;
 				} else {
 					prevRow--;
@@ -1474,8 +1703,7 @@ function findTrackRow(option, trackNumber, rowNumber) {
 			break;
 		default:
 			errorMsg = 'findTrackRow invalid option: ' + option;
-			alert(errorMsg);
-			throw new Error(errorMsg);
+			throwError(errorMsg);
 	}
 
 
@@ -1483,66 +1711,136 @@ function findTrackRow(option, trackNumber, rowNumber) {
 
 }
 
-function synchronizeWithTrack1(rowNumber, prefix, time, timeText) {
-	let sourceTrack = subtitleTrack[rowNumber];
-	if (sourceTrack != 1) {
-		errorMsg = 'synchronizeWithTrack1 invalid sourceTrack: ' + sourceTrack + " rowNumber= " + rowNumber;
-		alert(errorMsg);
-		throw new Error(errorMsg);
+function findTwinnedRow(subtitleTableIndex, rowNumber) {
+
+	const tableData = STTableMetadata[subtitleTableIndex];
+	const subtitleTrack = tableData.subtitleTrack[rowNumber];
+	const trackData = TrkFileMetadata[subtitleTrack];
+
+	let twinnedTrack = trackData.twinnedTrack;
+
+	if (twinnedTrack === 0) {
+		errorMsg = `findTwinnedRow Twinned track not defined, table: ${subtitleTableIndex} row: ${rowNumber}`;
+		throwError(errorMsg);
 	}
 
-	let targetRow = findTrackRow('next', 2, rowNumber);
-	if (!targetRow) { return; }
+	const twinnedTrackData = TrkFileMetadata[twinnedTrack];
+	const twinnedTableData = STTableMetadata[twinnedTrackData.STTableIndex];
 
-	switch (prefix) {
+	let twinnedRow = 0;
+
+	if (trackData.STTableIndex != twinnedTrackData.STTableIndex) {
+		if (rowNumber <= twinnedTrackData.lastSubtitleNumber) {
+			twinnedRow = rowNumber;
+		}
+	} else {
+		if (subtitleTrack < twinnedTrack) {
+			twinnedRow = findTrackRow('next', twinnedTrack, trackData.STTableIndex, rowNumber);
+		} else {
+			twinnedRow = findTrackRow('prev', twinnedTrack, trackData.STTableIndex, rowNumber);
+		}
+	};
+
+	if (twinnedRow <= 0) {
+		errorMsg = `findTwinnedRow Twinned row not found, table: ${subtitleTableIndex} row: ${rowNumber}`;
+		throwError(errorMsg);
+	}
+
+	return twinnedRow;
+
+}  //  findTwinnedRow
+
+function synchronizeTwinnedTrack(subtitleTableIndex, rowNumber, timeSelector) {
+
+	switch (timeSelector) {
 		case "t1":
-			subtitleStartSeconds[targetRow] = time;
-			subtitleTable.rows[targetRow].querySelector(".classSubtitleStart").textContent = timeText;
-			break;
 		case "t2":
-			subtitleEndSeconds[targetRow] = time;
-			subtitleTable.rows[targetRow].querySelector(".classSubtitleEnd").textContent = timeText;
 			break;
 		default:
-			errorMsg = 'synchronizeWithTrack1 invalid prefix: ' + prefix;
-			alert(errorMsg);
-			throw new Error(errorMsg);
+			errorMsg = `synchronizeTwinnedTrack Invalid timeSelector: ${timeSelector}`;
+			throwError(errorMsg);
 	}
-}  // synchronizeWithTrack1
+	
+	const tableData = STTableMetadata[subtitleTableIndex];
+	const subtitleTrack = tableData.subtitleTrack[rowNumber];
+	const trackData = TrkFileMetadata[subtitleTrack];
 
-function rectifySubtitleStart(rowNumber) {
+	let twinnedTrack = trackData.twinnedTrack;
 
-	let previousRow = rowNumber - 1;
-	let previousRowFound = false;
-	while ((!previousRowFound) && (previousRow > 0)) {
-		if (subtitleTrack[previousRow] === subtitleTrack[rowNumber]) {
-			previousRowFound = true;
-		} else {
-			previousRow--;
+	if (twinnedTrack === 0) { return; }
+
+	const twinnedTrackData = TrkFileMetadata[twinnedTrack];
+	const twinnedTableData = STTableMetadata[twinnedTrackData.STTableIndex];
+	let twinnedRow = findTwinnedRow(subtitleTableIndex, rowNumber);
+/*
+	let twinnedRow = 0;
+	const twinnedTrackData = TrkFileMetadata[twinnedTrack];
+	const twinnedTableData = STTableMetadata[twinnedTrackData.STTableIndex];
+
+	if (trackData.STTableIndex != twinnedTrackData.STTableIndex) {
+		if (rowNumber <= twinnedTrackData.lastSubtitleNumber) {
+			twinnedRow = rowNumber;
 		}
+	} else {
+		if (subtitleTrack < twinnedTrack) {
+			twinnedRow = findTrackRow('next', twinnedTrack, trackData.STTableIndex, rowNumber);
+		} else {
+			twinnedRow = findTrackRow('prev', twinnedTrack, trackData.STTableIndex, rowNumber);
+		}
+	};
+
+	if (twinnedRow <= 0) {
+		errorMsg = `synchronizeTwinnedTrack Twinned row not found, table: ${subtitleTableIndex} row: ${rowNumber}`;
+		throwError(errorMsg);
 	}
+*/
+	switch (timeSelector) {
+		case "t1":
+			twinnedTableData.subtitleStartSeconds[twinnedRow] = tableData.subtitleStartSeconds[rowNumber];
+			twinnedTableData.STTable.rows[twinnedRow].querySelector(".classSubtitleStart").textContent = 
+				tableData.STTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
+			break;
+		case "t2":
+			twinnedTableData.subtitleEndSeconds[twinnedRow] = tableData.subtitleEndSeconds[rowNumber];
+			twinnedTableData.STTable.rows[twinnedRow].querySelector(".classSubtitleEnd").textContent = 
+				tableData.STTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
+			break;
+		default:
+	}
+}  // synchronizeTwinnedTrack
 
-	if (!previousRowFound) { return; }
+function rectifySubtitleStart(subtitleTableIndex, rowNumber) {
 
-	if (subtitleStartSeconds[rowNumber] >= subtitleEndSeconds[previousRow]) { return; }
+	const tableData = STTableMetadata[subtitleTableIndex];
+	const subtitleTrack = tableData.subtitleTrack[rowNumber];
+	const trackData = TrkFileMetadata[subtitleTrack];
 
-	subtitleStartSeconds[rowNumber] = subtitleEndSeconds[previousRow];
-	subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent =
-		subtitleTable.rows[previousRow].querySelector(".classSubtitleEnd").textContent;
+	let previousRow = findTrackRow('prev', subtitleTrack, subtitleTableIndex, rowNumber);
 
-	if ((subtitleTrack[rowNumber] === 1) && (timeEditSynchronizeWithTrack1)) {
-		synchronizeWithTrack1(rowNumber, "t1", 
-			subtitleStartSeconds[rowNumber], 
-			subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent);
+	if (previousRow === 0) { return; }
+
+	if (tableData.subtitleStartSeconds[rowNumber] >= 
+		tableData.subtitleEndSeconds[previousRow]) { return; }
+
+	tableData.subtitleStartSeconds[rowNumber] = tableData.subtitleEndSeconds[previousRow];
+	tableData.STTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent =
+		tableData.STTable.rows[previousRow].querySelector(".classSubtitleEnd").textContent;
+
+	let twinnedTrack = trackData.twinnedTrack;
+
+	if (twinnedTrack != 0) {
+		synchronizeTwinnedTrack(subtitleTableIndex, rowNumber, "t1");
 	}
 
 }  // rectifySubtitleStart
 
 function undo() {
+
 	console.log("undo undoArrayCurrentIndex = ", undoArrayCurrentIndex);
+
 	if (undoArrayCurrentIndex >= 0) {
 		console.log("undo undoArray[undoArrayCurrentIndex] = ", undoArray[undoArrayCurrentIndex]);
-		console.log("redo undoArray[undoArrayCurrentIndex].inUse = ", undoArray[undoArrayCurrentIndex].inUse);
+		console.log("undo undoArray[undoArrayCurrentIndex].inUse = ", undoArray[undoArrayCurrentIndex].inUse);
 	}
 
 	if ((undoArrayCurrentIndex < 0) || (!(undoArray[undoArrayCurrentIndex].inUse))) {
@@ -1550,39 +1848,93 @@ function undo() {
 		return;
 	}
 
+	const tableData = STTableMetadata[undoArray[undoArrayCurrentIndex].selectedSubtitleTableIndex];
+	tableData.STTable.rows[tableData.selectedSubtitleNumber].classList.remove("selectedCustom");
+
 	switch (undoArray[undoArrayCurrentIndex].action) {
 	case "subtitleTextChange":
-		subtitleTable.rows[undoArray[undoArrayCurrentIndex].rowNumber].querySelector(".classSubtitleText").textContent =
+		let rowNumber = undoArray[undoArrayCurrentIndex].rowNumber;
+		tableData.STTable.rows[rowNumber].querySelector(".classSubtitleText").textContent =
 			undoArray[undoArrayCurrentIndex].oldValue;
 		break;
-	case "subtitleDeletion":
-		let deletedRowNumber = undoArray[undoArrayCurrentIndex].rowNumber;
-		insertSubtitle((deletedRowNumber - 1), 
-						undoArray[undoArrayCurrentIndex].oldValue, 
-						undoArray[undoArrayCurrentIndex].subtitleTrack, 
-						"selectNone");
-		subtitleTrack[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleTrack;
-		subtitleStartSeconds[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleStartSeconds;
-		subtitleEndSeconds[deletedRowNumber] = undoArray[undoArrayCurrentIndex].subtitleEndSeconds;
-		subtitleTable.rows[deletedRowNumber].querySelector(".classSubtitleStart").textContent =
-			undoArray[undoArrayCurrentIndex].startTime;
-		subtitleTable.rows[deletedRowNumber].querySelector(".classSubtitleEnd").textContent =
-			undoArray[undoArrayCurrentIndex].endTime;
-		if (subtitleTrack[deletedRowNumber] > 0) {
-			subtitleTable.rows[deletedRowNumber].querySelector(".classSubtitleTrack").textContent =
-				undoArray[undoArrayCurrentIndex].subtitleStyle;
+
+	case "subtitleInsertion":
+			if (!(undoArray[undoArrayCurrentIndex].hasOwnProperty("twinnedTrackObj"))) {
+			let subtitleTableIndex = undoArray[undoArrayCurrentIndex].subtitleTableIndex;
+			let tableData1 = STTableMetadata[subtitleTableIndex];
+			let row = undoArray[undoArrayCurrentIndex].newRowNumber;
+			console.log("subtitleInsertion row ", row, " tableData1 ", tableData1);
+			deleteRow(tableData1, row); 
+		} else {
+			// let tableData1 = STTableMetadata[undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleTableIndex1].STTable;
+			//let tableData1 = undoArray[undoArrayCurrentIndex].twinnedTrackObj.tableData1;
+			let subtitleTableIndex1 = undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleTableIndex1;
+			let tableData1 = STTableMetadata[subtitleTableIndex1];
+			let row1 = undoArray[undoArrayCurrentIndex].twinnedTrackObj.newRowNumber;
+			//let tableData2 = undoArray[undoArrayCurrentIndex].twinnedTrackObj.tableData2;
+			//let tableData2 = STTableMetadata[undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleTableIndex2].STTable;
+			let subtitleTableIndex2 = undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleTableIndex2;
+			let tableData2 = STTableMetadata[subtitleTableIndex2];
+			let row2 = undoArray[undoArrayCurrentIndex].twinnedTrackObj.newRowNumber2;
+			deleteRow(tableData2, row2); 
+			deleteRow(tableData1, row1); 
 		}
-		subtitleTable.rows[deletedRowNumber].querySelector(".classSubtitleText").textContent =
-			undoArray[undoArrayCurrentIndex].oldValue;
-		selectRow(undoArray[undoArrayCurrentIndex].selectedRowNumber);
 		break;
+
+	case "subtitleDeletion":
+		let subtitleTableIndex = undoArray[undoArrayCurrentIndex].selectedSubtitleTableIndex;
+		let deletedRowNumber = undoArray[undoArrayCurrentIndex].rowNumber;
+
+		let rowObject = {};
+		rowObject.startSeconds = undoArray[undoArrayCurrentIndex].subtitleStartSeconds;
+		rowObject.endSeconds = undoArray[undoArrayCurrentIndex].subtitleEndSeconds;
+		rowObject.track = undoArray[undoArrayCurrentIndex].subtitleTrack;
+
+		rowObject.startTime = undoArray[undoArrayCurrentIndex].startTime;
+		rowObject.endTime = undoArray[undoArrayCurrentIndex].endTime;
+		rowObject.subtitleStyle = undoArray[undoArrayCurrentIndex].subtitleStyle;
+		rowObject.subtitle = undoArray[undoArrayCurrentIndex].oldValue;
+
+		if (!(undoArray[undoArrayCurrentIndex].hasOwnProperty("twinnedTrackObj"))) {
+			insertRow(tableData, deletedRowNumber);
+			createSubtitleRow(rowObject, subtitleTableIndex, deletedRowNumber);
+		} else {
+			let rowObject2 = {};
+			rowObject2.startSeconds = undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleStartSeconds;
+			rowObject2.endSeconds = undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleEndSeconds;
+			rowObject2.track = undoArray[undoArrayCurrentIndex].twinnedTrackObj.twinnedTrack;
+
+			rowObject2.startTime = undoArray[undoArrayCurrentIndex].twinnedTrackObj.startTime;
+			rowObject2.endTime = undoArray[undoArrayCurrentIndex].twinnedTrackObj.endTime;
+			rowObject2.subtitleStyle = undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleStyle;
+			rowObject2.subtitle = undoArray[undoArrayCurrentIndex].twinnedTrackObj.oldValue;
+
+			let deletedRowNumber2 = undoArray[undoArrayCurrentIndex].twinnedTrackObj.twinnedRow;
+			let twinnedTrackData = TrkFileMetadata[rowObject2.track];
+			let twinnedTableData = STTableMetadata[twinnedTrackData.STTableIndex];
+			let subtitleTableIndex2 = undoArray[undoArrayCurrentIndex].twinnedTrackObj.STTableIndex;
+
+			if (deletedRowNumber >= deletedRowNumber2) { 
+				deleteRow(tableData, deletedRowNumber);
+				deleteRow(twinnedTableData, deletedRowNumber2);
+			} else {
+				deleteRow(twinnedTableData, deletedRowNumber2);
+				deleteRow(tableData, deletedRowNumber);
+			}
+			createSubtitleRow(rowObject, subtitleTableIndex, deletedRowNumber);
+			createSubtitleRow(rowObject2, subtitleTableIndex2, deletedRowNumber2);
+		};
+		break;
+
 	default:
-		console.log('undo Invalid action ', undoArray[undoArrayCurrentIndex].action);
-		alert("undo Invalid action " + undoArray[undoArrayCurrentIndex].action);
+		notificationMsg1 = `Invalid action: ${undoArray[undoArrayCurrentIndex].action}`;
+		notify("undo");
 		return;
 	}
 
-	selectRow(undoArray[undoArrayCurrentIndex].selectedRowNumber);
+	selectRow(undoArray[undoArrayCurrentIndex].selectedSubtitleTableIndex,
+	undoArray[undoArrayCurrentIndex].selectedSubtitleNumber);
+
 	selectCurrentIndex("redoArray");
 	swapUndoElement();
 
@@ -1616,8 +1968,8 @@ function selectCurrentIndex(arrayName) {
 		}
 		break;
 	default:
-		console.log('selectCurrentIndex Invalid arrayName ', arrayName);
-		alert("selectCurrentIndex Invalid arrayName " + arrayName);
+		notificationMsg1 = `Invalid arrayName: ${arrayName}`;
+		notify("selectCurrentIndex");
 		return;
 
 	}
@@ -1626,8 +1978,14 @@ function selectCurrentIndex(arrayName) {
 function swapUndoElement() {
     const objFrom1 = undoArray[undoArrayCurrentIndex];
     const objFrom2 = redoArray[redoArrayCurrentIndex];
-    undoArray[undoArrayCurrentIndex] = structuredClone(objFrom2);
-    redoArray[redoArrayCurrentIndex] = structuredClone(objFrom1);
+	console.log("swapUndoElement objFrom1 ", objFrom1);
+	console.log("swapUndoElement objFrom2 ", objFrom2);
+    let clone1 = structuredClone(objFrom2);
+    undoArray[undoArrayCurrentIndex] = clone1;
+    let clone2 = structuredClone(objFrom1);
+    redoArray[redoArrayCurrentIndex] = clone2;
+    //undoArray[undoArrayCurrentIndex] = structuredClone(objFrom2);
+    //redoArray[redoArrayCurrentIndex] = structuredClone(objFrom1);
 }
 
 function redo() {
@@ -1645,19 +2003,35 @@ function redo() {
 
 	switch (redoArray[redoArrayCurrentIndex].action) {
 	case "subtitleTextChange":
+		let subtitleTable = STTableMetadata[redoArray[redoArrayCurrentIndex].selectedSubtitleTableIndex].STTable;
 		subtitleTable.rows[redoArray[redoArrayCurrentIndex].rowNumber].querySelector(".classSubtitleText").innerHTML =
 			redoArray[redoArrayCurrentIndex].newValue;
-		selectRow(redoArray[redoArrayCurrentIndex].selectedRowNumber);
+		selectRow(redoArray[redoArrayCurrentIndex].selectedSubtitleTableIndex,
+			redoArray[redoArrayCurrentIndex].selectedSubtitleNumber);
 		selectCurrentIndex("undoArray");
 		swapUndoElement();
 		break;
-	case "subtitleDeletion":
-		selectRow(redoArray[redoArrayCurrentIndex].selectedRowNumber);
+
+		case "subtitleInsertion":
+		selectRow(redoArray[redoArrayCurrentIndex].selectedSubtitleTableIndex,
+			redoArray[redoArrayCurrentIndex].selectedSubtitleNumber);
+		insertSubtitle(redoArray[redoArrayCurrentIndex].trackNumber,
+			redoArray[redoArrayCurrentIndex].subtitleTableIndex,
+			redoArray[redoArrayCurrentIndex].insertDirection,
+			redoArray[redoArrayCurrentIndex].rowNumber,
+			redoArray[redoArrayCurrentIndex].text,
+			redoArray[redoArrayCurrentIndex].selectOption);
+		break;
+
+		case "subtitleDeletion":
+		selectRow(redoArray[redoArrayCurrentIndex].selectedSubtitleTableIndex,
+			redoArray[redoArrayCurrentIndex].selectedSubtitleNumber);
 		textEditPopupAction('delete');
 		break;
-	default:
-		console.log('redo Invalid action ', redoArray[redoArrayCurrentIndex].action);
-		alert("redo Invalid action " + redoArray[redoArrayCurrentIndex].action);
+
+		default:
+		notificationMsg1 = `Invalid action: ${redoArray[redoArrayCurrentIndex].action}`;
+		notify("redo");
 		return;
 	}
 
@@ -1733,11 +2107,11 @@ function enableFields(checkBox){
 		}
 		break;
 	case myCheck09:
-		if (myCheck09.checked == true) {
-			timeEditSynchronizeWithTrack1 = true;
-		} else {
-			timeEditSynchronizeWithTrack1 = false;
-		}
+		//if (myCheck09.checked == true) {
+		//	timeEditSynchronizeTwinnedTrack = true;
+		//} else {
+		//	timeEditSynchronizeTwinnedTrack = false;
+		//}
 		break;
 	case myCheck10:
 		toggleDashboard();
@@ -1783,19 +2157,19 @@ function toggleDashboard() {
 
 function toggleEditing() {
 
-	if (spanSubtitle1.contentEditable == "false") {
+	if (STSpan1.contentEditable == "false") {
 		console.log("toggleEditing editing changing to true");
-		spanSubtitle1.contentEditable = "true";
-		spanSubtitle2.contentEditable = "true";
+		STSpan1.contentEditable = "true";
+		STSpan2.contentEditable = "true";
 		myCheck07.checked = true;
 	} else {
 		console.log("toggleEditing editing changing to false");
-		spanSubtitle1.contentEditable = "false";
-		spanSubtitle2.contentEditable = "false";
+		STSpan1.contentEditable = "false";
+		STSpan2.contentEditable = "false";
 		myCheck07.checked = false;
 	}
 
-	console.log("toggleEditing editing ", spanSubtitle1.contentEditable);
+	console.log("toggleEditing editing ", STSpan1.contentEditable);
 
 }
 
@@ -1833,7 +2207,7 @@ function toggleVideoSection() {
 	}
 	console.log("toggleVideoSection showVideo = ", showVideo);
 	computeSubtitleTableHeight();
-	selectRow(selectedSubtitleNumber);
+	selectRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
 
 }
 
@@ -1857,7 +2231,7 @@ function changeTheme(newThemeNumber) {
 	customColorsCheckbox.checked = false;
 
 	if (selectedSubtitleNumber > 0){
-		highlightSelectedRow(selectedSubtitleNumber);
+		highlightSelectedRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
 	 }
 				
 }  // changeTheme
@@ -1875,15 +2249,17 @@ function skipBackward() {
 	let newTime = videoCurrentTime - skipBackwardSeconds;
 	console.log("skipBackward newTime ", newTime);
 
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
+
 	if (playing && !playingContinuously) {
-		if (newTime < subtitleStartSeconds[selectedSubtitleNumber]) {
-			newTime = subtitleStartSeconds[selectedSubtitleNumber];
+		if (newTime < tableData.subtitleStartSeconds[selectedSubtitleNumber]) {
+			newTime = tableData.subtitleStartSeconds[selectedSubtitleNumber];
 		}
 		skipTo(newTime);
 		return;
 	}
 	
-	if (newTime >= subtitleStartSeconds[selectedSubtitleNumber]) {
+	if (newTime >= tableData.subtitleStartSeconds[selectedSubtitleNumber]) {
 		skipTo(newTime);
 		return;
 	}
@@ -1892,16 +2268,17 @@ function skipBackward() {
 	let rowIndex = selectedSubtitleNumber;
 
 	do {
-		rowIndex = findTrackRow('prev', subtitleTrack[selectedSubtitleNumber], rowIndex);
+		let trackNumber = tableData.subtitleTrack[selectedSubtitleNumber];
+		rowIndex = findTrackRow('prev', trackNumber, selectedSubtitleTableIndex, rowIndex);
 		if (!rowIndex) {
 			stop = true;
 		} else {
-			if (newTime > subtitleEndSeconds[rowIndex]) {
+			if (newTime > tableData.subtitleEndSeconds[rowIndex]) {
 				stop = true;
 			} 
 			else {
-				if (newTime >= subtitleStartSeconds[rowIndex]) {
-					selectRow(rowIndex);
+				if (newTime >= tableData.subtitleStartSeconds[rowIndex]) {
+					selectRow(selectedSubtitleTableIndex, rowIndex);
 					stop = true;
 				}
 			} 
@@ -1942,15 +2319,17 @@ function skipForward() {
 
 	let newTime = videoCurrentTime + skipForwardSeconds;
 
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
+
 	if (playing && !playingContinuously) {
-		if (newTime > subtitleEndSeconds[selectedSubtitleNumber]) {
-			newTime = subtitleEndSeconds[selectedSubtitleNumber] - skipForwardSeconds;
+		if (newTime > tableData.subtitleEndSeconds[selectedSubtitleNumber]) {
+			newTime = tableData.subtitleEndSeconds[selectedSubtitleNumber] - skipForwardSeconds;
 		}
 		skipTo(newTime);
 		return;
 	}
 
-	if (newTime <= subtitleEndSeconds[selectedSubtitleNumber]) {
+	if (newTime <= tableData.subtitleEndSeconds[selectedSubtitleNumber]) {
 		skipTo(newTime);
 		return;
 	}
@@ -1959,16 +2338,17 @@ function skipForward() {
 	let rowIndex = selectedSubtitleNumber;
 
 	do {
-		rowIndex = findTrackRow('next', subtitleTrack[selectedSubtitleNumber], rowIndex);
+		rowIndex = findTrackRow('next', tableData.subtitleTrack[selectedSubtitleNumber], 
+			selectedSubtitleTableIndex, rowIndex);
 		if (!rowIndex) {
 			stop = true;
 		} else {
-			if (newTime < subtitleStartSeconds[rowIndex]) {
+			if (newTime < tableData.subtitleStartSeconds[rowIndex]) {
 				stop = true;
 			} 
 			else {
-				if (newTime <= subtitleEndSeconds[rowIndex]) {
-					selectRow(rowIndex);
+				if (newTime <= tableData.subtitleEndSeconds[rowIndex]) {
+					selectRow(selectedSubtitleTableIndex, rowIndex);
 					stop = true;
 				}
 			}
@@ -1976,52 +2356,38 @@ function skipForward() {
 	}
 	while ((!stop))
 
-/*	
-	let increment = 1;
-	let stop = false;
-	while ((!stop) && ((selectedSubtitleNumber + increment) >= 1)) {
-		if (spanTrack.textContent) ==
-			(subtitleTable.rows[selectedSubtitleNumber + increment].querySelector(".classSubtitleTrack").textContent)) {
-			if (newTime < subtitleStartSeconds[selectedSubtitleNumber + increment]) {
-				stop = true;
-			} 
-			else {
-				if (newTime <= subtitleEndSeconds[selectedSubtitleNumber + increment]) {
-					selectRow(selectedSubtitleNumber + increment);
-					stop = true;
-				}
-			} 
-		}
-		if (!stop) {
-			increment += 1;
-		}
-	}
-*/
 	skipTo(newTime);	
 
 }
 
 function checkTime() {
 	if (!checkTimeEnabled) {
+	if (verbose) {
 		console.log('checkTime entered while NOT Enabled');
+	}
 		if (!youTubeVideoId) {
 			videoArea.removeEventListener("timeupdate",checkTime,true);
 		}
 		return;
 	}
+	if (verbose) {
    	console.log('checkTime entered.');
+	}
 	let videoCurrentTime = 0;
 	
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
+
 	if (playingContinuously) {
-		let rowIndex = findTrackRow('next', subtitleTrack[selectedSubtitleNumber], selectedSubtitleNumber);
+		let rowIndex = findTrackRow('next', tableData.subtitleTrack[selectedSubtitleNumber], 
+			selectedSubtitleTableIndex, selectedSubtitleNumber);
 		if (youTubeVideoId) {
 			videoCurrentTime = player.getCurrentTime();
 		}
 		else {
 			videoCurrentTime = videoArea.currentTime;
 		}
-		if ((rowIndex) && (videoCurrentTime >= subtitleStartSeconds[rowIndex])) {
-			selectRow(rowIndex);
+		if ((rowIndex) && (videoCurrentTime >= tableData.subtitleStartSeconds[rowIndex])) {
+			selectRow(selectedSubtitleTableIndex, rowIndex);
 		}
 		if (youTubeVideoId) {
 			setTimeout(checkTime, checkTimeInterval);
@@ -2037,10 +2403,14 @@ function checkTime() {
 	else {
 		videoCurrentTime = videoArea.currentTime;
 	}
+	if (verbose) {
    	console.log('checkTime videoCurrentTime', videoCurrentTime, 
-		' subtitleEndSeconds[selectedSubtitleNumber] ', subtitleEndSeconds[selectedSubtitleNumber]);
+		' tableData.subtitleEndSeconds[selectedSubtitleNumber] ', 
+		tableData.subtitleEndSeconds[selectedSubtitleNumber]);
+
    	console.log('checkTime looping = ', looping, ' videoStateBusy() = ', videoStateBusy()); 
-		// If the end of the current selection has not been reached, return.
+	}
+	// If the end of the current selection has not been reached, return.
 	if (videoCurrentTime < selectionEndSeconds) {
 		if (youTubeVideoId) {
 			setTimeout(checkTime, checkTimeInterval);
@@ -2061,19 +2431,23 @@ function checkTime() {
 		if (player.getPlayerState() != YT.PlayerState.PAUSED) {
 			pauseYouTubeVideo();
 		}
-		player.seekTo(subtitleStartSeconds[selectedSubtitleNumber], true);
-		console.log("checkTime seekTo subtitleStartSeconds[selectedSubtitleNumber] ", 
-			subtitleStartSeconds[selectedSubtitleNumber], 
+		player.seekTo(tableData.subtitleStartSeconds[selectedSubtitleNumber], true);
+	if (verbose) {
+		console.log("checkTime seekTo tableData.subtitleStartSeconds[selectedSubtitleNumber] ", 
+			tableData.subtitleStartSeconds[selectedSubtitleNumber], 
 			" player.getCurrentTime ", player.getCurrentTime());
-		setTimeout(checkTime, checkTimeInterval);
+	}
+			setTimeout(checkTime, checkTimeInterval);
 	}
 	else {
-		videoArea.removeEventListener("timeupdate",checkTime,true);
+		videoArea.removeEventListener("timeupdate", checkTime, true);
 		clearTimeout(timeoutId);
 		playVideo(selectionStartSeconds, selectionEndSeconds);
 	}
 
+	if (verbose) {
 	console.log("checkTime updateTime");
+	}
 	updateTime();
 	return;
 } // checkTime
@@ -2085,7 +2459,9 @@ function checkTime2() {
 
 
 	if (!checkTimeEnabled) {
+	if (verbose) {
 		console.log('checkTime2 entered while NOT Enabled');
+	}
 		if (!youTubeVideoId) {
 			videoArea.removeEventListener("timeupdate",checkTime2,true);
 		}
@@ -2100,10 +2476,14 @@ function checkTime2() {
 		videoCurrentTime = videoArea.currentTime;
 	}
 
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
+
+	if (verbose) {
 	console.log('checkTime2 videoCurrentTime', videoCurrentTime, 
-		' subtitleEndSeconds[selectedSubtitleNumber] ', subtitleEndSeconds[selectedSubtitleNumber],
+		' tableData.subtitleEndSeconds[selectedSubtitleNumber] ',tableData.subtitleEndSeconds[selectedSubtitleNumber],
 		' selectionEndSeconds ', selectionEndSeconds);
    	console.log('checkTime2 looping = ', looping, ' videoStateBusy() = ', videoStateBusy()); 
+	}
 
 	if (videoCurrentTime >= selectionEndSeconds) {
 		// Playing the current selection once
@@ -2111,7 +2491,7 @@ function checkTime2() {
 			pauseVideo();
 			checkTimeEnabled = false;
 			updateTime();
-			selectRow(subsetFirstRow);
+			selectRow(selectedSubtitleTableIndex, subsetFirstRow);
 			return;
 		}
 
@@ -2121,34 +2501,40 @@ function checkTime2() {
 				pauseYouTubeVideo();
 			}
 			player.seekTo(selectionStartSeconds, true);
+	if (verbose) {
 			console.log("checkTime2 seekTo selectionStartSeconds ", selectionStartSeconds, 
 				" player.getCurrentTime ", player.getCurrentTime());
-			setTimeout(checkTime2, checkTimeInterval);
+	}
+				setTimeout(checkTime2, checkTimeInterval);
 		}
 		else {
 			videoArea.removeEventListener("timeupdate", checkTime2, true);
 			clearTimeout(timeoutId);
-			selectRow(subsetFirstRow);
+			selectRow(selectedSubtitleTableIndex, subsetFirstRow);
 			playVideo(selectionStartSeconds, selectionEndSeconds);
 		}
 		return;
 	}
 
-	let rowIndex = findTrackRow('next', subtitleTrack[selectedSubtitleNumber], selectedSubtitleNumber);
+	let rowIndex = findTrackRow('next', tableData.subtitleTrack[selectedSubtitleNumber], 
+		selectedSubtitleTableIndex, selectedSubtitleNumber);
+
 	if (youTubeVideoId) {
 		videoCurrentTime = player.getCurrentTime();
 	}
 	else {
 		videoCurrentTime = videoArea.currentTime;
 	}
-	if ((rowIndex) && (videoCurrentTime >= subtitleStartSeconds[rowIndex])) {
-		selectRow(rowIndex);
+	if ((rowIndex) && (videoCurrentTime >= tableData.subtitleStartSeconds[rowIndex])) {
+		selectRow(selectedSubtitleTableIndex, rowIndex);
 	}
 	if (youTubeVideoId) {
 		setTimeout(checkTime2, checkTimeInterval);
 	}
 
+	if (verbose) {
 	console.log("checkTime2 updateTime");
+	}
 	updateTime();
 
 } // checkTime2
@@ -2260,12 +2646,12 @@ async function issuePlayVideo2() {
 		}
 
 	} catch (err) {
-		let errMsg = 'issuePlayVideo2: Play request failed. err = ' + err;
-    	console.log(errMsg);
+		notificationMsg1 = `Play request failed, err = ${err}`;
+    	console.log(`issuePlayVideo2 ${notificationMsg1}`);
 		let playPauseError = "The play() request was interrupted by a call to pause()."
 		if ((err.name != 'AbortError') || 
 			(err.message.substring(0, (playPauseError.length)) != playPauseError)) {
-			alert(errMsg);
+			notify("issuePlayVideo2");
 		}
 	}
 }
@@ -2273,8 +2659,9 @@ async function issuePlayVideo2() {
 function handleSelectionTimeOut() {
 	if (!playing) {return;}
    	console.log("handleSelectionTimeOut video currentTime = ", videoArea.currentTime);
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
    	console.log("handleSelectionTimeOut ms elapsed = ",  
-		(videoArea.currentTime - subtitleStartSeconds[selectedSubtitleNumber]) * 1000);
+		(videoArea.currentTime - tableData.subtitleStartSeconds[selectedSubtitleNumber]) * 1000);
 	videoArea.currentTime = selectionEndSeconds;
 }
 
@@ -2308,18 +2695,19 @@ function handleVideoOnEnded() {
 		issuePlayVideo();
 		return;
 	}
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
 	if (!playingContinuously) {
 		if (youTubeVideoId) {
 			player.seekTo(subtitleStartSeconds[selectedSubtitleNumber], true);
-			console.log("handleVideoOnEnded seekTo subtitleStartSeconds[selectedSubtitleNumber]] ", 
-				subtitleStartSeconds[selectedSubtitleNumber], 
+			console.log("handleVideoOnEnded seekTo tableData.subtitleStartSeconds[selectedSubtitleNumber]] ", 
+				tableData.subtitleStartSeconds[selectedSubtitleNumber], 
 				" player.getCurrentTime ", player.getCurrentTime());
 			if (player.getPlayerState() != YT.PlayerState.PAUSED) {
 				pauseYouTubeVideo();
 			}
 		}
 		else {
-			videoArea.currentTime = subtitleStartSeconds[selectedSubtitleNumber];
+			videoArea.currentTime = tableData.subtitleStartSeconds[selectedSubtitleNumber];
 		}
 		console.log("handleVideoOnEnded updateTime");
 		updateTime();
@@ -2347,8 +2735,8 @@ async function loadVideoFile(file) {
 	console.log("loadVideoFile videoFileLoaded = " + videoFileLoaded);
 
 	if (videoFileLoaded) {
-		return;
 		console.log("loadVideoFile videoFileLoaded true");
+		return;
 	}
 
 //	const file = videoFile.files[0];
@@ -2427,12 +2815,12 @@ async function loadVideoFile(file) {
 
 function handleVideoFileLoaded() {
 
-	if (lastSubtitleNumber > 0) {
+	if (totalNumberOfSubtitlesRead > 0) {
 		subtitleTimeCorrections();
 	}
 
 	if (selectedSubtitleNumber > 0){
-		selectRow(selectedSubtitleNumber);
+		selectRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
  	}
 
 	changeVideoSize(); // Initialize video width.
@@ -2459,6 +2847,13 @@ function addKeyListenerForVideo() {
 
 		switch (event.key) {
 		case "-":
+			if (event.altKey) {
+				videoCrop -= 0.1;
+				if (videoCrop < 0.3) {
+					videoCrop = 0.3;
+				}
+				computeSubtitleTableHeight();
+			}
 			if (!event.shiftKey) {
 				break;
 			}
@@ -2469,6 +2864,13 @@ function addKeyListenerForVideo() {
 			changeVideoSize();
 			break;
 		case "+":
+			if (event.altKey) {
+				videoCrop += 0.1;
+				if (videoCrop > 1) {
+					videoCrop = 1;
+				}
+				computeSubtitleTableHeight();
+			}
 			if (!event.shiftKey) {
 				break;
 			}
@@ -2495,16 +2897,18 @@ function handleSeek(e) {
 	console.log("handleSeek e.target.value = ", e.target.value, 
 		" targetSeconds = ", targetSeconds);
 
-	while ((!stop) && (subtitleIndex <= lastSubtitleNumber)) {
-		if (targetSeconds <= subtitleEndSeconds[subtitleIndex]) {
-			selectRow(subtitleIndex);
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
+
+	while ((!stop) && (subtitleIndex <= tableData.lastSubtitleNumber)) {
+		if (targetSeconds <= tableData.subtitleEndSeconds[subtitleIndex]) {
+			selectRow(selectedSubtitleTableIndex, subtitleIndex);
 			stop = true;
 		}
 		subtitleIndex += 1;
 	}
 
 	if (!stop) {
-		selectRow(lastSubtitleNumber);
+		selectRow(selectedSubtitleTableIndex, tableData.lastSubtitleNumber);
 	}
 
 	if (playingContinuously) {
@@ -2547,8 +2951,8 @@ function getYouTubeVideoId(url) {
     var match = url.match(simplifiedPattern);
 	var result = (match && match[2].length == 11) ? match[2] : null;
 	if (!result){
-		errorMsg = 'getYouTubeID The YouTube video Id in the link provided is invalid';
-		alert(errorMsg);
+		notificationMsg1 = 'The YouTube video Id in the link provided is invalid';
+		notify("getYouTubeID");
 		return result;
 	}
 
@@ -2730,6 +3134,37 @@ function pauseYouTubeVideo() {
 	unFocus();
 }
 
+
+function createSubtitleFontOptions(fontArray, selectElement, chosenFont) {
+
+  	while (selectElement.firstChild) {
+		selectElement.removeChild(selectElement.lastChild);
+	}
+
+	let selectionFound = false;
+
+	appendOption(loadFontFileOptionText);
+
+	fontArray.forEach(function(fontName) {
+		appendOption(fontName);
+		if (fontName == chosenFont) {
+			selectElement.value = chosenFont;
+			selectionFound = true;
+		}
+	});
+
+	return selectionFound;
+
+	function appendOption(fontName) {
+		var fontOption = document.createElement("option");
+		fontOption.value = fontName;
+		fontOption.text = fontName;
+		fontOption.classList.add('selectOption');
+		//fontOption.style.fontSize = "20px";
+		selectElement.appendChild(fontOption);
+	};
+}
+
 async function loadFontListFile(file) {
 
 	console.log("loadFontListFile fileInput.files[0] " + fontListFileInput.files[0]);
@@ -2741,8 +3176,8 @@ async function loadFontListFile(file) {
 	case '.txt':
 		break;
 	default:
-		errorMsg = 'Unsupported file extension: ' + extension;
-		alert(errorMsg);
+		notificationMsg1 = `Unsupported file extension: ${extension}`;
+		notify("loadFontListFile");
 		return;
 	}
 	// Asynchronously load the file contents.
@@ -2750,42 +3185,45 @@ async function loadFontListFile(file) {
 	const lineArray = textContent.split(/\n/);
 
 	console.log("loadFontListFile Clearing fontListFileInput.value");
+	fontListFileInput.value  = ""; //Clear .value to make this file element reusable
 	console.log(fontListFileInput.value);
 
 	let fontArray = [];
 	let fontArrayIndex = 0;
-	let alertIssued = false;
+	let problemEncountered = false;
 
 	lineArray.filter(line => line.trim() !== "").forEach(createRow);
 
 	if (fontArrayIndex == 0) {
-		if (!alertIssued) {
-			errorMsg = 'Empty font list file encountered. Operation cancelled';
-			alert(errorMsg);
+		if (!problemEncountered) {
+			notificationMsg1 = 'Empty font list file encountered. Operation cancelled';
+			notify("loadFontListFile");
 		}
 		return;
 	}
 
-  	while (subtitleFontMenu.firstChild) {
-		subtitleFontMenu.removeChild(subtitleFontMenu.lastChild);
-	}
 	selectedFont = fontArray[0];
-	createSubtitleFontOptions(fontArray);
+	createSubtitleFontOptions(fontArray, subtitleFontMenu, selectedFont);
 	changeFont();
+
+	selectedFont2 = selectedFont;
+	createSubtitleFontOptions(fontArray, subtitleFontMenu2, selectedFont2);
+	changeFont2();
+	
 	return;
 
 	function createRow(content) {
-		if (alertIssued) {return;}
+		if (problemEncountered) {return;}
 		if (content.length > 50) {
-			errorMsg = 'Maximum line length exceeded: \n' + content + '\nOperation cancelled';
-			alert(errorMsg);
-			alertIssued = true;
+			notificationMsg1 = 'Maximum line length exceeded: \n' + content + '\nOperation cancelled';
+			notify("createRow");
+			problemEncountered = true;
 			return;
 		}
 		if (fontArrayIndex > 50) {
-			errorMsg = 'Maximum line number exceeded: \n' + content + '\nOperation cancelled';
-			alert(errorMsg);
-			alertIssued = true;
+			notificationMsg1 = 'Maximum line number exceeded: \n' + content + '\nOperation cancelled';
+			notify("createRow");
+			problemEncountered = true;
 			return;
 		}
 		fontArray[fontArrayIndex] = content;
@@ -2795,110 +3233,182 @@ async function loadFontListFile(file) {
 
 async function loadSubtitleFile(trackNumber, file) {
 
-	statusMsg("loadSubtitleFile", "Loading subtitle file " + trackNumber);
+	if ((trackNumber < 0) || (trackNumber > maxTrackNumber)) {
+		errorMsg = `loadSubtitleFile Invalid trackNumber: ${trackNumber}`;
+		throwError(errorMsg);
+	}
+
+	notificationMsg1 = `Loading subtitle file ${trackNumber}`;
+	notify("loadSubtitleFile");
 
 	// sample mergeDataArray member: 
-	// 	{dataIndex: "1", arrayIndex: 0} means subtitleFileDataArray[1].array[0]
+	// 	{trackIndex: "1", arrayIndex: 0} means TrkFileMetadata[1].array[0]
 	//
-	// sample subtitleFileDataArray[x].array[y] member: 
+	// sample TrkFileMetadata[x].array[y] member: 
 	// 	{track: 0; startSeconds: 120, endSeconds: 123, startTime: "0:02.00", endTime: "0:02.03", 
 	//		subtitleStyle: "File1", subtitle: "Caption text" }
 
 	let oldSelectedSubtitleNumber = 0;
+	let oldSelectedSubtitleTableIndex = null;
 
-	if (trackNumber < 2) {
+	if (trackNumber < maxTrackNumber) {
 		if (trackNumber === 0) {
 			oldSelectedSubtitleNumber = selectedSubtitleNumber;
+			oldSelectedSubtitleTableIndex = selectedSubtitleTableIndex;
 		}
-		deleteSubtitleTable();
+		deleteAllSubtitleTables();
 	}
 
-	await extractSubtitleFile(file, subtitleFileDataArray[trackNumber]);
+	await extractSubtitleFile(file, trackNumber);
 //?? What if totalNumberOfSubtitlesRead = 0?
+	const subtitleTableIndex = TrkFileMetadata[trackNumber].STTableIndex;  
+	console.log("index? ", subtitleTableIndex);  
+
 	if (trackNumber === 0) {
+	console.log("loadSubtitleFile ", subtitleTableIndex, " ", STTableMetadata[subtitleTableIndex], " ", 
+	STTableMetadata[subtitleTableIndex].STTable.rows.length);
+		STTableMetadata[subtitleTableIndex].lastSubtitleNumber = 
+			STTableMetadata[subtitleTableIndex].STTable.rows.length - 1;
 		save1File.style.display = "inline-block";
 		save2Files.style.display = "none";
-		subtitleTrackField.classList.add('notDisplayed');
+		STTableMetadata[subtitleTableIndex].trackHeader.classList.add('notDisplayed');
 		if (oldSelectedSubtitleNumber <= totalNumberOfSubtitlesRead) {
 			selectedSubtitleNumber = oldSelectedSubtitleNumber;
+			selectedSubtitleTableIndex = oldSelectedSubtitleTableIndex;
 		}
 		if (selectedSubtitleNumber == 0) {	// If no subtitle has yet been selected
 			selectedSubtitleNumber = 1;		// by default, select the first subtitle
+			selectedSubtitleTableIndex = trackNumber;
 		}
+		configuration = "1Track1Table";
 		displaySubtitles();
 		scrollStepMenu.value = '1';
 		changeScrollStep();
-		console.log("loadSubtitleFile subtitleFileDataArray[0].loaded = ", 
-			subtitleFileDataArray[0].loaded);
+		console.log("loadSubtitleFile TrkFileMetadata[0].loaded = ", TrkFileMetadata[0].loaded);
+		logTimeStamp("loadSubtitleFile", "exiting");
 		return;
 	}
 	
 	save1File.style.display = "none";
+	if (!fileAPIPickersSupported) {
+		saveBothTracks.style.display = "none";
+	}
 	save2Files.style.display = "inline-block";
-	subtitleTrackField.classList.remove('notDisplayed');
+	STTableMetadata[subtitleTableIndex].trackHeader.classList.remove('notDisplayed');
 
-	console.log("loadSubtitleFile subtitleFileDataArray[1].loaded = ", subtitleFileDataArray[1].loaded);
-	console.log("loadSubtitleFile subtitleFileDataArray[2].loaded = ", subtitleFileDataArray[2].loaded);
 
-	if (subtitleFileDataArray[1].loaded && subtitleFileDataArray[2].loaded) {
-		statusMsg("loadSubtitleFile", "Merging tracks 1 & 2");
+	console.log("loadSubtitleFile TrkFileMetadata[1].loaded = ", TrkFileMetadata[1].loaded);
+	console.log("loadSubtitleFile TrkFileMetadata[2].loaded = ", TrkFileMetadata[2].loaded);
+
+	// 2 tracks, single subtitle table
+
+	if ((numberOfSubtitleTables === 1) && 
+		(TrkFileMetadata[1].loaded && TrkFileMetadata[2].loaded)) {
+		if (TrkFileMetadata[1].twinnedTrack === 2) {
+			const length1 = TrkFileMetadata[1].array.length;
+			const length2 = TrkFileMetadata[2].array.length;
+			if (length1 != length2) {
+				notificationMsg1 = `File 1 contains ${length1} subtitles.`;
+				notificationMsg2 = `File 2 contains ${length2} subtitles.`;
+				notificationMsg3 = `Twinning requires an equal number of subtitles.`;
+				notify("loadSubtitleFile");
+				return;
+			}
+		}
+		configuration = "2TwinnedTracks1Table";
+		notificationMsg1 = "Merging tracks";
+		notify("loadSubtitleFile");
 		totalNumberOfSubtitlesRead = 
-			interleave(subtitleFileDataArray[1].array, subtitleFileDataArray[2].array);
+			interleave(TrkFileMetadata[1].array, TrkFileMetadata[2].array);
 		console.log("loadSubtitleFile mergeDataArray.length = ", mergeDataArray.length);
 		console.log("loadSubtitleFile mergeDataArray[0] = ", mergeDataArray[0]);
 		console.log("loadSubtitleFile mergeDataArray[1] = ", mergeDataArray[1]);
+		const subtitleTableIndex = TrkFileMetadata[mergeDataArray[0].trackIndex].STTableIndex;  
 		mergeDataArray.forEach(function(dataElement, index) {
-			createSubtitleRow(subtitleFileDataArray[dataElement.dataIndex].array[dataElement.arrayIndex], 
-			(index + 1));
+			createSubtitleRow(TrkFileMetadata[dataElement.trackIndex].array[dataElement.arrayIndex], 
+			subtitleTableIndex, (index + 1));
 		});
+		STTableMetadata[subtitleTableIndex].lastSubtitleNumber = 
+			STTableMetadata[subtitleTableIndex].STTable.rows.length - 1;
+	console.log("loadSubtitleFile 2 files 1 table ", subtitleTableIndex, " ", 
+		STTableMetadata[subtitleTableIndex], " ", 
+		STTableMetadata[subtitleTableIndex].STTable.rows.length);
+		selectedSubtitleTableIndex = 0;
 		selectedSubtitleNumber = 1;		// by default, select the first subtitle
-		statusMsg("loadSubtitleFile", "Displaying subtitles");
 		displaySubtitles();
 		if (trackNumber === 2) {
 			scrollStepMenu.value = '2';
 			changeScrollStep();
 		}
+		logTimeStamp("loadSubtitleFile", "exiting 1");
+		return;
 	}
-	logTimeStamp("loadSubtitleFile", "exiting");
+
+	// 2 tracks, 2 subtitle tables
+	//	configuration = "2TwinnedTracks2Tables";
+	//	configuration = "2Tracks2Tables";
+
+
+	logTimeStamp("loadSubtitleFile", "exiting 2");
+	notification.style.display = 'none';
+
+	console.log(`loadSubtitleFile trackNumber: ${trackNumber} TrkFileMetadata[2].loaded ${TrkFileMetadata[2].loaded}`);
+
+	if ((firefoxAgent) && (trackNumber === 1) && (!TrkFileMetadata[2].loaded)) {
+		console.log(`loadSubtitleFile calling fileNotify`);
+		fileNotificationMsg1 =	`<div><p>Click OK to load file 2</p><br>` + 
+				`<button class="button color4" style="float: left"` + 
+				`onclick="subtitleFileInput2.click(); fileNotification.style.display = 'none'">OK</button>` + 
+				`<button class="button color4" style="float: right"` +
+				`onclick="deleteAllSubtitleTables(); fileNotification.style.display = 'none'">Cancel</button></div>`;
+		fileNotify("loadSubtitleFile");
+	}
+
 
 }  // loadAndDisplaySubtitles
 
 function displaySubtitles()	 {
 
 	if (totalNumberOfSubtitlesRead == 0) { return; }
-	
+
+	notificationMsg1 = "Displaying subtitles";
+	notify("loadSubtitleFile");
+
 	selectionLabel.style.display = "inline";
 	selectionHyphen.style.display = "inline";
 	selectionLabelOnDashboard.style.display = "inline";
 	selectionHyphenOnDashboard.style.display = "inline";
 	
-	console.log("displaySubtitles lastSubtitleNumber old " + lastSubtitleNumber
+	console.log("displaySubtitles old totalNumberOfSubtitlesRead: " + oldTotalNumberOfSubtitlesRead
 		+ " new " + totalNumberOfSubtitlesRead);
 
-	if (lastSubtitleNumber > totalNumberOfSubtitlesRead) {
-		console.log("displaySubtitles lastSubtitleNumber ", lastSubtitleNumber, 
-			" > totalNumberOfSubtitlesRead ", totalNumberOfSubtitlesRead);
-		errorMsg = 'displaySubtitles lastSubtitleNumber > totalNumberOfSubtitlesRead';
-		alert(errorMsg);
-		throw new Error(errorMsg);
-	}
+	let totalSubtitles = 0;
+	STTableMetadata.forEach(function(content, index) { 
+		console.log(`${index} ${totalSubtitles}`, content);
+		totalSubtitles += content.lastSubtitleNumber; 
+		console.log(`${index} ${totalSubtitles} `);
+	});
 
-	lastSubtitleNumber = totalNumberOfSubtitlesRead;
+	if (totalSubtitles != totalNumberOfSubtitlesRead) {
+		errorMsg = `displaySubtitles totalSubtitles: ${totalSubtitles} != totalNumberOfSubtitlesRead: ${totalNumberOfSubtitlesRead}`;
+		throwError(errorMsg);
+	}
 
 	if (videoFileLoaded) {
 		subtitleTimeCorrections();
 	}
 
-	selectRow(selectedSubtitleNumber);
+	selectRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
 
 	if (showSubtitleTable) {
-		subtitleTableDiv.style.display = "block";
+		subtitleTableDiv0.style.display = "block";
 	}
 
 	addKeyListenerForSubtitles();
 
 	addKeyListener();
-
+	
+	notification.style.display = 'none';
 	// unFocus();
 	
 }  // displaySubtitles
@@ -2907,27 +3417,30 @@ function updateRow() {
 
 	let selectedSpan = "";
 	let spanElement;
+	let STTableIndex = null;
 	let rowNumber = 0;
 	let doNothing = true;
 
-	if (spanSubtitle1Selected) {
-		selectedSpan = "spanSubtitle1";
-		spanElement = spanSubtitle1;
-		rowNumber = spanSubtitle1Row;
-		spanSubtitle1Selected = false;
-		console.log("updateRow spanSubtitle1Selected = f 2");
-		if (spanSubtitle1Modified) {
+	if (STSpan1Selected) {
+		selectedSpan = "STSpan1";
+		spanElement = STSpan1;
+		STTableIndex = STSpan1STTableIndex;
+		rowNumber = STSpan1RowNumber;
+		STSpan1Selected = false;
+		console.log("updateRow STSpan1Selected = f 2");
+		if (STSpan1Modified) {
 			doNothing = false;
-			spanSubtitle1Modified = false;
+			STSpan1Modified = false;
 		}
-	} else if (spanSubtitle2Selected) {
-		selectedSpan = "spanSubtitle2";
-		spanElement = spanSubtitle2;
-		rowNumber = spanSubtitle2Row;
-		spanSubtitle2Selected = false;
-		if (spanSubtitle2Modified) {
+	} else if (STSpan2Selected) {
+		selectedSpan = "STSpan2";
+		spanElement = STSpan2;
+		STTableIndex = STSpan2STTableIndex;
+		rowNumber = STSpan2RowNumber;
+		STSpan2Selected = false;
+		if (STSpan2Modified) {
 			doNothing = false;
-			spanSubtitle2Modified = false;
+			STSpan2Modified = false;
 		}
 	}
 
@@ -2936,11 +3449,13 @@ function updateRow() {
 	//	throwError(errorMsg);
 	// }
 
-	console.log("updateRow ", selectedSpan, " rowNumber ", rowNumber, " modified = ", !doNothing);
+	console.log(`updateRow ${selectedSpan} STTableIndex ${STTableIndex} rowNumber ${rowNumber} modified = ${!doNothing}`);
 
 	if (doNothing) { return; }
 
-	let oldValue = subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
+	const tableData = STTableMetadata[STTableIndex];
+
+	let oldValue = tableData.STTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
 	let newValue = spanElement.innerHTML;
 	console.log("updateRow ", selectedSpan, " oldValue = ", oldValue);
 	console.log("updateRow ", selectedSpan, " newValue = ", newValue);
@@ -2954,11 +3469,12 @@ function updateRow() {
 		undoArray[undoArrayCurrentIndex].inUse = true;
 		undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
 		undoArray[undoArrayCurrentIndex].action = "subtitleTextChange";
+		undoArray[undoArrayCurrentIndex].selectedSubtitleTableIndex = STTableIndex;
 		undoArray[undoArrayCurrentIndex].rowNumber = rowNumber;
-		undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
+		undoArray[undoArrayCurrentIndex].selectedSubtitleNumber = selectedSubtitleNumber;
 		undoArray[undoArrayCurrentIndex].oldValue = oldValue;
 		undoArray[undoArrayCurrentIndex].newValue = newValue;
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML = newValue;
+		tableData.STTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML = newValue;
 	}
 
 	computeSubtitleTableHeight();
@@ -2976,15 +3492,17 @@ function addKeyListenerForSubtitles() {
 			(document.activeElement.isContentEditable)) {
 			switch (event.key) {
 			case "Escape":
-				spanSubtitle1Modified = false;
-				spanSubtitle2Modified = false;
-				selectRow(selectedSubtitleNumber);
+				STSpan1Modified = false;
+				STSpan2Modified = false;
+				selectRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
 				event.preventDefault();
 				return;
 			default:
 				return;	
 			}
 		}
+
+		const tableData = STTableMetadata[selectedSubtitleTableIndex];
 
 		switch (event.key) {
 		case "ArrowUp":
@@ -3000,16 +3518,25 @@ function addKeyListenerForSubtitles() {
 			break;
 		case "b":
 			console.log("b newLine before ", selectedSubtitleNumber);
-			insertSubtitle((selectedSubtitleNumber - 1), "", subtitleTrack[selectedSubtitleNumber], 
+			insertSubtitle(tableData.subtitleTrack[selectedSubtitleNumber],
+				selectedSubtitleTableIndex,
+				"before",
+				selectedSubtitleNumber,
+				"",
 				"selectNew");
 			break;
 		case "d":
 			console.log("d delete row ", selectedSubtitleNumber);
-			deleteSubtitle(selectedSubtitleNumber);
+			textEditPopupAction('delete');
+			// deleteSubtitle(selectedSubtitleTableIndex, selectedSubtitleNumber);
 			break;
 		case "n":
 			console.log("n newLine after ", selectedSubtitleNumber);
-			insertSubtitle(selectedSubtitleNumber, "", subtitleTrack[selectedSubtitleNumber], 
+			insertSubtitle(tableData.subtitleTrack[selectedSubtitleNumber],
+				selectedSubtitleTableIndex,
+				"after",
+				selectedSubtitleNumber,
+				"",
 				"selectNew");
 			break;
 		case "r":
@@ -3017,18 +3544,18 @@ function addKeyListenerForSubtitles() {
 			redo();
 			break;
 		case "t":
-			var d = new Date();
-			alert(d);
+			notificationMsg1 = new Date();
+			notify("keyup");
 			break;
 		case "u":
 			console.log("u undo");
 			undo();
 			break;
 		case "Home":
-			selectRow(1, "scroll");
+			selectRow(selectedSubtitleTableIndex, 1, "scroll");
 			break;
 		case "End":
-			selectRow(lastSubtitleNumber, "scroll");
+			selectRow(selectedSubtitleTableIndex, tableData.lastSubtitleNumber, "scroll");
 			break;
 		case "Delete":
 			toggleVideoSection();
@@ -3038,14 +3565,14 @@ function addKeyListenerForSubtitles() {
 				return;	
 			}
 			if (timeEditPopup.style.display == "inline-block") {
-				showTimeEditPopup(0);
+				showTimeEditPopup(selectedSubtitleTableIndex, 0);
 			} else {
-				showTimeEditPopup(selectedSubtitleNumber);
+				showTimeEditPopup(selectedSubtitleTableIndex, selectedSubtitleNumber);
 			}
 			event.preventDefault();
 			break;
 		case "-":
-			if (event.shiftKey) {
+			if ((event.shiftKey) || (event.altKey)) {
 				break;
 			}
 		case "[":
@@ -3054,8 +3581,8 @@ function addKeyListenerForSubtitles() {
 			}
 			changeFontSize();
 			break;
-		case "+":addEventListener
-			if (event.shiftKey) {
+		case "+":
+			if ((event.shiftKey) || (event.altKey)) {
 				break;
 			}
 		case "]":
@@ -3070,49 +3597,49 @@ function addKeyListenerForSubtitles() {
 		}	
 	});
 
-	spanSubtitle1.addEventListener('click', (e) => {
+	STSpan1.addEventListener('click', (e) => {
 		if (!(myCheck07.checked)) { return;}
-		spanSubtitle1Selected = true;
-		//console.log("click spanSubtitle1Selected = true");
-		spanSubtitle2Selected = false;
+		STSpan1Selected = true;
+		//console.log("click STSpan1Selected = true");
+		STSpan2Selected = false;
 		e.preventDefault();
 		return;
 	});
 
-	spanSubtitle1.addEventListener('input', () => {
-		spanSubtitle1Modified = true;
-		spanSubtitle1Selected = true;
-		spanSubtitle2Selected = false;
+	STSpan1.addEventListener('input', () => {
+		STSpan1Modified = true;
+		STSpan1Selected = true;
+		STSpan2Selected = false;
 	});
 
-	spanSubtitle1.addEventListener('paste', handlePaste, false);
+	STSpan1.addEventListener('paste', handlePaste, false);
 		
-	spanSubtitle1.addEventListener('blur', () => {
-		console.log("onblur spanSubtitle1 spanSubtitle1Modified = ", spanSubtitle1Modified);
-		spanSubtitle1Selected = true;
-		spanSubtitle2Selected = false;
+	STSpan1.addEventListener('blur', () => {
+		console.log("onblur STSpan1 STSpan1Modified = ", STSpan1Modified);
+		STSpan1Selected = true;
+		STSpan2Selected = false;
 		updateRow();
 	});
 
-	spanSubtitle2.addEventListener('click', (e) => {
+	STSpan2.addEventListener('click', (e) => {
 		if (!(myCheck07.checked)) { return;}
-		spanSubtitle2Selected = true;
-		spanSubtitle1Selected = false;
+		STSpan2Selected = true;
+		STSpan1Selected = false;
 		e.preventDefault();
 		return;
 	});
-	spanSubtitle2.addEventListener('input', () => {
-		spanSubtitle2Modified = true;
-		spanSubtitle1Selected = false;
-		spanSubtitle2Selected = true;
+	STSpan2.addEventListener('input', () => {
+		STSpan2Modified = true;
+		STSpan1Selected = false;
+		STSpan2Selected = true;
 	});
 
-	spanSubtitle2.addEventListener('paste', handlePaste, false);
+	STSpan2.addEventListener('paste', handlePaste, false);
 
-	spanSubtitle2.addEventListener('blur', () => {
-		console.log("onBlur spanSubtitle2 spanSubtitle2Modified = ", spanSubtitle2Modified);
-		spanSubtitle1Selected = false;
-		spanSubtitle2Selected = true;
+	STSpan2.addEventListener('blur', () => {
+		console.log("onBlur STSpan2 STSpan2Modified = ", STSpan2Modified);
+		STSpan1Selected = false;
+		STSpan2Selected = true;
 		updateRow();
 	});
 
@@ -3136,11 +3663,12 @@ function handlePaste(e) {
 
     // Make sure the user actually has a cursor active on the page
     if (selection.rangeCount <= 0) {
-		spanSubtitle1Modified = false;
-		spanSubtitle2Modified = false;
-		spanSubtitle1Selected = false;
-		spanSubtitle2Selected = false;
-		alert("handlePaste selection.rangeCount <= 0; pasteTarget.id = ", pasteTarget.id);
+		STSpan1Modified = false;
+		STSpan2Modified = false;
+		STSpan1Selected = false;
+		STSpan2Selected = false;
+		notificationMsg1 = `selection.rangeCount <= 0; pasteTarget.id = ${pasteTarget.id}`;
+		notify("handlePaste");
 		return;
 	}
 
@@ -3168,80 +3696,108 @@ function handlePaste(e) {
 	pasteTarget.focus();
 
 	switch (pasteTarget.id) {
-	case 'spanSubtitle1':
-		spanSubtitle1Modified = true;
-		spanSubtitle1Selected = true;
-		spanSubtitle2Selected = false;
+	case 'STSpan1':
+		STSpan1Modified = true;
+		STSpan1Selected = true;
+		STSpan2Selected = false;
 		break;
-	case 'spanSubtitle2':
-		spanSubtitle2Modified = true;
-		spanSubtitle1Selected = false;
-		spanSubtitle2Selected = true;
+	case 'STSpan2':
+		STSpan2Modified = true;
+		STSpan1Selected = false;
+		STSpan2Selected = true;
 		break;
 	default:
 		errorMsg = 'handlePaste unexpected pasteTarget.id ' + pasteTarget.id;
-		alert(errorMsg);
-		throw new Error(errorMsg);
+		throwError(errorMsg);
 	}
 
 	return;
 }
 
-function deleteSubtitleTable() {
-	console.log("deleteSubtitleTable Deleting subtitle table");
+function deleteAllSubtitleTables() {
+
+	STTableMetadata.forEach(function(content, index) { deleteSubtitleTable(index); });
+
+	TrkFileMetadata[0].loaded = false;
+	TrkFileMetadata[1].loaded = false;
+	TrkFileMetadata[2].loaded = false;
+
+	selectedSubtitleNumber = 0;
+	selectedSubtitleTableIndex = null;
+	oldTotalNumberOfSubtitlesRead = totalNumberOfSubtitlesRead
+	totalNumberOfSubtitlesRead = 0;
+
+	changeCounter = 0;
+	undoArrayCurrentIndex = -1;
+	redoArrayCurrentIndex = -1;
+	configuration = "1Track1Table";
+
+}
+
+function deleteSubtitleTable(subtitleTableIndex) {
+
+	const tableData = STTableMetadata[subtitleTableIndex];
+	console.log(`deleteSubtitleTable Deleting subtitle table ${subtitleTableIndex} ${tableData.STTableId}`);
+
 	let new_tbody = document.createElement('tbody');
-	let old_tbody = document.getElementById("subtitleTbody");
+	let old_tbody = document.getElementById(`subtitleTbody${subtitleTableIndex}`);
 	old_tbody.parentNode.replaceChild(new_tbody, old_tbody);
-	new_tbody.id = "subtitleTbody";
+	new_tbody.id = `subtitleTbody${subtitleTableIndex}`;
 	old_tbody.remove();
 	old_tbody = null;
-	subtitleStartSeconds = [];
-	subtitleEndSeconds = [];
-	subtitleTrack = [];
-	lastSubtitleNumber = 0;
-	selectedSubtitleNumber = 0;
-	totalNumberOfSubtitlesRead = 0;
-	subtitleFileDataArray[0].loaded = false;
-	subtitleFileDataArray[1].loaded = false;
-	subtitleFileDataArray[2].loaded = false;
+
+	tableData.selectedSubtitleNumber = 0;
+	tableData.lastSubtitleNumber = 0;
+	tableData.subtitleStartSeconds = [];
+	tableData.subtitleEndSeconds = [];
+	tableData.subtitleTrack = [];
 }
 
 function newFile() {
+	
+	let index = 0;
+	let totalSubtitles = 0;
+	do {
+		totalSubtitles += STTableMetadata[index].lastSubtitleNumber;
+		index++;
+	} while (index < STTableMetadata.length);
 
-	if (lastSubtitleNumber > 0) {
+	if (totalSubtitles > 0) {
 		if (!confirm("Discard all present subtitles and begin a new file?")) {
     		return;
 		}
-		deleteSubtitleTable();
+		deleteAllSubtitleTables();
 	} 
 
-/*	let rowObject = {};
-	rowObject.track = 0;
-	rowObject.startSeconds = 0;
-	rowObject.endSeconds = 2;
-	rowObject.startTime = "0:00:00.00";
-	rowObject.endTime = "0:00:02.00";
-	rowObject.subtitleStyle = subtitleFileDataArray[0].defaultSubtitleStyle;
-	rowObject.subtitle = ""; // "…";
-*/
-
+	const trackIndex = 0;  // New track will be track 0
+	const trackData = TrkFileMetadata[trackIndex];
+	const subtitleTableIndex = trackData.STTableIndex;
+	const tableData = STTableMetadata[subtitleTableIndex];
+	
 	let rowObject = {
-		track: 0,
+		track: null,
 		startSeconds: 0,
 		endSeconds: 2,
 		startTime: "0:00:00.00",
 		endTime: "0:00:02.00",
+		subtitleStyle: "",
 		subtitle: ""
 	};
 
-	rowObject.subtitleStyle = subtitleFileDataArray[0].defaultSubtitleStyle;
+	rowObject.track = trackIndex;
+	rowObject.subtitleStyle = trackData.defaultSubtitleStyle;
 
-	subtitleFileDataArray[0].loaded = true;
-	createSubtitleRow(rowObject, 1);
+	trackData.loaded = true;
+
+	createSubtitleRow(rowObject, TrkFileMetadata[0].STTableIndex, 1);
 
 	totalNumberOfSubtitlesRead = 1;
+	selectedSubtitleTableIndex = trackIndex;
 	selectedSubtitleNumber = 1;
-	lastSubtitleNumber = 1;
+
+	tableData.lastSubtitleNumber = 1;
+	tableData.selectedSubtitleNumber = 1;
+
 	addKeyListenerForSubtitles();
 	displaySubtitles();
 
@@ -3273,23 +3829,23 @@ function getCharacterOffsetWithin(range, node) {
  
 function textEditPopupAction(operand) {
 
-	let spanSubtitle1SelectedOnEntry = spanSubtitle1Selected;
-	let spanSubtitle2SelectedOnEntry = spanSubtitle2Selected;
+	let STSpan1SelectedOnEntry = STSpan1Selected;
+	let STSpan2SelectedOnEntry = STSpan2Selected;
 
-	if (spanSubtitle1SelectedOnEntry && spanSubtitle2SelectedOnEntry) {
-		let msg = "textEditPopupAction Anomally: spanSubtitle1 & spanSubtitle2 both selected";
-		console.log(msg);
-		alert(msg);
+	if (STSpan1SelectedOnEntry && STSpan2SelectedOnEntry) {
+		notificationMsg1 = "Anomally: STSpan1 & STSpan2 both selected";
+		notify("textEditPopupAction");
 	}
 
 	console.log("textEditPopupAction operand = ", operand);
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
 
 	switch (operand) {
 		case 'splitToNext':
 		case 'splitToNextNewline':
 		case 'splitToPrev':
-			spanSubtitle1Modified = false; // Prevent onblur routine from updating the row
-			spanSubtitle2Modified = false;
+			STSpan1Modified = false; // Prevent onblur routine from updating the row
+			STSpan2Modified = false;
 			//document.getElementById("splitLineWrapper").style.pointerEvents = 'none';
 			//setTimeout(() => {document.getElementById("splitLineWrapper").style.pointerEvents = ''}, 500);
 			break;
@@ -3310,16 +3866,24 @@ function textEditPopupAction(operand) {
 			insertLineWrapper.style.pointerEvents = 'none';
 			setTimeout(() => {insertLineWrapper.style.pointerEvents = ''}, 500);
 			if (operand === 'insertAbove') {
-				insertSubtitle((selectedSubtitleNumber - 1), "", subtitleTrack[selectedSubtitleNumber], 
+				insertSubtitle(tableData.subtitleTrack[selectedSubtitleNumber],
+					selectedSubtitleTableIndex,
+					"before",
+					selectedSubtitleNumber,
+					"",
 					"selectNew");
 			} else {
-				insertSubtitle(selectedSubtitleNumber, "", subtitleTrack[selectedSubtitleNumber], 
+				insertSubtitle(tableData.subtitleTrack[selectedSubtitleNumber],
+					selectedSubtitleTableIndex,
+					"after",
+					selectedSubtitleNumber,
+					"",
 					"selectNew");
 			}
 			return;
 		case 'delete':
 			updateRow();
-			deleteSubtitle(selectedSubtitleNumber);
+			deleteSubtitle(selectedSubtitleTableIndex, selectedSubtitleNumber);
 			return;
 		default:
 			console.log("textEditPopupAction invalid operand: ", operand);
@@ -3332,31 +3896,29 @@ function textEditPopupAction(operand) {
 	let spanElement;
 	let rowNumber = 0;
 
-	if (spanSubtitle1SelectedOnEntry) {
-		selectedSpan = "spanSubtitle1";
-		spanElement = spanSubtitle1;
-		rowNumber = spanSubtitle1Row;
-		if (!spanSubtitle1Selected) {
-			let msg = "textEditPopupAction spanSubtitle1Selected already set to false";
-			console.log(msg);
-			alert(msg);
+	if (STSpan1SelectedOnEntry) {
+		selectedSpan = "STSpan1";
+		spanElement = STSpan1;
+		rowNumber = STSpan1RowNumber;
+		if (!STSpan1Selected) {
+			notificationMsg1 = "STSpan1Selected already set to false";
+			notify("textEditPopupAction");
 		}
-		spanSubtitle1Selected = false;
-		console.log("spanSubtitle1Selected = f 4");
-	} else if (spanSubtitle2SelectedOnEntry) {
-		selectedSpan = "spanSubtitle2";
-		spanElement = spanSubtitle2;
-		rowNumber = spanSubtitle2Row;
-		spanSubtitle2Selected = false;
+		STSpan1Selected = false;
+		console.log("STSpan1Selected = f 4");
+	} else if (STSpan2SelectedOnEntry) {
+		selectedSpan = "STSpan2";
+		spanElement = STSpan2;
+		rowNumber = STSpan2RowNumber;
+		STSpan2Selected = false;
 	}
 
 	console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
 		" selectedSpan ", selectedSpan);
 
 	if (selectedSpan == "") {
-		let msg = "textEditPopupAction Place the cursor in an editable area before choosing a split action";
-		console.log(msg);
-		alert(msg);
+		notificationMsg1 = "Place the cursor in an editable area before choosing a split action";
+		notify("textEditPopupAction");
 		return;
 	}
 
@@ -3367,7 +3929,8 @@ function textEditPopupAction(operand) {
     if (selection.rangeCount <= 0) {
 		console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
 		' selectedSpan = ', selectedSpan);
-		alert("textEditPopupAction selection.rangeCount <= 0");
+		notificationMsg1 = "selection.rangeCount <= 0";
+		notify("textEditPopupAction");
 		return;
 	}
 
@@ -3379,7 +3942,8 @@ function textEditPopupAction(operand) {
  	} else {
 		console.log("textEditPopupAction operand ", operand, " rowNumber ", rowNumber,
 		' selectedSpan = ""', selectedSpan);
-		alert("textEditPopupAction The cursor is not in the expected edit area: ", selectedSpan );
+		notificationMsg1 = `The cursor is not in the expected edit area: ${selectedSpan}`;
+		notify("textEditPopupAction");
 		spanElement.removeAllRanges();
 		return;
 	}
@@ -3400,25 +3964,35 @@ function textEditPopupAction(operand) {
 	// This safely removes the text and <br> tags from spanElement
 	// and packages them into a DocumentFragment.
 	const extractedContent = activeRange.extractContents();
-	subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML = spanElement.innerHTML;
+	tableData.STTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML = spanElement.innerHTML;
 
 	if ((operand === "splitToNext") || (operand === "splitToNextNewline")) {
 		// Insert the extracted content at the beginning of the next subtitle
-		let nextRow = findTrackRow('next', subtitleTrack[rowNumber], rowNumber);
+		let nextRow = findTrackRow('next', tableData.subtitleTrack[rowNumber], selectedSubtitleTableIndex, rowNumber);
 		if ((operand === "splitToNextNewline") || (!nextRow)) {
-			nextRow = insertSubtitle(rowNumber, "", subtitleTrack[rowNumber], "selectNone");
+			nextRow = insertSubtitle(tableData.subtitleTrack[rowNumber],
+				selectedSubtitleTableIndex,
+				"after",
+				rowNumber,
+				"",
+				"selectNone");
 		}
-		subtitleTable.rows[nextRow].querySelector(".classSubtitleText").prepend(extractedContent);
-		selectRow(selectedSubtitleNumber);
+		tableData.STTable.rows[nextRow].querySelector(".classSubtitleText").prepend(extractedContent);
+		selectRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
 		return;
 	} else {
 		// Insert the extracted content at the end of the previous subtitle
-		let prevRow = findTrackRow('prev', subtitleTrack[rowNumber], rowNumber);
+		let prevRow = findTrackRow('prev', tableData.subtitleTrack[rowNumber], selectedSubtitleTableIndex, rowNumber);
 		if (!prevRow) {
-			prevRow = insertSubtitle((rowNumber - 1), "", subtitleTrack[rowNumber], "selectNone");
+			prevRow = insertSubtitle(tableData.subtitleTrack[rowNumber],
+				selectedSubtitleTableIndex,
+				"before",
+				rowNumber,
+				"",
+				"selectNone");
 		} 
-		subtitleTable.rows[prevRow].querySelector(".classSubtitleText").append(extractedContent);
-		selectRow(prevRow);
+		tableData.STTable.rows[prevRow].querySelector(".classSubtitleText").append(extractedContent);
+		selectRow(selectedSubtitleTableIndex, prevRow);
 	}
 
 	// Optional: clear the selection so the cursor doesn't jump weirdly
@@ -3428,7 +4002,7 @@ function textEditPopupAction(operand) {
 
 }
 
-function insertSubtitle(afterRowNumber, text, trackNumber, selectOption) {
+function insertSubtitle(trackNumber, subtitleTableIndex, insertDirection, rowNumber, text, selectOption) {
 
 	let helper = {
   		toTimeString: function(ms) {
@@ -3444,152 +4018,448 @@ function insertSubtitle(afterRowNumber, text, trackNumber, selectOption) {
   		}
 	};
 
-	if (lastSubtitleNumber == 0) {
-		newFile();
-		return 1;
-	}
+	// Is this needed??
+	// if (tableData.lastSubtitleNumber === 0) {
+	//	newFile();
+	//	return 1;
+	//}
 
-	// sample subtitleFileDataArray[x].array[y] member: 
+	// sample TrkFileMetadata[x].array[y] member: 
 	// 	{track: 0; startSeconds: 120, endSeconds: 123, startTime: "0:02.00", endTime: "0:02.03", 
 	//		subtitleStyle: "File1", subtitle: "Caption text" }
 
-	let newRowNumber = afterRowNumber + 1;
-	subtitleTable.rows[selectedSubtitleNumber].classList.remove("selectedCustom");
-	let row = subtitleTable.insertRow(newRowNumber);
-	subtitleStartSeconds.splice(newRowNumber, 0, 0);
-	subtitleEndSeconds.splice(newRowNumber, 0, 0);
-	subtitleTrack.splice(newRowNumber, 0, 0);
+	switch (insertDirection) {
+	case "before": 
+	case "after": 
+		break;
+	default:
+		errorMsg = `insertSubtitle Invalid insertDirection: ${insertDirection}`;
+		throwError(errorMsg);
+	}
 
-	let rowObject = {};
-	lastSubtitleNumber++;
-
-	rowObject.track = trackNumber;
-	rowObject.subtitleStyle = subtitleFileDataArray[trackNumber].defaultSubtitleStyle;
-
-	if ((newRowNumber != 1) && (newRowNumber != lastSubtitleNumber)) {
-		rowObject.startSeconds = subtitleEndSeconds[newRowNumber - 1];
-		rowObject.endSeconds = subtitleStartSeconds[newRowNumber + 1];
-	} else {
-		if (newRowNumber == 1) {
-			rowObject.endSeconds = subtitleStartSeconds[newRowNumber + 1];
-			rowObject.startSeconds = rowObject.endSeconds - 2;
-		} else {
-			if (newRowNumber == lastSubtitleNumber) {
-				rowObject.startSeconds = subtitleEndSeconds[newRowNumber - 1];
-				rowObject.endSeconds = rowObject.startSeconds + 2;
-			}
-		}
+	switch (selectOption) {
+	case "selectNew": 
+	case "selectOld":
+	case "selectNone": 
+		break;
+	default:
+		errorMsg = `insertSubtitle Invalid selectOption: ${selectOption}`;
+		throwError(errorMsg);
 	}
 	
-	if (rowObject.startSeconds < 0) {
-		rowObject.startSeconds = 0;
-	}
+	const trackData = TrkFileMetadata[trackNumber];
+	const tableData = STTableMetadata[subtitleTableIndex];
+	tableData.STTable.rows[tableData.selectedSubtitleNumber].classList.remove("selectedCustom");
 
-	// if (rowObject.endSeconds > videoDuration) {
+	let rowObject = {};
+
+	rowObject.track = trackNumber;
+	rowObject.subtitleStyle = TrkFileMetadata[trackNumber].defaultSubtitleStyle;
+
+
+	// ??  if (rowObject.endSeconds > videoDuration) {
 	// 	rowObject.endSeconds = videoDuration;
 	// }
 
-	rowObject.startTime = helper.toTimeString(rowObject.startSeconds * 1000);
-	rowObject.endTime = helper.toTimeString(rowObject.endSeconds * 1000);
 	if (text != "") {
 		rowObject.subtitle = text;
 	} else {
 		rowObject.subtitle = ""; // "…";
 	}
 
-	createSubtitleRow(rowObject, newRowNumber);
+	let twinnedTrack = trackData.twinnedTrack;
+	let twinnedRow = 0;
+	let newRowNumber = 0;
+	let newRowNumber2 = 0;
+	let track1 = 0;
+	let track2 = 0;
+	let futureSelectedRow = 0;
+	// let configuration = "";
+	let trackData1;
+	let tableData1;
+	let subtitleTableIndex1;
+	let trackData2;
+	let tableData2;
+	let subtitleTableIndex2;
 
-	let chosenRow = newRowNumber;
+
+	// if (twinnedTrack === 0) {
+	// 	configuration = "1Track1Table";
+	// } else {
+	// 	twinnedRow = findTwinnedRow(subtitleTableIndex, rowNumber);
+	// 	if (twinnedRow === rowNumber) {  // twinned tracks reside in matched separate ST tables
+	// 		configuration = "2TwinnedTracks2Tables";
+	// 	} else {
+	// 		configuration = "2TwinnedTracks1Table";
+	// 	}
+	// }
+
+	if ((configuration === "2TwinnedTracks1Table") || (configuration === "2TwinnedTracks2Tables")) {
+		twinnedRow = findTwinnedRow(subtitleTableIndex, rowNumber);
+	}
+
+	switch (configuration) {
+	case "1Track1Table":
+		switch (insertDirection) {
+		case "before": 
+			newRowNumber = rowNumber;
+			if (rowNumber > 1) {
+				rowObject.startSeconds = tableData.subtitleEndSeconds[rowNumber - 1];
+			} else {
+				rowObject.startSeconds = 0;
+			}
+			rowObject.endSeconds = tableData.subtitleStartSeconds[rowNumber];
+			break;
+		case "after": 
+			newRowNumber = rowNumber + 1;
+			rowObject.startSeconds = tableData.subtitleEndSeconds[rowNumber];
+			if (rowNumber < tableData.lastSubtitleNumber) {
+				rowObject.endSeconds = tableData.subtitleStartSeconds[rowNumber + 1];
+			} else {
+				rowObject.endSeconds = rowObject.startSeconds + 2;
+			}
+			break;
+		}  // switch (insertDirection) 
+		futureSelectedRow = newRowNumber;
+		rowObject.startTime = helper.toTimeString(rowObject.startSeconds * 1000);
+		rowObject.endTime = helper.toTimeString(rowObject.endSeconds * 1000);
+		insertRow(tableData, newRowNumber);
+		createSubtitleRow(rowObject, TrkFileMetadata[0].STTableIndex, newRowNumber);
+		break;
+
+	case "2TwinnedTracks2Tables":  // twinned tracks reside in matched separate ST tables
+		switch (insertDirection) {
+		case "before": 
+			newRowNumber = rowNumber;
+			if (rowNumber > 1) {
+				rowObject.StartSeconds = tableData.subtitleEndSeconds[rowNumber - 1];
+			} else {
+				rowObject.StartSeconds = 0;
+			}
+			rowObject.endSeconds = tableData.subtitleStartSeconds[rowNumber];
+			break;
+		case "after": 
+			newRowNumber = rowNumber + 1;
+			rowObject.startSeconds = tableData.subtitleEndSeconds[rowNumber];
+			if (rowNumber < tableData.lastSubtitleNumber) {
+				rowObject.endSeconds = tableData.subtitleStartSeconds[rowNumber + 1];
+			} else {
+				rowObject.endSeconds = rowObject.startSeconds + 2;
+			}
+			break;
+		}
+		newRowNumber2 = newRowNumber;
+		track1 = trackNumber;
+		track2 = twinnedTrack;
+		break;
+
+	case "2TwinnedTracks1Table": // twinned tracks reside in a single ST table
+		let selectionConfiguration = ""	;
+		if (rowNumber < twinnedRow) {
+			selectionConfiguration = "1stOf2Selected";
+		} else {
+			selectionConfiguration = "2ndOf2Selected";
+		}
+
+		switch (selectionConfiguration) {
+		case "1stOf2Selected":
+			switch (insertDirection) {
+			case "before": 
+				newRowNumber = rowNumber;
+				if (rowNumber > 1) {
+					rowObject.startSeconds = tableData.subtitleEndSeconds[rowNumber - 1];
+				} else {
+					rowObject.startSeconds = 0;
+				}
+				rowObject.endSeconds = tableData.subtitleStartSeconds[rowNumber];
+				break;
+			case "after": 
+				newRowNumber = rowNumber + 2;
+				rowObject.startSeconds = tableData.subtitleEndSeconds[rowNumber];
+				if ((rowNumber + 2) < tableData.lastSubtitleNumber) {
+					rowObject.endSeconds = tableData.subtitleStartSeconds[rowNumber + 2];
+				} else {
+					rowObject.endSeconds = rowObject.startSeconds + 2;
+				}
+				break;
+			}
+			track1 = trackNumber;
+			track2 = twinnedTrack;
+			break;
+		case "2ndOf2Selected":
+			switch (insertDirection) {
+			case "before": 
+				newRowNumber = twinnedRow;
+				if (rowNumber > 1) {
+					rowObject.startSeconds = tableData.subtitleEndSeconds[twinnedRow - 1];
+				} else {
+					rowObject.startSeconds = 0;
+				}
+				rowObject.endSeconds = tableData.subtitleStartSeconds[rowNumber];
+				break;
+			case "after": 
+				newRowNumber = twinnedRow + 2;
+				rowObject.startSeconds = tableData.subtitleEndSeconds[twinnedRow];
+				if (rowNumber < tableData.lastSubtitleNumber) {
+					rowObject.endSeconds = tableData.subtitleStartSeconds[rowNumber + 1];
+				} else {
+					rowObject.endSeconds = rowObject.startSeconds + 2;
+				}
+				break;
+			}
+			track1 = twinnedTrack;
+			track2 = trackNumber;
+			break;
+		}  // switch (selectionConfiguration)
+		newRowNumber2 = newRowNumber + 1;
+		if (track1 === trackNumber) {
+			futureSelectedRow = newRowNumber;
+		} else {
+			futureSelectedRow = newRowNumber2;
+		}
+		break;			
+	}  // switch (configuration)
+
+	if ((configuration === "2TwinnedTracks1Table") || (configuration === "2TwinnedTracks2Tables")) {
+		rowObject.track = track1;
+		rowObject.subtitleStyle = TrkFileMetadata[track1].defaultSubtitleStyle;
+		rowObject.startTime = helper.toTimeString(rowObject.startSeconds * 1000);
+		rowObject.endTime = helper.toTimeString(rowObject.endSeconds * 1000);
+
+		let rowObject2 = {};
+		rowObject2.track = track2;
+		rowObject2.subtitleStyle = TrkFileMetadata[track2].defaultSubtitleStyle;
+		rowObject2.startSeconds = rowObject.startSeconds;
+		rowObject2.endSeconds = rowObject.endSeconds;
+		rowObject2.startTime = rowObject.startTime;
+		rowObject2.endTime = rowObject.endTime;
+		rowObject2.subtitle = rowObject.subtitle;
+
+		trackData1 = TrkFileMetadata[track1];
+		tableData1 = STTableMetadata[trackData1.STTableIndex];
+		subtitleTableIndex1 = trackData1.STTableIndex;
+		trackData2 = TrkFileMetadata[track2];
+		tableData2 = STTableMetadata[trackData2.STTableIndex];
+		subtitleTableIndex2 = trackData2.STTableIndex;
+
+		console.log(`insertSubtitle track1: ${track1} track2: ${track2}`);
+		console.log(`insertSubtitle newRowNumber: ${newRowNumber} newRowNumber2: ${newRowNumber2}`);
+		console.log("rowObject: ", rowObject);
+		console.log("rowObject2: ", rowObject2);
+		insertRow(tableData1, newRowNumber);
+		insertRow(tableData2, newRowNumber2);
+		createSubtitleRow(rowObject, subtitleTableIndex1, newRowNumber);
+		createSubtitleRow(rowObject2, subtitleTableIndex2, newRowNumber2);
+	}
+
+	prepareUndo();
+
+	let chosenRow = futureSelectedRow;
 
 	switch (selectOption) {
 		case "selectNew": 
 			break;
 		case "selectOld":
-			if (afterRowNumber > 0) {
-				chosenRow = afterRowNumber;
+			if (rowNumber > 0) {
+				chosenRow = rowNumber;
 			}
 			break;
 		case "selectNone": 
 			return newRowNumber;
-		default:
-			console.log ("insertSubtitle invalid selectOption ", selectOption);
 	}
 
-	selectRow(chosenRow);
+	selectRow(selectedSubtitleTableIndex, chosenRow);
 	if (showTimePopup) {
-		showTimeEditPopup(chosenRow);
+		showTimeEditPopup(subtitleTableIndex, chosenRow);
 	}
 
 	return newRowNumber;
 
+function prepareUndo() {
+
+	changeCounter += 1;
+	selectCurrentIndex("undoArray");
+	undoArray[undoArrayCurrentIndex].inUse = true;
+	undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
+	undoArray[undoArrayCurrentIndex].action = "subtitleInsertion";
+	
+	undoArray[undoArrayCurrentIndex].selectedSubtitleTableIndex = selectedSubtitleTableIndex;
+	undoArray[undoArrayCurrentIndex].selectedSubtitleNumber = selectedSubtitleNumber;
+
+	// insertSubtitle(trackNumber, subtitleTableIndex, insertDirection, rowNumber, text, selectOption)	
+	undoArray[undoArrayCurrentIndex].trackNumber = trackNumber;
+	undoArray[undoArrayCurrentIndex].subtitleTableIndex = subtitleTableIndex;
+	undoArray[undoArrayCurrentIndex].insertDirection = insertDirection;
+	undoArray[undoArrayCurrentIndex].rowNumber = rowNumber;
+	undoArray[undoArrayCurrentIndex].text = text;
+	undoArray[undoArrayCurrentIndex].selectOption = selectOption;
+	
+	undoArray[undoArrayCurrentIndex].newRowNumber = newRowNumber;
+
+	if (twinnedTrack === 0) {
+		delete undoArray[undoArrayCurrentIndex].twinnedTrackObj;
+	} else {
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj = {};
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleTableIndex1 = subtitleTableIndex1;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.newRowNumber = newRowNumber;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleTableIndex2 = subtitleTableIndex2;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.newRowNumber2 = newRowNumber2;
+	}
+
+}  // insertSubtitle prepareUndo
+
 }  // insertSubtitle
 
-function deleteSubtitle(rowNumber) {
+function insertRow(tableData, row) {
+		tableData.STTable.insertRow(row);
+		tableData.subtitleStartSeconds.splice(row, 0, 0);
+		tableData.subtitleEndSeconds.splice(row, 0, 0);
+		tableData.subtitleTrack.splice(row, 0, 0);
+		tableData.lastSubtitleNumber++;
+}  // insertRow
 
-	console.log("deleteSubtitle entered rowNumber = ", rowNumber);
+function deleteRow(tableData, row) {
+
+	console.log("deleteRow row ", row, " tableData: ", tableData);
+
+	tableData.STTable.deleteRow(row); 
+	tableData.subtitleTrack.splice(row, 1);
+	tableData.subtitleStartSeconds.splice(row, 1);
+	tableData.subtitleEndSeconds.splice(row, 1);
+	tableData.lastSubtitleNumber--;
+
+}  //deleteRow
+
+function deleteSubtitle(subtitleTableIndex, rowNumber) {
+
+	console.log(`deleteSubtitle entered table: ${subtitleTableIndex} row: ${rowNumber}`);
 
 	if (rowNumber <= 0) {return;}
+
+	const tableData = STTableMetadata[subtitleTableIndex];
+	const subtitleTrack = tableData.subtitleTrack[rowNumber];
+	const trackData = TrkFileMetadata[subtitleTrack];
+
+	let twinnedTrack = trackData.twinnedTrack;
+	let twinnedTrackData;
+	let twinnedTableData;
+	let twinnedRow;
+
+	if (twinnedTrack != 0) {
+		twinnedTrackData = TrkFileMetadata[twinnedTrack];
+		twinnedTableData = STTableMetadata[twinnedTrackData.STTableIndex];
+		twinnedRow = findTwinnedRow(subtitleTableIndex, rowNumber);
+	}
+
+	prepareUndo();
+
+	let isLast = false;
+	if (rowNumber === tableData.lastSubtitleNumber) {
+		isLast = true;
+	}
+
+	if (twinnedTrack === 0) { 
+		deleteRow(tableData, rowNumber);
+		selectRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
+		return;
+	}
+
+	console.log(`deleteSubtitle twinnedTrack: ${twinnedTrack} twinnedRow: ${twinnedRow}`);
+
+	if (twinnedRow > rowNumber) { 
+		deleteRow(twinnedTableData, twinnedRow);
+		deleteRow(tableData, rowNumber);
+	} else {
+		deleteRow(tableData, rowNumber);
+		deleteRow(twinnedTableData, twinnedRow);
+	}
+
+	if (!isLast) {
+		selectRow(selectedSubtitleTableIndex, rowNumber);
+	} else {
+		if (tableData.lastSubtitleNumber >= 1) {
+			selectRow(selectedSubtitleTableIndex, tableData.lastSubtitleNumber);
+		} else {
+			selectedSubtitleNumber = 0;
+			STSpan1.innerHTML = "";
+			STSpan2.innerHTML = "";
+		}
+	}
+
+	console.log("deleteSubtitle exiting rowNumber = ", rowNumber);
+	selectRow(selectedSubtitleTableIndex, selectedSubtitleNumber);
+
+function prepareUndo() {
 
 	changeCounter += 1;
 	selectCurrentIndex("undoArray");
 	undoArray[undoArrayCurrentIndex].inUse = true;
 	undoArray[undoArrayCurrentIndex].changeNumber = changeCounter;
 	undoArray[undoArrayCurrentIndex].action = "subtitleDeletion";
+	undoArray[undoArrayCurrentIndex].selectedSubtitleNumber = selectedSubtitleNumber;
+
+	undoArray[undoArrayCurrentIndex].selectedSubtitleTableIndex = selectedSubtitleTableIndex;
 	undoArray[undoArrayCurrentIndex].rowNumber = rowNumber;
-	undoArray[undoArrayCurrentIndex].selectedRowNumber = selectedSubtitleNumber;
+
 	undoArray[undoArrayCurrentIndex].startTime = 
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
+		tableData.STTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
 	undoArray[undoArrayCurrentIndex].endTime = 
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
-	if (subtitleTrack[rowNumber] > 0) {
+		tableData.STTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
+	undoArray[undoArrayCurrentIndex].subtitleStyle = "";
+	if (tableData.subtitleTrack[rowNumber] > 0) {
 		undoArray[undoArrayCurrentIndex].subtitleStyle = 
-			subtitleTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
+			tableData.STTable.rows[rowNumber].querySelector(".classSubtitleTrack").textContent;
 	}
 	undoArray[undoArrayCurrentIndex].oldValue = 
-		subtitleTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
-	undoArray[undoArrayCurrentIndex].subtitleTrack = subtitleTrack[rowNumber];
-	undoArray[undoArrayCurrentIndex].subtitleStartSeconds = subtitleStartSeconds[rowNumber];
-	undoArray[undoArrayCurrentIndex].subtitleEndSeconds = subtitleEndSeconds[rowNumber];
+		tableData.STTable.rows[rowNumber].querySelector(".classSubtitleText").innerHTML;
+	undoArray[undoArrayCurrentIndex].subtitleTrack = tableData.subtitleTrack[rowNumber];
+	undoArray[undoArrayCurrentIndex].subtitleStartSeconds = tableData.subtitleStartSeconds[rowNumber];
+	undoArray[undoArrayCurrentIndex].subtitleEndSeconds = tableData.subtitleEndSeconds[rowNumber];
 
-	let isLast = false;
-	if (rowNumber === lastSubtitleNumber) {
-		isLast = true;
-	}
+	delete undoArray[undoArrayCurrentIndex].twinnedTrackObj;
 
-	subtitleTable.deleteRow(rowNumber); 
-	subtitleTrack.splice(rowNumber, 1);
-	subtitleStartSeconds.splice(rowNumber, 1);
-	subtitleEndSeconds.splice(rowNumber, 1);
-	lastSubtitleNumber--;
-
-	if (!isLast) {
-		selectRow(rowNumber);
+	if (twinnedTrack === 0) {
+		delete undoArray[undoArrayCurrentIndex].twinnedTrackObj;
 	} else {
-		if (lastSubtitleNumber >= 1) {
-			selectRow(lastSubtitleNumber);
-		} else {
-			selectedSubtitleNumber = 0;
-			spanSubtitle1.innerHTML = "";
-			spanSubtitle2.innerHTML = "";
-		}
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj = {};
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.twinnedTrack = twinnedTrack;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.STTableIndex = twinnedTrackData.STTableIndex
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.twinnedRow = twinnedRow;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.startTime = 
+			twinnedTableData.STTable.rows[twinnedRow].querySelector(".classSubtitleStart").textContent;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.endTime = 
+			twinnedTableData.STTable.rows[twinnedRow].querySelector(".classSubtitleEnd").textContent;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleStyle = 
+				twinnedTableData.STTable.rows[twinnedRow].querySelector(".classSubtitleTrack").textContent;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.oldValue = 
+			twinnedTableData.STTable.rows[twinnedRow].querySelector(".classSubtitleText").innerHTML;
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleTrack = 
+			twinnedTableData.subtitleTrack[twinnedRow];
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleStartSeconds = 
+			twinnedTableData.subtitleStartSeconds[twinnedRow];
+		undoArray[undoArrayCurrentIndex].twinnedTrackObj.subtitleEndSeconds = 
+			twinnedTableData.subtitleEndSeconds[twinnedRow];
 	}
-	console.log("deleteSubtitle exiting rowNumber = ", rowNumber);
 
-}
+}  // deleteSubtitle prepareUndo
 
-function createSubtitleRow(rowObject, rowIndex) {
+}  // deleteSubtitle
 
-	subtitleStartSeconds[rowIndex] = rowObject.startSeconds;
-	subtitleEndSeconds[rowIndex] = rowObject.endSeconds;
-	subtitleTrack[rowIndex] = rowObject.track;
+function createSubtitleRow(rowObject, subtitleTableIndex, rowIndex) {
+
+	const tableData = STTableMetadata[subtitleTableIndex];
+
+	tableData.subtitleStartSeconds[rowIndex] = rowObject.startSeconds;
+	tableData.subtitleEndSeconds[rowIndex] = rowObject.endSeconds;
+	tableData.subtitleTrack[rowIndex] = rowObject.track;
 
 	let newRow;
 
-	if ((rowIndex + 1) > subtitleTable.rows.length) {
+	if ((rowIndex + 1) > tableData.STTable.rows.length) {
 		newRow = document.createElement("tr");
-		subtitleTable.tBodies[0].appendChild(newRow);
+		tableData.STTable.tBodies[0].appendChild(newRow);
 	} else {
-		newRow = subtitleTable.rows[rowIndex];
+		newRow = tableData.STTable.rows[rowIndex];
 	}
 
 	newRow.style.display = 'table-row'; /* Ensure that the row is visible. */
@@ -3597,19 +4467,19 @@ function createSubtitleRow(rowObject, rowIndex) {
 
 	let rowColumns = `
 		<tr class="classSubtitleRow">
-		<td headers="subtitleNumber" class="classSubtitleNumber"></td>
-		<td headers="subtitleStart" class="classSubtitleStart">${rowObject.startTime}</td>
-		<td headers="subtitleEnd" class="classSubtitleEnd">${rowObject.endTime}</td>
+		<td class="classSubtitleNumber"></td>
+		<td class="classSubtitleStart">${rowObject.startTime}</td>
+		<td class="classSubtitleEnd">${rowObject.endTime}</td>
 		`;
 		
-//	if (!subtitleFileDataArray[0].loaded) {
-	if (subtitleTrack[rowIndex] > 0) {
+//	if (!TrkFileMetadata[0].loaded) {
+	if (tableData.subtitleTrack[rowIndex] > 0) {
 		rowColumns += 
-			`<td headers="subtitleTrack" class="classSubtitleTrack">${rowObject.subtitleStyle}</td>`;
+			`<td class="classSubtitleTrack">${rowObject.subtitleStyle}</td>`;
 	}
 
 	rowColumns += 
-		`<td headers="subtitleText" class="classSubtitleText">${rowObject.subtitle}</td>
+		`<td class="classSubtitleText">${rowObject.subtitle}</td>
 		</tr>`;
 
 	newRow.innerHTML = rowColumns;
@@ -3620,52 +4490,96 @@ function createSubtitleRow(rowObject, rowIndex) {
 }  // createSubtitleRow
 
 
-function showTimeEditPopup(rowNumber) {
+function showTimeEditPopup(subtitleTableIndex, rowNumber) {
 
-	console.log('showTimeEditPopup rowNumber ', rowNumber);
+	const tableData = STTableMetadata[subtitleTableIndex];
+	const subtitleTrack = tableData.subtitleTrack[rowNumber];
+	const trackData = TrkFileMetadata[subtitleTrack];
+
+	console.log(`showTimeEditPopup table: ${subtitleTableIndex} rowNumber: ${rowNumber} track: ${subtitleTrack}`);
 
 	let newDisplay = (timeEditPopupRow === 0);
 
 	if (rowNumber < 1) {
 		timeEditPopup.style.display = "none";
 		timeEditPopupRow = 0;
+		timeEditPopupTableIndex = null;
+		timeEditPopupSubtitleTrack = null;
 		toggleHideShow('timeEditPopupOToOff');
 		return;
 	}
 
-	if (timeEditPopupRow != rowNumber) {
-		timeEditPopupRow = rowNumber;
-		t1timeEditPopupOldTime = subtitleTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
-		t1timeEditPopupOldSeconds = subtitleStartSeconds[rowNumber];
-		t2timeEditPopupOldTime = subtitleTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
-		t2timeEditPopupOldSeconds = subtitleEndSeconds[rowNumber];
-		if ((subtitleTrack[rowNumber] === 1) && (timeEditSynchronizeWithTrack1)) {
-			let pairedTrack2Row = findTrackRow('next', 2, rowNumber);
-			t1timeEditPopupOldTimeOnTrack2 = 
-				subtitleTable.rows[pairedTrack2Row].querySelector(".classSubtitleStart").textContent;
-			t1timeEditPopupOldSecondsOnTrack2 = subtitleStartSeconds[pairedTrack2Row];
-			t2timeEditPopupOldTimeOnTrack2 = 
-				subtitleTable.rows[pairedTrack2Row].querySelector(".classSubtitleEnd").textContent;
-			t2timeEditPopupOldSecondsOnTrack2 = subtitleEndSeconds[pairedTrack2Row];
-		}
-	}
-
-	fillTimeFields((subtitleStartSeconds[rowNumber] * 1000), "t1");
-	fillTimeFields((subtitleEndSeconds[rowNumber] * 1000), "t2");
+	fillTimeFields((tableData.subtitleStartSeconds[rowNumber] * 1000), "t1");
+	fillTimeFields((tableData.subtitleEndSeconds[rowNumber] * 1000), "t2");
 
 	if (newDisplay) {
 		timeEditPopup.style.display = "inline-block";
-		// timeEditPopup.style.visibility = "visible";
-		//timeEditPopup.style.opacity = "0.1";
 	}
 
+	if ((timeEditPopupRow === rowNumber) && (timeEditPopupSubtitleTrack === subtitleTrack)) {
+		return;
+	}
+
+	timeEditPopupRow = rowNumber;
+	timeEditPopupTableIndex = subtitleTableIndex;
+	timeEditPopupSubtitleTrack = subtitleTrack;
+	t1timeEditPopupOldTime = tableData.STTable.rows[rowNumber].querySelector(".classSubtitleStart").textContent;
+	t1timeEditPopupOldSeconds = tableData.subtitleStartSeconds[rowNumber];
+	t2timeEditPopupOldTime = tableData.STTable.rows[rowNumber].querySelector(".classSubtitleEnd").textContent;
+	t2timeEditPopupOldSeconds = tableData.subtitleEndSeconds[rowNumber];
+
+	let trackInfo = `&nbsp;-&nbsp;`;
+	if (TrkFileMetadata[2].loaded) {
+		trackInfo += `Track ${timeEditPopupSubtitleTrack}`;
+	}
+	trackInfo += `&nbsp;Row ${timeEditPopupRow}`;
+	timeEditPopupTrackInfo.innerHTML = trackInfo;
+/*
+	let twinnedTrack = trackData.twinnedTrack;
+
+	if (twinnedTrack === 0) { return; }
+
+	const twinnedTrackData = TrkFileMetadata[twinnedTrack];
+	const twinnedTableData = STTableMetadata[twinnedTrackData.STTableIndex];
+
+	let twinnedRow = findTwinnedRow(subtitleTableIndex, rowNumber);
+
+	let twinnedRow = 0;
+	const twinnedTrackData = TrkFileMetadata[twinnedTrack];
+	const twinnedTableData = STTableMetadata[twinnedTrackData.STTableIndex];
+
+	if (trackData.STTableIndex != twinnedTrackData.STTableIndex) {
+		if (rowNumber <= twinnedTrackData.lastSubtitleNumber) {
+			twinnedRow = rowNumber;
+		}
+	} else {
+		if (subtitleTrack < twinnedTrack) {
+			twinnedRow = findTrackRow('next', twinnedTrack, trackData.STTableIndex, rowNumber);
+		} else {
+			twinnedRow = findTrackRow('prev', twinnedTrack, trackData.STTableIndex, rowNumber);
+		}
+	};
+
+	if (twinnedRow <= 0) {
+		errorMsg = `showTimeEditPopup Twinned row not found, table: ${subtitleTableIndex} row: ${rowNumber}`;
+		throwError(errorMsg);
+	}
+
+
+	t1timeEditPopupOldTimeOnTwinnedTrack = 
+		twinnedTableData.STTable.rows[twinnedRow].querySelector(".classSubtitleStart").textContent;
+	t1timeEditPopupOldSecondsOnTwinnedTrack = twinnedTableData.subtitleStartSeconds[twinnedRow];
+	t2timeEditPopupOldTimeOnTwinnedTrack = 
+		twinnedTableData.STTable.rows[twinnedRow].querySelector(".classSubtitleEnd").textContent;
+	t2timeEditPopupOldSecondsOnTwinnedTrack = twinnedTableData.subtitleEndSeconds[twinnedRow];
+*/
 	return;
 
-function fillTimeFields (ms, selector) {
+function fillTimeFields (ms, timeSelector) {
 
 	let timeObject = {};
 
-	switch (selector) {
+	switch (timeSelector) {
 		case "t1":
 			timeObject = t1timeObject;
 			break;
@@ -3673,9 +4587,8 @@ function fillTimeFields (ms, selector) {
 			timeObject = t2timeObject;
 			break;
 		default:
-			errorMsg = 'saveTime invalid selector: ' + selector;
-			alert(errorMsg);
-			throw new Error(errorMsg);
+			errorMsg = 'saveTime invalid timeSelector: ' + timeSelector;
+			throwError(errorMsg);
 	}
 
 	let hh = Math.floor(ms / 1000 / 3600);
@@ -3808,7 +4721,7 @@ function interleave(array1, array2) {
 	let index2 = 0;
 
 	// sample mergeDataArray[x] member: 
-	// 	{dataIndex: "1", arrayIndex: 0} means subtitleFileDataArray[1].array[0]
+	// 	{trackIndex: "1", arrayIndex: 0} means TrkFileMetadata[1].array[0]
 	mergeDataArray = [];
 
 	while (index1 < array1.length && index2 < array2.length) {
@@ -3816,28 +4729,28 @@ function interleave(array1, array2) {
 		const time2 = array2[index2].startSeconds;
 
 	    if (time1 == time2) {
-    		mergeDataArray.push({ dataIndex: 1, arrayIndex: index1 });
-			mergeDataArray.push({ dataIndex: 2, arrayIndex: index2 });
+    		mergeDataArray.push({ trackIndex: 1, arrayIndex: index1 });
+			mergeDataArray.push({ trackIndex: 2, arrayIndex: index2 });
 			index1++;
 		    index2++;
 		} else if (time1 < time2) {
-			mergeDataArray.push({ dataIndex: 1, arrayIndex: index1 });
+			mergeDataArray.push({ trackIndex: 1, arrayIndex: index1 });
 			index1++;
 	    } else {
-			mergeDataArray.push({ dataIndex: 2, arrayIndex: index2 });
+			mergeDataArray.push({ trackIndex: 2, arrayIndex: index2 });
 			index2++;
 		}
   	}
 
 	// Add remaining elements from array1
 	while (index1 < array1.length) {
-		mergeDataArray.push({ dataIndex: 1, arrayIndex: index1 });
+		mergeDataArray.push({ trackIndex: 1, arrayIndex: index1 });
 		index1++;
 	}
 
 	// Add remaining elements from array2
 	while (index2 < array2.length) {
-		mergeDataArray.push({ dataIndex: 2, arrayIndex: index2 });
+		mergeDataArray.push({ trackIndex: 2, arrayIndex: index2 });
 		index2++;
 	}
 
@@ -3846,13 +4759,15 @@ function interleave(array1, array2) {
 
 }
 
-async function extractSubtitleFile(file, subtitleFile) {
+async function extractSubtitleFile(file, trackNumber) {
 
-	console.log('extractSubtitleFile subtitleFile ', subtitleFile);
+	const TrkMetadata = TrkFileMetadata[trackNumber];
 
-	console.log("extractSubtitleFile file.name " + file.name);
+	console.log("extractSubtitleFile TrkMetadata: ", TrkMetadata);
+
+	console.log(`extractSubtitleFile file.name = ${file.name}`);
 	let extension = file.name.substring((file.name.length - 4));
-	console.log("extractSubtitleFile extension " + extension);
+	console.log(`extractSubtitleFile extension = ${extension}`);
 
 	// Asynchronously load the file contents.
 	const textContent = await file.text();
@@ -3860,8 +4775,8 @@ async function extractSubtitleFile(file, subtitleFile) {
 	console.log("extractSubtitleFile file ", file);
 	console.log("extractSubtitleFile {file} ", {file});
 
-	subtitleFile.array = [];
-	subtitleFile.loaded = false;
+	TrkMetadata.array = [];
+	TrkMetadata.loaded = false;
 
 	let counter = 0;
 
@@ -3870,27 +4785,25 @@ async function extractSubtitleFile(file, subtitleFile) {
 			let parseOptions = {};
 			const lineArray = parse(textContent, parseOptions);
 			lineArray.filter(filterSsaCaptions).forEach(function(content) {
-				captureSingleSubtitle(content, subtitleFile.inputId); 
+				captureSingleSubtitle(content, trackNumber); 
 			});
 			break;
 		case '.srt':
 			const srtArray = parseSrt(textContent);
 			srtArray.forEach(function(content) {
-				captureSingleSubtitle(content, subtitleFile.inputId); 
+				captureSingleSubtitle(content, trackNumber); 
 			});
 			break;
 		default:
 			errorMsg = 'unsupported file extension: ' + extension;
-			alert(errorMsg);
-			throw new Error(errorMsg);
+			throwError(errorMsg);
 			break;
 	}
 
 	if (counter !== 0) {
-		subtitleFile.loaded = true;
-		console.log('extractSubtitleFile ', counter, ' ', counter, 
-			' subtitles read');
-		if (subtitleFile.inputId == "subtitleFileInput0") {
+		TrkMetadata.loaded = true;
+		console.log(`extractSubtitleFile ${counter} subtitles read`);
+		if (trackNumber === 0) {
 			totalNumberOfSubtitlesRead = counter;
 		}
 	}
@@ -3901,7 +4814,7 @@ function filterSsaCaptions(arrayElement) {
     return (arrayElement.type == "caption");
 }
 
-function captureSingleSubtitle(content, inputId) {
+function captureSingleSubtitle(content, trackNumber) {
 
 // helper adapted from https://github.com/papnkukn/subsrt/blob/master/lib/format/srt.js
 
@@ -3929,34 +4842,19 @@ function captureSingleSubtitle(content, inputId) {
 
 	rowData.startSeconds = content.start / 1000;
 	rowData.endSeconds = content.end / 1000;
-	switch (inputId) {
-		case 'subtitleFileInput0':
-			rowData.track = 0;
-			break;
-		case 'subtitleFileInput1':
-			rowData.track = 1;
-			break;
-		case 'subtitleFileInput2':
-			rowData.track = 2;
-			break;
-		default:
-			errorMsg = 'captureSingleSubtitle invalid inputId: ' + inputId;
-			alert(errorMsg);
-			throw new Error(errorMsg);
-	}
-
+	rowData.track = trackNumber;
 	rowData.startTime = helper.toTimeString(content.start);
 	rowData.endTime = helper.toTimeString(content.end);
 	
 	if (content.subtitleStyle == '') {
-		rowData.subtitleStyle = subtitleFile.defaultSubtitleStyle;
+		rowData.subtitleStyle = TrkMetadata.defaultSubtitleStyle;
 	}
 	else {
-		if (inputId == "subtitleFileInput0") {
+		if (trackNumber === 0) {
 			rowData.subtitleStyle = content.subtitleStyle;
 		}
 		else {
-			rowData.subtitleStyle = subtitleFile.defaultSubtitleStyle + '-' + content.subtitleStyle;
+			rowData.subtitleStyle = `${TrkMetadata.defaultSubtitleStyle}-${content.subtitleStyle}`;
 		}
 	}
 
@@ -3964,11 +4862,11 @@ function captureSingleSubtitle(content, inputId) {
 	//rowData.subtitle = clearHTMLTags(content.text);  // Sanitize text to remove possibly malicious HTML code.
 	rowData.subtitle = sanitizeHTML(content.text, ['br', 'i']);  // Sanitize text to remove possibly malicious HTML code.
 
-	if (inputId == "subtitleFileInput0") {
-		createSubtitleRow(rowData, counter);
+	if (trackNumber === 0) {
+		createSubtitleRow(rowData, TrkMetadata.STTableIndex, counter);
 	}
 	else {
-		subtitleFile.array.push(rowData);
+		TrkMetadata.array.push(rowData);
 	}
 	
 } // captureSingleSubtitle
@@ -4030,7 +4928,6 @@ const clearHTMLTags = (strToSanitize) => {
   }
 }
 
-
 function convertSecondsToSrtTime(seconds) {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -4043,11 +4940,22 @@ function convertSecondsToSrtTime(seconds) {
 //    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')},${milliseconds}`;
 }
 
-function saveFile(targetTrack) {
+async function saveBothFiles() {
+
+    const savedFirst = await saveFile(1);
+	const savedSecond = await saveFile(2);
+
+}
+
+async function saveFile(targetTrack) {
+
 	console.log("saveFile targetTrack ", targetTrack);
 
-	if (lastSubtitleNumber <= 0) {return;}
-	if ((targetTrack === 0) && (!subtitleFileDataArray[0].loaded)) {return;}
+	const trackData = TrkFileMetadata[targetTrack];
+	const tableData = STTableMetadata[trackData.STTableIndex];
+
+	if (tableData.lastSubtitleNumber <= 0) {return;}
+	if ((targetTrack === 0) && (!TrkFileMetadata[0].loaded)) {return;}
 
 	let filename = ("track" + targetTrack + "-output.srt").trim();
 	
@@ -4055,12 +4963,12 @@ function saveFile(targetTrack) {
 	let subtitleIndex = 1;
 	let outputIndex = 0;
 
-	while (subtitleIndex <= lastSubtitleNumber) {
+	while (subtitleIndex <= tableData.lastSubtitleNumber) {
 	
 		let matchFound = false;
 
-		while ((!matchFound) && (subtitleIndex <= lastSubtitleNumber)) {
-			if (subtitleTrack[subtitleIndex] === targetTrack) {
+		while ((!matchFound) && (subtitleIndex <= tableData.lastSubtitleNumber)) {
+			if (tableData.subtitleTrack[subtitleIndex] === targetTrack) {
 				matchFound = true;
 			} else {
 				subtitleIndex += 1;
@@ -4071,11 +4979,11 @@ function saveFile(targetTrack) {
 			outputIndex += 1;
 			fileContent += outputIndex + 
 				"\n" +
-				convertSecondsToSrtTime(subtitleStartSeconds[subtitleIndex]) + 
+				convertSecondsToSrtTime(tableData.subtitleStartSeconds[subtitleIndex]) + 
 				" --> " + 
-				convertSecondsToSrtTime(subtitleEndSeconds[subtitleIndex]) + 
+				convertSecondsToSrtTime(tableData.subtitleEndSeconds[subtitleIndex]) + 
 				"\n" +
-				subtitleTable.rows[subtitleIndex].querySelector(".classSubtitleText").innerText.replaceAll('<br>', '\n').trim() +
+				tableData.STTable.rows[subtitleIndex].querySelector(".classSubtitleText").innerText.replaceAll('<br>', '\n').trim() +
 				"\n\n";
 		}
 
@@ -4083,28 +4991,71 @@ function saveFile(targetTrack) {
 	}
 
 	if (!outputIndex) {
-		let msg = "saveFile Track " + targetTrack + " empty, save cancelled";
-		alert(msg);
-		console.log(msg);
-		return;
+		notificationMsg1 = `Track ${targetTrack} empty, save cancelled`;
+		notify("saveFile");
+		return false;
 	}
 
-    // Create a Blob containing the text data
-    const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+	const savedFlag = await writeFile(fileContent, filename);
+	return savedFlag;
 
-    // Create a link element
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
+}  // saveFile
 
-    // Programmatically click the link to trigger the download
-    document.body.appendChild(link); // Append to body is good practice
-    link.click();
-    document.body.removeChild(link); // Clean up the DOM
+async function writeFile(fileContent, defaultFileName) {
 
-    // Revoke the object URL to free up memory
-    URL.revokeObjectURL(link.href);
+	if (!fileAPIPickersSupported) {
+	    // Create a Blob containing the text data
+    	const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
 
+	    // Create a link element
+	    const link = document.createElement('a');
+	    link.href = URL.createObjectURL(blob);
+	    link.download = defaultFileName;
+
+	    // Programmatically click the link to trigger the download
+	    document.body.appendChild(link); // Append to body is good practice
+	    link.click();
+	    document.body.removeChild(link); // Clean up the DOM
+
+	    // Revoke the object URL to free up memory
+	    URL.revokeObjectURL(link.href);
+
+		return true;
+	}
+
+    try {
+        // 1. Open the browser's Save File dialog
+        // Execution PAUSES here until the user saves or cancels
+        const fileHandle = await window.showSaveFilePicker({
+            suggestedName: defaultFileName,
+            types: [{
+                accept: { 'text/plain': ['.srt'] }, // Adjust mime-type and extension as needed
+            }],
+        });
+
+        // 2. The user selected a location. Create a writable stream to that file.
+        const writable = await fileHandle.createWritable();
+
+        // 3. Write the data to the file
+        await writable.write(fileContent);
+
+        // 4. Close the file to finalize the save
+        await writable.close();
+        
+        console.log(`writeFile Successfully saved: ${defaultFileName}`);
+        return true; 
+
+    } catch (error) {
+        // If the user clicks "Cancel" in the save dialog, it throws an AbortError
+        if (error.name === 'AbortError') {
+            console.log(`User cancelled saving: ${defaultFileName}`);
+            return false; // Return false indicating cancellation
+        }
+        
+        // Handle other unexpected errors (e.g., disk full, permissions issue)
+        console.error("An error occurred while saving:", error);
+        return false;
+    }
 }
 
 	// Monitor the keydown event
@@ -4159,7 +5110,7 @@ function addKeyListener(){
 		
 	}
 
-	if (!((lastSubtitleNumber > 0) && videoFileLoaded)) { return; }
+	if (!((totalNumberOfSubtitlesRead > 0) && videoFileLoaded)) { return; }
 
 	seekBarContainer.style.display = "inline";
 
@@ -4260,7 +5211,7 @@ function addKeyListener(){
 } // addKeyListener
 
 function buttonEvents(e) {
-	if (!(lastSubtitleNumber > 0)) {
+	if (!(totalNumberOfSubtitlesRead > 0)) {
 		return;
 	}
 	let element_id = e.target.id;
@@ -4273,36 +5224,40 @@ function buttonAction(actionType) {
 		return; // no action
 	}
 
+	const tableData = STTableMetadata[selectedSubtitleTableIndex];
+
 	switch(actionType) {
 	case 'prevST':
-		if ((subtitleTrack[selectedSubtitleNumber] === 0) &&
+		if ((tableData.subtitleTrack[selectedSubtitleNumber] === 0) &&
 			(selectedSubtitleNumber > scrollStepOption)) {
-			selectRow(selectedSubtitleNumber - scrollStepOption);
-			skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
+			selectRow(selectedSubtitleTableIndex, (selectedSubtitleNumber - scrollStepOption));
+			skipTo(tableData.subtitleStartSeconds[selectedSubtitleNumber]);
 		} else {
-			nextTrack1Row = findTrackRow('prev', 1, selectedSubtitleNumber);
-			if (nextTrack1Row > 0) {
-				selectRow(nextTrack1Row);
-				skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
+			const prevTrack1Row = findTrackRow('prev', 1, selectedSubtitleTableIndex, selectedSubtitleNumber);
+			if (prevTrack1Row > 0) {
+				selectRow(selectedSubtitleTableIndex, prevTrack1Row);
+				skipTo(tableData.subtitleStartSeconds[selectedSubtitleNumber]);
 			}
 		}
 		return;
 	case 'nextST':
-		if ((subtitleTrack[selectedSubtitleNumber] === 0) &&
-			(selectedSubtitleNumber < subtitleTable.rows.length - scrollStepOption)) {
-			selectRow(selectedSubtitleNumber + scrollStepOption);
-			skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
+		console.log(`nextST tableData.subtitleTrack[selectedSubtitleNumber] = ${tableData.subtitleTrack[selectedSubtitleNumber]}`);
+		if ((tableData.subtitleTrack[selectedSubtitleNumber] === 0) &&
+			(selectedSubtitleNumber < tableData.STTable.rows.length - scrollStepOption)) {
+			selectRow(selectedSubtitleTableIndex, (selectedSubtitleNumber + scrollStepOption));
+			skipTo(tableData.subtitleStartSeconds[selectedSubtitleNumber]);
 		} else {
-			nextTrack1Row = findTrackRow('next', 1, selectedSubtitleNumber);
+			const nextTrack1Row = findTrackRow('next', 1, selectedSubtitleTableIndex, selectedSubtitleNumber);
+			console.log("nextST nextTrack1Row = ", nextTrack1Row);
 			if (nextTrack1Row > 0) {
-				selectRow(nextTrack1Row);
-				skipTo(subtitleStartSeconds[selectedSubtitleNumber]);
+				selectRow(selectedSubtitleTableIndex, nextTrack1Row);
+				skipTo(tableData.subtitleStartSeconds[selectedSubtitleNumber]);
 			}
 		}
 		return;
 	}
 
-	if (!((lastSubtitleNumber > 0) && videoFileLoaded)) { 
+	if (!((tableData.lastSubtitleNumber > 0) && videoFileLoaded)) { 
 		return;
 	}
 
@@ -4314,8 +5269,8 @@ function buttonAction(actionType) {
 	switch(actionType) {
 	case 'currentLine':
 	case 'currentLineOnDashboard':
-		selectionStartSeconds = subtitleStartSeconds[selectedSubtitleNumber] - marginOption;
-		selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
+		selectionStartSeconds = tableData.subtitleStartSeconds[selectedSubtitleNumber] - marginOption;
+		selectionEndSeconds = tableData.subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
 		break;
 	case 'restOfcurrentLine':
 		if (youTubeVideoId) {
@@ -4324,7 +5279,7 @@ function buttonAction(actionType) {
 		else {
 			selectionStartSeconds = videoArea.currentTime;
 		}
-		selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
+		selectionEndSeconds = tableData.subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
 		break;
 	case 'playVideo':
 	case 'playVideoOnDashboard':
@@ -4343,13 +5298,13 @@ function buttonAction(actionType) {
 		if (subsetting()) {
 			playingContinuously = true;
 		} else {
-			selectionStartSeconds = subtitleStartSeconds[selectedSubtitleNumber] - marginOption;
-			selectionEndSeconds = subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
+			selectionStartSeconds = tableData.subtitleStartSeconds[selectedSubtitleNumber] - marginOption;
+			selectionEndSeconds = tableData.subtitleEndSeconds[selectedSubtitleNumber] + marginOption;
 			console.log('loop Selected row ',selectedSubtitleNumber);
-			console.log('loop subtitleStartSeconds ',subtitleStartSeconds[selectedSubtitleNumber]);
-			console.log('loop subtitleEndSeconds ',subtitleEndSeconds[selectedSubtitleNumber]);
-			console.log('loop selectionStartSeconds ',selectionStartSeconds);
-			console.log('loop selectionEndSeconds ',selectionEndSeconds);
+			console.log('loop subtitleStartSeconds ', tableData.subtitleStartSeconds[selectedSubtitleNumber]);
+			console.log('loop subtitleEndSeconds ', tableData.subtitleEndSeconds[selectedSubtitleNumber]);
+			console.log('loop selectionStartSeconds ', selectionStartSeconds);
+			console.log('loop selectionEndSeconds ', selectionEndSeconds);
 		}
 		looping = true;
 		break;
@@ -4379,10 +5334,10 @@ function subsetting() {
 	
 	if (subsetRange > 1) {
 		subsetFirstRow = selectedSubtitleNumber;
-		let subsetFirstRowTrack = subtitleTrack[subsetFirstRow];
+		let subsetFirstRowTrack = tableData.subtitleTrack[subsetFirstRow];
 		subsetLastRow = selectedSubtitleNumber;
 		for (let i = 2; i <= subsetRange; i++) {
-			let nextRow = findTrackRow('next', subsetFirstRowTrack, subsetLastRow);
+			let nextRow = findTrackRow('next', subsetFirstRowTrack, selectedSubtitleTableIndex, subsetLastRow);
 			if (nextRow) {
 				subsetLastRow = nextRow;
 			} else {
@@ -4391,11 +5346,11 @@ function subsetting() {
 		}
 	}
 
-	selectionStartSeconds = subtitleStartSeconds[subsetFirstRow] - marginOption;
-	selectionEndSeconds = subtitleEndSeconds[subsetLastRow] + marginOption;
+	selectionStartSeconds = tableData.subtitleStartSeconds[subsetFirstRow] - marginOption;
+	selectionEndSeconds = tableData.subtitleEndSeconds[subsetLastRow] + marginOption;
 	
 	if (selectedSubtitleNumber != subsetFirstRow) {
-		selectRow(subsetFirstRow);
+		selectRow(selectedSubtitleTableIndex, subsetFirstRow);
 	}
 	
 	return true;
@@ -4404,57 +5359,54 @@ function subsetting() {
 }  // buttonAction
 
 function subtitleTimeCorrections(){
+
+	STTableMetadata.forEach(function(content, subtitleTableIndex) { doTimeCorrections(subtitleTableIndex); });
+
+function doTimeCorrections (subtitleTableIndex) {	
+
+	const tableData = STTableMetadata[subtitleTableIndex];
 	let index = 1; 
 
-	while (index <= lastSubtitleNumber) {
-		if (subtitleStartSeconds[index] > videoDuration) {
-		console.log('subtitleTimeCorrections subtitleStartSeconds for subtitle ', index, ' corrected from ',
-		subtitleStartSeconds[index], ' to ',videoDuration);
-		subtitleStartSeconds[index] = videoDuration;
+	while (index <= tableData.lastSubtitleNumber) {
+		if (tableData.subtitleStartSeconds[index] > videoDuration) {
+		console.log('subtitleTimeCorrections subtitleStartSeconds for track ', tableData.subtitleTrack[index],
+			' subtitle ', index, ' corrected from ',
+		tableData.subtitleStartSeconds[index], ' to ',videoDuration);
+		tableData.subtitleStartSeconds[index] = videoDuration;
 		}
-		if (subtitleEndSeconds[index] > videoDuration) {
-		console.log('subtitleTimeCorrections subtitleEndSeconds for subtitle ', index, ' corrected from ',
-		subtitleEndSeconds[index], ' to ',videoDuration);
-		subtitleEndSeconds[index] = videoDuration;
+		if (tableData.subtitleEndSeconds[index] > videoDuration) {
+		console.log('subtitleTimeCorrections subtitleEndSeconds for track ', tableData.subtitleTrack[index],
+			' subtitle ', index, ' corrected from ',
+		tableData.subtitleEndSeconds[index], ' to ',videoDuration);
+		tableData.subtitleEndSeconds[index] = videoDuration;
 		}
 		index += 1;	
 	}
-};
+}  // doTimeCorrections
+}; // subtitleTimeCorrections
 
-function createSubtitleFontOptions(fontArray) {
-
-	let selectionFound = false;
-
-	appendOption(loadFontFileOptionText);
-
-	fontArray.forEach(function(fontName) {
-		appendOption(fontName);
-		if (fontName == selectedFont) {
-			subtitleFontMenu.value = selectedFont;
-			selectionFound = true;
-		}
-	});
-
-	return selectionFound;
-
-	function appendOption(fontName) {
-		var fontOption = document.createElement("option");
-		fontOption.value = fontName;
-		fontOption.text = fontName;
-		fontOption.classList.add('selectOption');
-		//fontOption.style.fontSize = "20px";
-		subtitleFontMenu.appendChild(fontOption);
-	};
-}
-
-function clickSubtitleFileInput(numberOfFiles) {
+function clickSubtitleFileInput(numberOfFiles, numberOfTables, directive) {
 
 	if ((numberOfFiles < 1) || (numberOfFiles > 2)) {
 		errorMsg = 'clickSubtitleFileInput Invalid numberOfFiles: ' + numberOfFiles;
 		throwError(errorMsg);
 	}
 	
-	console.log("clickSubtitleFileInput numberOfFiles = ", numberOfFiles);
+	if ((numberOfTables < 1) || (numberOfTables > 2)) {
+		errorMsg = 'clickSubtitleFileInput Invalid numberOfTables: ' + numberOfTables;
+		throwError(errorMsg);
+	}
+	
+	numberOfSubtitleTables = numberOfTables;
+
+	if (numberOfSubtitleTables > 1) {
+		notificationMsg1 = "Under construction";
+		notify("clickSubtitleFileInput");
+		return;
+	}
+
+	console.log("clickSubtitleFileInput numberOfFiles = ", numberOfFiles, 
+		" numberOfSubtitleTables = ", numberOfSubtitleTables);
 	
 	console.log("clickSubtitleFileInput subtitleFileInput0", subtitleFileInput0);
 	
@@ -4465,23 +5417,36 @@ function clickSubtitleFileInput(numberOfFiles) {
 	if (numberOfFiles == 1) {
 		subtitleFileInput0.value = ""; //Clear .value to make this file element reusable
 		subtitleFileInput0.click();
+		splitLineWrapper.style.display = "block";
 		return;
 	}
 
-	// 2 files
+	// 2 files: ?? distinguish between twinned and independent tracks
 
-	subtitleFileDataArray[1].loaded = false;
-	subtitleFileDataArray[2].loaded = false;
+	splitLineWrapper.style.display = "none";
+
+	TrkFileMetadata[1].loaded = false;
+	TrkFileMetadata[2].loaded = false;
+	TrkFileMetadata[1].twinnedTrack = 0;
+	TrkFileMetadata[2].twinnedTrack = 0;
+	if ((directive != "undefined") && directive === 'twinned') {
+		TrkFileMetadata[1].twinnedTrack = 2;
+		TrkFileMetadata[2].twinnedTrack = 1;
+	}
 
 	subtitleFileInput1.value = ""; //Clear .value to make this file element reusable
 	subtitleFileInput1.click();
 	
 	subtitleFileInput2.value = ""; //Clear .value to make this file element reusable
-	subtitleFileInput2.click();
+	if (!firefoxAgent) {
+		subtitleFileInput2.click();
+	}
 
 }
 
 function DOMInitializations() {
+
+checkBrowser();
 
 videoURLButton = document.getElementById("videoURLButton");
 videoURLInput = document.getElementById("videoURLInput");
@@ -4490,13 +5455,25 @@ subtitleFileInput0 = document.getElementById("subtitleFileInput0");
 subtitleFileInput1 = document.getElementById("subtitleFileInput1");
 subtitleFileInput2 = document.getElementById("subtitleFileInput2");
 
+subtitleTableSection = document.getElementById("subtitleTableSection");
+subtitleTableDiv0 = document.getElementById("subtitleTableDiv0");
+
+let index = 0;
+do {
+	STTableMetadata[index].STTable = document.getElementById(STTableMetadata[index].STTableId);
+	// console.log("DOMInitializations index = ", index, " ", STTableMetadata[index].STTable );
+	STTableMetadata[index].trackHeader = document.getElementById(`subtitleTrackHeader${index}`);
+	STTableMetadata[index].trackHeader.classList.add('notDisplayed');
+	addSubtitleTableEventListeners (index);
+	index++;
+} while (index < STTableMetadata.length);
+
 selectedCustomStyle = document.createElement('style');
 document.head.appendChild(selectedCustomStyle);
 
-subtitleTrackField = document.getElementById("subtitleTrackField");
-subtitleTrackField.classList.add('notDisplayed');
 save1File = document.getElementById("save1File");
 save2Files = document.getElementById("save2Files");
+saveBothTracks = document.getElementById("saveBothTracks");
 
 let viewportWidth = getViewportWidth();
 let viewportHeight = getViewportHeight();
@@ -4534,6 +5511,8 @@ currentLineOnDashboardButton = document.getElementById("currentLineOnDashboard")
 playVideoOnDashboardButton = document.getElementById("playVideoOnDashboard");
 loopOnDashboardButton = document.getElementById("loopOnDashboard");
 textEditPopupPlaySingleButton = document.getElementById("textEditPopupPlaySingle");
+splitLineWrapper = document.getElementById("splitLineWrapper");
+timeEditPopupTrackInfo = document.getElementById("timeEditPopupTrackInfo");
 
 spanStartTime = document.getElementById("spanStartTime");
 spanEndTime = document.getElementById("spanEndTime");
@@ -4542,8 +5521,8 @@ spanStartTimeOnDashboard = document.getElementById("spanStartTimeOnDashboard");
 spanEndTimeOnDashboard = document.getElementById("spanEndTimeOnDashboard");
 spanTrackOnDashboard = document.getElementById("spanTrackOnDashboard");
 
-spanSubtitle1 = document.getElementById("spanSubtitle1");
-spanSubtitle2 = document.getElementById("spanSubtitle2");
+STSpan1 = document.getElementById("STSpan1");
+STSpan2 = document.getElementById("STSpan2");
 subtitleAlignmentMenu = document.getElementById("subtitleAlignmentMenu");
 
 selectionLabel = document.getElementById("selectionLabel");
@@ -4591,30 +5570,11 @@ subtitleWidthMenu = document.getElementById("subtitleWidthMenu");
 subtitleFontMenu = document.getElementById("subtitleFontMenu");
 fontListFileInput = document.getElementById("fontListFileInput");
 subtitleFontSizeMenu = document.getElementById("subtitleFontSizeMenu");
+subtitleFontMenu2 = document.getElementById("subtitleFontMenu2");
+// fontListFileInput = document.getElementById("fontListFileInput");
+subtitleFontSizeMenu2 = document.getElementById("subtitleFontSizeMenu2");
 
-subtitleTableDiv = document.getElementById("subtitleTableDiv");
-subtitleTable = document.getElementById("subtitleTable");
 EOT = document.getElementById("EOT");
-
-subtitleTable.addEventListener('mousedown', (e) => {
-	const cell = e.target.closest('td');
-	if (!cell) {return;}
-	const row = cell.parentElement;
-   	console.log("EventListener-subtitleTable-mousedown row.rowIndex:", row.rowIndex);
-});
-
-subtitleTable.addEventListener('click', (e) => {
-	const cell = e.target.closest('td');
-	if (!cell) {return;}
-	const row = cell.parentElement;
-   	console.log("EventListener-subtitleTable-click row.rowIndex:", row.rowIndex, 
-		" cell.textContent: ", cell.textContent);
-	selectRow(row.rowIndex);
-	if ((cell.classList.contains('classSubtitleStart')) || 
-		(cell.classList.contains('classSubtitleEnd'))) {
-		showTimeEditPopup(row.rowIndex);
-	}
-});
 
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -4622,12 +5582,12 @@ const allUrlParamsObject = Object.fromEntries(urlParams.entries());
 console.log("DOMInitializations All Query Parameters as Object:", allUrlParamsObject);
 
 if (allUrlParamsObject.yturl == undefined) {
-	console.log("DOMInitializations parm is undefined");
+	console.log("DOMInitializations URL parm is undefined");
 } else {
 	if (allUrlParamsObject.yturl = "") {
-		console.log('DOMInitializations parm is ""');
+		console.log('DOMInitializations URL parm is ""');
 	} else {
-		console.log("DOMInitializations parm is present: ",allUrlParamsObject.yturl);
+		console.log("DOMInitializations URL parm is present: ",allUrlParamsObject.yturl);
 	}
 }
 
@@ -4646,6 +5606,7 @@ configInitializations(); // Process config.js
 changeTheme(selectedThemeNumber); // Initialize theme option
 changeSpacebar();		// Initialize spacebar option
 changeFont();			// Initialize font option
+changeFont2();			// Initialize font option
 changeFontSize();		// Initialize font size option
 changeAlignment();		// Initialize alignment option
 changeScroll();			// Initialize scroll option
@@ -4658,6 +5619,8 @@ changeSubtitleWidth();
 const controls = [
 	{element: subtitleFontMenu, changeFunction: changeFont},
 	{element: subtitleFontSizeMenu, changeFunction: changeFontSize},
+	{element: subtitleFontMenu2, changeFunction: changeFont2},
+	{element: subtitleFontSizeMenu2, changeFunction: changeFontSize},
 	{element: subtitleAlignmentMenu, changeFunction: changeAlignment},
 	{element: videoSizeMenu, changeFunction: changeVideoSize},
 	{element: subtitleWidthMenu, changeFunction: changeSubtitleWidth},
@@ -4688,8 +5651,7 @@ if (urlParams.has('yturl')) {
 	if ((yturlFirst != yturlLast) || 
 		((yturlFirst != '"') && (yturlFirst != "'"))) {
 			errorMsg = 'DOMInitializations yturl: Quotes missing or mismatched';
-			alert(errorMsg);
-			throw new Error(errorMsg);
+			throwError(errorMsg);
 		}
 	yturl = yturl.substring(1, (yturl.length - 1));	
 	console.log("DOMInitializations  edited yturl = ", yturl);
@@ -4754,6 +5716,37 @@ document.getElementById('splashScreen').remove();
 
 return;
 
+function addSubtitleTableEventListeners (subtitleTableIndex) {
+
+subtitleTable = STTableMetadata[subtitleTableIndex].STTable;
+STTableMetadata[1].STTable = document.getElementById(STTableMetadata[1].STTableId);
+
+subtitleTable.addEventListener('mousedown', (e) => {
+	const cell = e.target.closest('td');
+	if (!cell) {return;}
+	const row = cell.parentElement;
+   	console.log(`EventListener mousedown subtitleTableIndex = ${subtitleTableIndex}`, 
+		`STTableId = ${STTableMetadata[subtitleTableIndex].STTableId}`,
+		`row = ${row.rowIndex}`);
+
+});
+
+subtitleTable.addEventListener('click', (e) => {
+	const cell = e.target.closest('td');
+	if (!cell) {return;}
+	const row = cell.parentElement;
+   	console.log(`EventListener click subtitleTableIndex = ${subtitleTableIndex}`,
+		`\n STTableId = ${STTableMetadata[subtitleTableIndex].STTableId}`,
+		`\n row = ${row.rowIndex} \n cell.textContent: ${cell.textContent}`);
+	selectRow(subtitleTableIndex, row.rowIndex);
+	if ((cell.classList.contains('classSubtitleStart')) || 
+		(cell.classList.contains('classSubtitleEnd'))) {
+		showTimeEditPopup(subtitleTableIndex, row.rowIndex);
+	}
+});
+
+}  // addSubtitleTableEventListeners
+
 function createTimeObject(prefix) {
 
 	let timeObject = {};
@@ -4814,7 +5807,7 @@ function configInitializations() {
 		initError(errorReason);
 	}
 	
-	console.log("Configuration: editEnabled = ", editEnabled);
+	console.log("Initialization: editEnabled = ", editEnabled);
 
 	if (editEnabled) {
 		toggleEditing();
@@ -4839,9 +5832,7 @@ function configInitializations() {
 
 	if (!found) {
 		errorMsg = "configInitializations Invalid theme: " + theme;
-		console.log(errorMsg);
-		alert(errorMsg);
-		throw new Error(errorMsg);
+		throwError(errorMsg);
 	}
 
 	let themeAttributeObject = findThemeAttributeObject(selectedThemeNumber);
@@ -4854,9 +5845,7 @@ function configInitializations() {
 		let themeElement = document.getElementById("theme" + index);
 		if (!themeElement) {
 			errorMsg = "configInitializations HTML element not found: theme" + index;
-			console.log(errorMsg);
-			alert(errorMsg);
-			throw new Error(errorMsg);
+			throwError(errorMsg);
 		}
 		themeElement.textContent = themeAttributesArray[index].themeName;
 		themeElement.style.color = themeAttributesArray[index].foregroundColor;
@@ -4876,7 +5865,7 @@ function configInitializations() {
 		case 'currentLine':
 		case 'loop':
 			spacebarMenu.value = spacebarOption;
-			console.log("Configuration: spacebarOption = " + spacebarMenu.value);
+			console.log("Initialization: spacebarOption = " + spacebarMenu.value);
 			break;
 		default:
 			errorReason = 'spacebarOption = ' + spacebarOption + ' invalid';
@@ -4894,12 +5883,23 @@ function configInitializations() {
 		initError(errorReason);
 	}
 
-	if (!createSubtitleFontOptions(fontList)) {
+	if (typeof selectedFont2 == 'undefined') {
+		errorReason = 'selectedFont2 missing';
+		initError(errorReason);
+	}
+
+	if (!createSubtitleFontOptions(fontList, subtitleFontMenu, selectedFont)) {
 		errorReason = 'selectedFont = ' + selectedFont + ' not in fontList';
 		initError(errorReason);
 	}
 
-	console.log('Configuration: selectedFont = ', selectedFont);
+	if (!createSubtitleFontOptions(fontList, subtitleFontMenu2, selectedFont2)) {
+		errorReason = 'selectedFont2 = ' + selectedFont2 + ' not in fontList';
+		initError(errorReason);
+	}
+
+	console.log('Initialization: selectedFont = ', selectedFont);
+	console.log('Initialization: selectedFont2 = ', selectedFont2);
 
 	if (typeof videoWidthScale == 'undefined') {
 		errorReason = 'videoWidthScale missing';
@@ -4913,7 +5913,7 @@ function configInitializations() {
 		initError(errorReason);
 	}
 
-	console.log("Configuration: videoWidthScale = " + videoSizeMenu.value);
+	console.log("Initialization: videoWidthScale = " + videoSizeMenu.value);
 
 	if (typeof subtitleWidthScale == 'undefined') {
 		errorReason = 'subtitleWidthScale missing';
@@ -4927,7 +5927,7 @@ function configInitializations() {
 		initError(errorReason);
 	}
 
-	console.log("Configuration: subtitleWidthScale = " + subtitleWidthMenu.value);
+	console.log("Initialization: subtitleWidthScale = " + subtitleWidthMenu.value);
 
 	if (typeof fontSize == 'undefined') {
 		errorReason = 'fontSize missing';
@@ -4935,21 +5935,60 @@ function configInitializations() {
 	}
 
 	subtitleFontSizeMenu.value = fontSize;
+	subtitleFontSizeMenu2.value = fontSize;
 
 	if (subtitleFontSizeMenu.value != fontSize){
 		errorReason = 'fontSize = ' + fontSize + ' not in list of allowed values';
 		initError(errorReason);
 	}
 
-	console.log("Configuration: fontSize = " + subtitleFontSizeMenu.value);
+	console.log("Initialization: fontSize = " + subtitleFontSizeMenu.value);
 
 function initError(errorType){
-	errorMsg = 'Configuration error. ' + errorType + '\nCheck config.js';
-	alert(errorMsg);
-	throw new Error(errorMsg);
+	errorMsg = 'Initialization error. ' + errorType + '\nCheck config.js';
+	throwError(errorMsg);
 }
 
 }  // configInitializations
+
+function checkBrowser() {
+
+	// Source: https://www.geeksforgeeks.org/javascript/how-to-detect-the-user-browser-safari-chrome-ie-firefox-and-opera-using-javascript/
+
+	userAgentString = navigator.userAgent;
+	chromeAgent = userAgentString.indexOf("Chrome") > -1;
+	IExplorerAgent = userAgentString.indexOf("MSIE") > -1 || userAgentString.indexOf("rv:") > -1;
+	firefoxAgent = userAgentString.indexOf("Firefox") > -1;
+	safariAgent = userAgentString.indexOf("Safari") > -1;
+	if ((chromeAgent) && (safariAgent)) 
+		safariAgent = false;
+	operaAgent = userAgentString.indexOf("OP") > -1;
+	if ((chromeAgent) && (operaAgent)) 
+		chromeAgent = false;
+
+	// Source: https://www.testmuai.com/learning-hub/file-system-access-api-browser-support/
+
+	const pickers = ["showOpenFilePicker", "showSaveFilePicker", "showDirectoryPicker"];
+	const supported = pickers.filter((method) => method in window);
+
+	if (supported.length === pickers.length) {
+		console.log("File System Access API pickers available:", supported.join(", "));
+		fileAPIPickersSupported = true;
+	} else if (supported.length > 0) {
+		console.log("Partial support. Available:", supported.join(", "));
+	} else {
+		console.log("File System Access API pickers are not supported in this browser.");
+	}
+
+	// Separate check for the Origin Private File System half of the API.
+	if (navigator.storage && "getDirectory" in navigator.storage) {
+		console.log("OPFS is available via navigator.storage.getDirectory().");
+		OPFSAvailable = true;
+	} else {
+		console.log("OPFS is not supported.");
+	}
+	
+}
 
 } // DOMInitializations
 
@@ -5033,4 +6072,5 @@ CaretUtil.createRange = function(node,chars,range) {
 	return range;
 };
 
-} 
+
+}
