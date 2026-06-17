@@ -294,9 +294,20 @@ video::-webkit-media-controls-panel {
 
 .videoArea {
 	display: none;
+	position: absolute;
+	bottom: 0;      /* Pins the video to the bottom of div1 */
+	left: 0;
 	width: 100%;
 	height: auto;
 	preload: auto;
+}
+
+#playerWrapper {
+	position: absolute;
+	bottom: 0;      /* Pins the video to the bottom of div1 */
+	left: 0;
+	width: 100%;
+	height: auto;
 }
 
 /* ----------- seekBar ----------- */
@@ -709,10 +720,11 @@ select {
     height: auto;
 	padding: none;
     position: absolute; 
-    /* text-align:center; */
-    top: 65%;
+    font-family: Arial, sans-serif;
+	font-size: 1rem;
+	top: 65%;
 	left: 50%;
-    width: 800px; /* 740px;*/
+    width: 810px; /* 740px;*/
     z-index: 9000;
     background-color: #fff; 
 	/* border: 1px solid black; */
@@ -744,6 +756,7 @@ select {
 	display: flex;
 	flex-direction: row;
 	float: left;
+	font-size: 1rem;
 	width: 100%;
 	height: fit-content;
 	cursor: move;
@@ -954,12 +967,19 @@ select {
 
 .themeList-dropdown-option:active {background-color: hsl(182, 87%, 37%);}
 
+.subtitleTableSection {
+}
+
 .subtitleTableDiv {
 	margin: 0;
 	padding-left: 2px; 
 	overflow-y: auto; 
 	height: 1rem; 
 	display: none;
+}
+
+.subtitleTrackHeader {
+	width: 6%;
 }
 
 .notDisplayed {
@@ -969,3 +989,70 @@ select {
 .selected {
 	background-color: #c71f1f; 
 }
+
+.notification {
+    /* background-color:rgba(0,0,0,.4); */
+    display: none;
+    height: auto;
+	min-height: 10rem;
+	padding: none;
+    position: absolute; 
+    font-family: Arial, sans-serif;
+    top: 50%;
+	left: 50%;
+    width: max-content;
+	z-index: 9000;
+    background-color: #fff; 
+	color: black;
+	/* border: 1px solid black; */
+	box-shadow: 5px 5px 10px hsla(241, 86%, 77%, 0.431);
+    border-radius: 8px;
+	-webkit-user-select: none; /* Safari */
+	-ms-user-select: none; /* IE 10 and IE 11 */
+	user-select: none; /* Standard syntax */
+}
+
+.notificationHeader {
+    display: flex;
+	flex-direction: row;
+	background-color: #001858;
+	width: 100%;
+	height: fit-content;
+	margin-bottom: 3px;
+    border-radius: 4px;
+}
+
+.notificationLabel {
+	padding: 0;
+	display: flex;
+	flex-direction: row;
+	float: left;
+	width: 100%;
+	height: fit-content;
+	cursor: move;
+	z-index: 10;
+	margin-bottom: 3px;
+	background-color: #001858;
+	color: #fff;
+	border-radius: 4px;
+}
+
+.notificationX {
+	/* float: right; */
+	color: #fff;
+	max-width: 2rem; /* 5%; */
+	font-size: 1rem;
+	cursor: pointer;
+	border: 2px solid rgba(146, 210, 16, 0.439);
+}
+
+#notificationMsg {
+	/* text-align:center; */
+	padding: 1rem;
+	font-weight: bold;
+	font-size: 1rem;
+	margin-right: 0.5rem;
+	/* vertical-align: middle; */
+}
+
+
