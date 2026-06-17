@@ -44,7 +44,9 @@
 <div id="pageTitleWrapper" class="pageTitleWrapper">
 <div id="pageTitle" class="pageTitle"><b>Subtitle Player & Editor for Browsers</b></div>
 </div>
+<div id="playerWrapper">
 <div id="player"></div>
+</div>
 <div id="videoFileInputDiv">
 	<input id="videoFileInput" type="file" accept=".mp4,.mp3" class="videoFileInput" 
 		onchange="loadVideoFile(this.files[0])" >
@@ -57,11 +59,11 @@
 	<div>Or paste a YouTube link:<br></div>
 	<input type="url" id="videoURLInput" name="videoURLInput" 
 		placeholder="Insert YouTube url" class="videoURLInput">
-	<div id="videoURLButton" class="vidButton">Submit</div><br><br><br>
+	<div id="videoURLButton" class="vidButton">Submit</div><br>
 </div>
 <div style="bottom: 0%;">
 	<input type="checkbox" id="myCheck20" onclick="enableFields(myCheck20)">
-	<label for="displayVideoControls" class="selectOption">Display native video controls</label>
+	<label for="myCheck20" class="selectOption">Display native video controls</label>
 </div>
 </div>
 <video id="videoArea" class="videoArea" disablePictureInPicture>
@@ -83,7 +85,7 @@
 	width: 50%; margin-top: 0; margin-bottom: 0px;
 	margin-left: auto; margin-right: auto; align-items: center;">
 <span contenteditable="false" style="text-wrap: balance; padding-left: 5px;
-	padding-right: 5px; min-width: 50px;" id="spanSubtitle1"></span><br>
+	padding-right: 5px; min-width: 50px; caret-shape: block;" id="STSpan1"></span><br>
 </div>
 
 <!-- marginLine2 -->
@@ -95,7 +97,7 @@
 	width: 50%; margin-top: 0; margin-bottom: 0;
 	margin-left: auto; margin-right: auto; align-items: center;">
 <span contenteditable="false" style="text-wrap: balance; padding-left: 5px;
-	padding-right: 5px; min-width: 50px;" id="spanSubtitle2"></span><br>
+	padding-right: 5px; min-width: 50px; caret-shape: block;" id="STSpan2"></span><br>
 </div>
 
 <!-- Video counter -->
@@ -144,20 +146,37 @@
 <div id="marginLine3" style="position: relative; min-height: 1rem; width: 100%;"></div>
 
 <!-- Subtitle Table div -->
-<div id="subtitleTableDiv" class="subtitleTableDiv">
-<table class="table" id="subtitleTable">
-            <thead id="subtitleTableHeader">
+<div id="subtitleTableSection" class="subtitleTableSection">
+<div id="subtitleTableDiv0" class="subtitleTableDiv">
+<table class="table" id="subtitleTable0">
+            <thead>
                 <tr style="font-weight: bold; font-size: 1.5rem; padding: 0px;">
-                    <th scope="col" style="width: 3%" id="subtitleNumber">#</th>
-                    <th scope="col" style="width: 6%" id="subtitleStart">Start</th>
-                    <th scope="col" style="width: 6%" id="subtitleEnd">End</th>
-                    <th scope="col" style="width: 6%" id="subtitleTrackField">Track</th>
-                    <th scope="col" style="width: 79%" id="subtitleText">Subtitle</th>
+                    <th scope="col" style="width: 3%">#</th>
+                    <th scope="col" style="width: 6%">Start</th>
+                    <th scope="col" style="width: 6%">End</th>
+                    <th scope="col" style="width: 6%" id="subtitleTrackHeader0">Track</th>
+                    <th scope="col" style="width: 79%">Subtitle</th>
                 </tr>
             </thead>
-            <tbody id="subtitleTbody">
+            <tbody id="subtitleTbody0">
             </tbody>
         </table>
+</div>
+<div id="subtitleTableDiv1" class="subtitleTableDiv">
+<table class="table" id="subtitleTable1">
+            <thead>
+                <tr style="font-weight: bold; font-size: 1.5rem; padding: 0px;">
+                    <th scope="col" style="width: 3%">#</th>
+                    <th scope="col" style="width: 6%">Start</th>
+                    <th scope="col" style="width: 6%">End</th>
+                    <th scope="col" style="width: 6%" id="subtitleTrackHeader1">Track</th>
+                    <th scope="col" style="width: 79%">Subtitle</th>
+                </tr>
+            </thead>
+            <tbody id="subtitleTbody1">
+            </tbody>
+        </table>
+</div>
 </div>
 
 <!-- End-of-table delimiter -->
@@ -167,7 +186,7 @@
 <div class="timeEditPopupThumb" id="timeEditPopupThumb"></div>
 <div class="timeEditPopup" id="timeEditPopup">
 <div class="timeEditPopupHeaderBlock">
-	<div class="timeEditPopupLabel">Editing</div>
+	<div class="timeEditPopupLabel">Editing<span id="timeEditPopupTrackInfo"></span></div>
 	<div style="float: right; display: flex; flex-direction: row;">
 	<div class="timeEditPopupV color3" id="timeEditPopupV" onclick="toggleHideShow('timeEditPopupV')">👁</div>
 	<div class="timeEditPopupO color3" id="timeEditPopupO" onclick="toggleHideShow('timeEditPopupO')">◯</div>
@@ -403,7 +422,8 @@
 </div>  <!-- timeEditPopupWrapper -->
 <div class="textEditPopupWrapper">
 	<span class="hovertext1" data-hover="Play the selection and pause">
-	<div class="textEditPopupTitle color1" id="textEditPopupPlaySingle" onclick="textEditPopupAction('playSingle')"">Play Single</div>
+	<div class="textEditPopupTitle color1" id="textEditPopupPlaySingle" 
+		onclick="textEditPopupAction('playSingle')"">Play Single</div>
 	</span>
 	<div class="textEditButtonColumn">
 		<div class="textEditPopupButton1">
@@ -440,8 +460,7 @@
 			onclick="textEditPopupAction('delete')">Delete</button>
 		</span>
 		</div>
-	</div>
-	<!-- textEditButtonColumn -->
+	</div> 	<!-- textEditButtonColumn -->
 	<div class="textEditButtonColumn">
 		<div class="textEditPopupButton1">
 		<span class="hovertext1" data-hover="Select the next subtitle">
@@ -532,10 +551,13 @@
 		<input id="subtitleFileInput2" type="file" accept=".ass,.srt" style="display:none"
 			onchange="loadSubtitleFile(2, this.files[0])" >
 		<span class="hovertext1" data-hover="Load subtitles from 1 file">
-		<div class="general-dropdown-option" onclick="clickSubtitleFileInput(1)">Load 1 file</div>
+		<div class="general-dropdown-option" onclick="clickSubtitleFileInput(1, 1)">1 file</div>
 		</span>
 		<span class="hovertext1" data-hover="Load subtitles from 2 files and interleave them">
-		<div class="general-dropdown-option" onclick="clickSubtitleFileInput(2)">Load 2 files</div>
+		<div class="general-dropdown-option" onclick="clickSubtitleFileInput(2, 1, 'twinned')">2 twinned files</div>
+		</span>
+		<span class="hovertext1" data-hover="Load 2 independent subtitle files into 2 columns">
+		<div class="general-dropdown-option" onclick="clickSubtitleFileInput(2, 2)">2 independent files</div>
 		</span>
 		</span>
 		<!-- Dropdown Unit End -->
@@ -653,6 +675,49 @@
 		<!-- Dropdown Unit End -->
 		<!-- Dropdown Unit Start -->
 		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Select the font of the featured subtitle">
+			<span class="settings-dropdown-option">Font 2</span>
+			<span class="dropright">
+			<select id="subtitleFontMenu2" class="selectClass" style="position: relative;">
+			</select>
+			</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
+		<span class="hovertext" data-hover="Change the font size of the featured subtitle">
+			<span class="settings-dropdown-option">Font 2 Size</span>
+		<span class="dropright">
+			<select id="subtitleFontSizeMenu2" class="selectClass" style="position: relative;">
+			<option class="selectOption" value="100%">100%</option>
+			<option class="selectOption" value="110%">110%</option>
+			<option class="selectOption" value="120%">120%</option>
+			<option class="selectOption" value="130%">130%</option>
+			<option class="selectOption" value="140%">140%</option>
+			<option class="selectOption" value="150%">150%</option>
+			<option class="selectOption" value="160%">160%</option>
+			<option class="selectOption" value="170%">170%</option>
+			<option class="selectOption" value="180%">180%</option>
+			<option class="selectOption" value="190%">190%</option>
+			<option class="selectOption" value="200%">200%</option>
+			<option class="selectOption" value="210%">210%</option>
+			<option class="selectOption" value="220%">220%</option>
+			<option class="selectOption" value="230%">230%</option>
+			<option class="selectOption" value="240%">240%</option>
+			<option class="selectOption" value="250%">250%</option>
+			<option class="selectOption" value="260%">260%</option>
+			<option class="selectOption" value="270%">270%</option>
+			<option class="selectOption" value="280%">280%</option>
+			<option class="selectOption" value="290%">290%</option>
+			<option class="selectOption" value="300%">300%</option>
+			</select>
+		</span>
+		</span>
+		</span><br>
+		<!-- Dropdown Unit End -->
+		<!-- Dropdown Unit Start -->
+		<span class="settings-dropdown-unit">
 		<span class="hovertext" data-hover="Set the action performed when the space bar is pressed">
 			<span class="settings-dropdown-option">Space Bar</span>
 		<span class="dropright">
@@ -698,6 +763,7 @@
 		<span class="themeList-dropdown-option" id="theme5">x</span> 
 		<span class="themeList-dropdown-option" id="theme6">x</span> 
 		<span class="themeList-dropdown-option" id="theme7">x</span> 
+		<span class="themeList-dropdown-option" id="theme8">x</span> 
 		<!-- Dropdown Unit End -->
 		</span> <!-- class="themeList-dropdown-unit" -->
 		</span> <!-- class="themeList-dropdown-block" -->
@@ -892,10 +958,12 @@
 		<span class="hovertext1" data-hover="Save track 2 to a .srt file">
 		<div class="general-dropdown-option" onclick="saveFile(2)">Track 2</div>
 		</span>
+		<div id="saveBothTracks">
 		<span class="hovertext1" data-hover="Save tracks 1 & 2 to separate .srt files">
 		<div class="general-dropdown-option" 
-			onclick="saveFile(1, 'lock'); setTimeout(() => {saveFile(2)}, 2000);">Tracks 1 & 2</div>
+			onclick="saveBothFiles()">Tracks 1 & 2</div>
 		</span>
+		</div>
 		</div>  <!-- Dropdown Unit End -->
 		</div>  <!-- general-dropdown-block -->
 	</div>  <!-- class="general-dropdown-wrapper"-->
@@ -904,6 +972,7 @@
 		<div class="button color4" onclick="newFile()">New File</div>
 	</div>  <!-- class="general-dropdown-wrapper"-->
 
+	<!--
 	<div class="general-dropdown-wrapper">
 		<div class="help-button button color4">?</div>
 	</div>  <!-- class="general-dropdown-wrapper"-->
@@ -918,6 +987,33 @@
 	<button class="button color3"
 		onclick="changeRange('clear')">Reset</button>
 	</span>
+</div>
+
+<div class="notification" id="notification">
+<div class="notificationHeader">
+	<div class="notificationLabel">Notification<span id="notificationInfo"></span></div>
+	<div style="float: right; display: flex; flex-direction: row;">
+	<div class="notificationX" id="notificationX">X</div>
+	</div>
+</div>
+<div style="padding: 1rem;">
+<div id="notificationDiv1"></div>
+<div id="notificationDiv2"></div>
+<div id="notificationDiv3"></div>
+</div>
+</div>
+
+<div class="notification" id="fileNotification">
+<div class="notificationHeader">
+	<div class="notificationLabel">Notification<span id="fileNotificationInfo"></span></div>
+	<div style="float: right; display: flex; flex-direction: row;">
+	</div>
+</div>
+<div style="padding: 1rem;">
+<div id="fileNotificationDiv1"></div>
+<div id="fileNotificationDiv2"></div>
+<div id="fileNotificationDiv3"></div>
+</div>
 </div>
 
 </body>
