@@ -369,7 +369,8 @@ video::-webkit-media-controls-panel {
 	text-decoration: none;
 	font-family: Arial; 
 	font-size: 1rem;
-	min-width: 4rem;
+	white-space: nowrap;
+	/* min-width: max(4rem, max-content); */
 	margin: 0px 2px;
 	cursor: pointer;
 	transition: background-color 0.25s;
@@ -483,7 +484,11 @@ select {
 
 .general-dropdown-wrapper {
 	position: relative;
-	display: inline-block;
+	display: flex; /* inline-block; */
+	flex-direction: column;	
+	width: fit-content;
+	margin: 0;
+	padding: 0;
 }
 
 .general-dropdown-wrapper:hover .general-dropdown-block {display: block;}
@@ -541,6 +546,11 @@ select {
     left: 100%;
     top: 0%;
     margin-left: 0.125rem;
+}
+
+.dropdown {
+	left: 0;
+	top: 1.25rem;
 }
 
 .dropup {
@@ -648,10 +658,11 @@ select {
 	color: black;
 	background-color:white;
 	padding: 0; 
-	text-align: center;
+    justify-content: center;
 	display: inline;
 	font-size: 1.5rem;
-	margin: 0px 2px 0px 2px; 
+	/* margin: 0px 2px 0px 2px;  */
+	padding-left: .6rem;
 	cursor: pointer;
 }
 
@@ -675,6 +686,7 @@ select {
 	display: flex;
 	justify-content: center;
 	margin: 0px 0px .6rem 0px;
+	padding: 1px 20px 1px 20px; /* top right bottom left */
     border-radius: 8px;
 	cursor: pointer;
 	transition: background-color 0.25s;
@@ -688,7 +700,8 @@ select {
 .timeDigit1,
 .timeDigit2,
 .timeDigit3 {
-	margin: .6rem 0px .6rem 0px;
+	/* margin: .6rem 0px .6rem 0px;*/
+	padding-left: .3rem;
 	font-size: 1.75rem;
 	color: #000; 
 }
@@ -717,6 +730,8 @@ select {
 .timeEditPopup{
     /* background-color:rgba(0,0,0,.4); */
     display: none;
+	flex-direction: column;
+	width: fit-content;
     height: auto;
 	padding: none;
     position: absolute; 
@@ -724,7 +739,6 @@ select {
 	font-size: 1rem;
 	top: 65%;
 	left: 50%;
-    width: 810px; /* 740px;*/
     z-index: 9000;
     background-color: #fff; 
 	/* border: 1px solid black; */
@@ -739,20 +753,21 @@ select {
 .timeEditPopupWrapper {
 	background-color: #fff; 
     /* box-shadow: 10px 10px 10px #555; */
-    display: inline-block;
+    display: flex;
+	width: fit-content;
     height: auto;
-    max-width: 280px;
-    min-height: 200px;
+    /* max-width: auto; /*280px; */
+    /* min-height: 200px;
     vertical-align: top;
     width: auto; /* 100%; */
     position: relative;
     border-radius: 8px;
 	border: 1px solid black;
-    padding: 15px 2% 15px 2%;
+	padding: 10px 20px 10px 15px; /* top right bottom left */
 }
 
 .timeEditPopupLabel {
-	padding: 0;
+	padding-left: 2px;
 	display: flex;
 	flex-direction: row;
 	float: left;
@@ -764,7 +779,6 @@ select {
 	margin-bottom: 3px;
 	background-color: #001858;
 	color: #fff;
-	border-radius: 4px;
 }
 
 .timeEditPopupHeaderBlock {
@@ -773,8 +787,9 @@ select {
 	background-color: #001858;
 	width: 100%;
 	height: fit-content;
-	margin-bottom: 3px;
-    border-radius: 4px;
+	padding-top: 2px;
+	/* margin-bottom: 3px; */
+    /* border-radius: 4px; */
 }
 
 .timeEditPopupV,
@@ -785,40 +800,41 @@ select {
 	max-width: 2rem; /* 5%; */
 	font-size: 1rem;
 	cursor: pointer;
-	border: 2px solid rgba(146, 210, 16, 0.439);
+	border: 1px solid rgba(142, 75, 204, 0.439);
 }
 
 /* timeEditPopup END */
 
-/* textEditPopup BEGIN */
+/* textEditPopupWrapper BEGIN */
 
 
 .textEditPopupWrapper {
+    width: fit-content; /* 100%; */ /* auto;*/ /* 100%; */
 	background-color: #fff; 
+    display: flex;
     /* box-shadow: 10px 10px 10px #555; */
-    display: inline-block;
     height: auto;
-    max-width: 300px;
-    min-height: 200px;
+    /* max-width: 300px; */
+    /* min-height: 200px; */
     vertical-align: top;
     /* align-items: top; */
-    width: 100%; /* auto;*/ /* 100%; */
-    position: relative; 
     border-radius: 8px;
 	border: 1px solid black;
-    padding: 15px 2% 15px 2%;
+	padding: 10px 5px 10px 5px; /* top right bottom left */
 }
 
 
 
 .textEditButtonColumn {
     vertical-align: top;
-	padding-left: 0;
+	padding-left: 0px;
+	padding-right: 35px;
 	margin-left: 0;
-    display: inline-block;
-	width: 48%;
+    display: flex;
+	flex-direction: column;
+	width: fit-content; /*48%;*/
     height: auto; /* 100%; */
-	/* border: 1px solid #333333; */
+	/* border: 1px solid #333333;  */
 }
 
 
@@ -828,7 +844,9 @@ select {
 	color: white;
 	display: flex;
 	justify-content: center;
-	margin: 0px 0px .6rem 0px;
+	white-space: nowrap;
+	margin: 0; /* 0px 0px .6rem 0px; */
+	padding: 1px 20px 1px 20px; /* top right bottom left */
     border-radius: 8px;
 	cursor: pointer;
 	transition: background-color 0.25s;
@@ -842,15 +860,16 @@ select {
 {
 	color: black;
 	background-color:white;
-	padding: 0; 
-	text-align: center;
+	padding: 0px 2px 10px 2px; /* top right bottom left */
+	/* text-align: center; */
 	display: flex; /* inline-block; */
+	width: fit-content;
 	font-size: 1.5rem;
-	margin: 0px 2px 8px 2px; 
+	/* margin: 0px 2px 8px 2px; */
 	cursor: pointer;
 }
 
-/* textEditPopup END */
+/* textEditPopupWrapper END */
 
 /* dashboard BEGIN */
 
@@ -1056,3 +1075,40 @@ select {
 }
 
 
+  /* The outer container */
+  .row-container {
+    display: grid;
+    /* 1fr auto 1fr ensures the center remains at the absolute midpoint */
+    grid-template-columns: 1fr auto 1fr;
+    background-color: white;
+    align-items: center;
+    width: 100%;
+    height: 60px; /* Optional: adjust height as needed */
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  /* Shared styles for the 3 inner divs */
+  .inner-box {
+    /* background-color: black;*/
+    color: white;
+    /* padding: 8px 15px; */
+    font-family: sans-serif;
+	font-size: 1.25rem;
+    white-space: nowrap; /* Keeps title on one line */
+  	padding: 1px 5px 1px 5px; /* top right bottom left */
+    border-radius: 8px;
+}
+
+  /* Alignment for the inner boxes within their grid cells */
+  .left {
+    justify-self: start; /* Align to the far left */
+  }
+
+  .center {
+    justify-self: center; /* Absolute center of the row */
+  }
+
+  .right {
+    justify-self: end; /* Align to the far right */
+  }
