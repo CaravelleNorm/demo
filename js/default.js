@@ -209,7 +209,7 @@ const loadFontFileOptionText = 'Load Font List from a File';
 let callUpdateTimeTimeoutId;
 const checkTimeInterval = 200;
 const updateTimeInterval = 1000;
-let rectifySubtitleStartEnabled = false;
+let rectifySubtitleStartEnabled = true; 
 let timeEditPopupRow = 0;
 let timeEditPopupSubtitleTrack = null;
 let timeEditPopupTableIndex = null;
@@ -3364,8 +3364,9 @@ async function loadSubtitleFile(trackNumber, file) {
 		console.log("loadSubtitleFile mergeDataArray[1] = ", mergeDataArray[1]);
 		const subtitleTableIndex = TrkFileMetadata[mergeDataArray[0].trackIndex].STTableIndex;
 		const tableData = STTableMetadata[subtitleTableIndex];  
-		tableData.tbodyFragment = document.createDocumentFragment();
+		tableData.tbodyFragment = null;
 		tableData.tbodyFragmentCounter = 0;
+		tableData.tbodyFragment = document.createDocumentFragment();
 		let mergeDataArrayLast = mergeDataArray.length - 1;
 		for (let index = 0; index <= mergeDataArrayLast; index++) {
 			let dataElement = mergeDataArray[index];
@@ -3808,6 +3809,12 @@ function deleteSubtitleTable(subtitleTableIndex) {
 	tableData.subtitleStartSeconds = [];
 	tableData.subtitleEndSeconds = [];
 	tableData.subtitleTrack = [];
+	
+	tableData.tbodyFragment = null;
+	tableData.tbodyFragmentCounter = 0;
+	tableData.tbodyFragment = document.createDocumentFragment();
+
+	console.log("deleteSubtitleTable tableData ", tableData);
 }
 
 function newFile() {
@@ -3823,8 +3830,9 @@ function newFile() {
 		if (!confirm("Discard all present subtitles and begin a new file?")) {
     		return;
 		}
-		deleteAllSubtitleTables();
 	} 
+
+	deleteAllSubtitleTables();
 
 	const trackIndex = 0;  // New track will be track 0
 	const trackData = TrkFileMetadata[trackIndex];
@@ -3846,7 +3854,15 @@ function newFile() {
 
 	trackData.loaded = true;
 
-	createSubtitleRow(rowObject, TrkFileMetadata[0].STTableIndex, 1);
+	createSubtitleRow(rowObject, subtitleTableIndex, 1);
+
+	if (tableData.tbodyFragmentCounter != 0) {
+		tableData.STTable.tBodies[0].appendChild(tableData.tbodyFragment);
+		tableData.tbodyFragment = null;
+		tableData.tbodyFragmentCounter = 0;
+		// await yieldToMain();
+		// requestAnimationFrame(renderMsg);
+	}
 
 	totalNumberOfSubtitlesRead = 1;
 	selectedSubtitleTableIndex = trackIndex;
@@ -5679,7 +5695,8 @@ myCheck05 = document.getElementById("myCheck05");
 myCheck06 = document.getElementById("myCheck06");
 myCheck07 = document.getElementById("myCheck07");
 myCheck08 = document.getElementById("myCheck08");
-myCheck09 = document.getElementById("myCheck00");
+myCheck08.checked = true; // ?? create config keyword to control rectifySubtitleStartEnabled
+myCheck09 = document.getElementById("myCheck09");
 myCheck10 = document.getElementById("myCheck10");
 myCheck20 = document.getElementById("myCheck20");
 
